@@ -1,17 +1,302 @@
-site_name: CRIOBE Documentation
-site_description: Technical guides for CVAT bridge deployment, Nuclio setup, and related tooling.
+# MkDocs Configuration for CRIOBE Documentation
+# Version: 1.0
+# Last Updated: 2025-10-28
+
+# Site Information
+site_name: CRIOBE Coral Segmentation
+site_description: Complete documentation for the CRIOBE automated coral reef monitoring and segmentation pipeline
+site_author: CRIOBE Research Team
+site_url: https://criobe.github.io/coral-segmentation/  # Update with your actual URL
+
+# Repository Information
+repo_name: criobe/coral-segmentation
+repo_url: https://github.com/criobe/coral-segmentation  # Update with your actual repo
+edit_uri: edit/main/documentation/docs/
+
+# Copyright
+copyright: Copyright &copy; 2025 CRIOBE Research Team
+
+# Documentation Directory
 docs_dir: docs
+site_dir: site
+
+# Theme Configuration
 theme:
   name: material
+  language: en
+
+  # Color Palette
+  palette:
+    # Light mode
+    - scheme: default
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  # Fonts
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+  # Logo and Favicon
+  # logo: assets/images/logo.png  # Uncomment and add your logo
+  # favicon: assets/images/favicon.png  # Uncomment and add your favicon
+
+  # Icons
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+  # Features
+  features:
+    # Navigation
+    - navigation.instant        # Instant loading (SPA-like)
+    - navigation.instant.progress  # Loading progress indicator
+    - navigation.tracking       # URL updates with scroll
+    - navigation.tabs          # Top-level sections as tabs
+    - navigation.tabs.sticky   # Tabs always visible
+    - navigation.sections      # Navigation sections
+    - navigation.expand        # Expand navigation by default
+    - navigation.path          # Breadcrumbs
+    - navigation.indexes       # Section index pages
+    - navigation.top           # Back to top button
+    - navigation.footer        # Previous/next navigation in footer
+
+    # Table of Contents
+    - toc.follow               # TOC follows scroll
+    - toc.integrate            # TOC integrated in navigation
+
+    # Search
+    - search.suggest           # Search suggestions
+    - search.highlight         # Highlight search terms
+    - search.share             # Share search results
+
+    # Header
+    - header.autohide          # Auto-hide header on scroll
+
+    # Content
+    - content.code.copy        # Copy button for code blocks
+    - content.code.select      # Select code blocks
+    - content.code.annotate    # Code annotations
+    - content.tabs.link        # Link content tabs
+    - content.tooltips         # Improved tooltips
+    - content.action.edit      # Edit this page button
+    - content.action.view      # View source button
+
+# Plugins
+plugins:
+  # Search plugin
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+      lang: en
+
+  # Git revision date (shows last updated)
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+      fallback_to_build_date: true
+
+  # Redirects (for URL restructuring)
+  - redirects:
+      redirect_maps:
+        # Migrate old docs to new structure
+        'en/setup_cvat_with_nuclio_and_bridge.md': 'setup/installation/cvat-nuclio.md'
+        'en/coral_segmentation_pipeline.md': 'user-guide/concepts/pipeline-overview.md'
+        'en/bridge/index.md': 'user-guide/modules/bridge.md'
+
+# Markdown Extensions
+markdown_extensions:
+  # Python Markdown Extensions
+  - abbr                        # Abbreviations
+  - admonition                  # Admonitions (note, warning, etc.)
+  - attr_list                   # Attribute lists for styling
+  - def_list                    # Definition lists
+  - footnotes                   # Footnotes
+  - md_in_html                  # Markdown in HTML
+  - tables                      # Tables
+  - toc:                        # Table of contents
+      permalink: true
+      permalink_title: Anchor link to this section
+      toc_depth: 3
+
+  # PyMdown Extensions
+  - pymdownx.arithmatex:        # Math equations
+      generic: true
+  - pymdownx.betterem:          # Better emphasis
+      smart_enable: all
+  - pymdownx.caret              # Superscript (^)
+  - pymdownx.mark               # Highlight (==)
+  - pymdownx.tilde              # Subscript (~)
+  - pymdownx.critic             # Track changes
+  - pymdownx.details            # Collapsible details
+  - pymdownx.emoji:             # Emojis
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:         # Code highlighting
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite       # Inline code highlighting
+  - pymdownx.keys               # Keyboard keys
+  - pymdownx.magiclink:         # Auto-link URLs
+      repo_url_shorthand: true
+      user: criobe
+      repo: coral-segmentation
+  - pymdownx.smartsymbols       # Smart symbols
+  - pymdownx.snippets:          # Include file snippets
+      check_paths: true
+      # auto_append:
+      #   - includes/abbreviations.md  # Uncomment when abbreviations file is ready
+  - pymdownx.superfences:       # Nested code blocks
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:            # Tabbed content
+      alternate_style: true
+  - pymdownx.tasklist:          # Task lists
+      custom_checkbox: true
+
+# Extra CSS and JavaScript
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/extra.js
+  # MathJax for math equations
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+# Extra Configuration
+extra:
+  # Social Links
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/criobe/coral-segmentation
+      name: GitHub Repository
+    # Add more social links as needed
+    # - icon: fontawesome/brands/twitter
+    #   link: https://twitter.com/criobe
+    # - icon: fontawesome/brands/linkedin
+    #   link: https://linkedin.com/company/criobe
+
+  # Version
+  version:
+    provider: mike
+    default: latest
+
+  # Announcement bar (uncomment to use)
+  # announcement:
+  #   text: "🎉 CRIOBE v2.0 is now available! <a href='changelog.md'>See what's new</a>"
+
+  # Analytics (uncomment and configure)
+  # analytics:
+  #   provider: google
+  #   property: G-XXXXXXXXXX
+
+  # Consent (for GDPR compliance)
+  consent:
+    title: Cookie Consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+
+# Navigation Structure
 nav:
-  - Overview: index.md
-  - English:
-      - Coral Segmentation Pipeline: en/coral_segmentation_pipeline.md
-      - Platform Setup:
-          - CVAT + Nuclio Setup: en/setup_cvat_with_nuclio_and_bridge.md
-          - Bridge:
-              - Overview: en/bridge/index.md
-              - Deployment: en/bridge/deployment.md
-              - Operations: en/bridge/operations.md
-              - Troubleshooting: en/bridge/troubleshooting.md
-          - Serverless Setup: en/setup_nuclio.md
+  - Home: index.md
+
+  - Quickstart:
+    - quickstart/index.md
+    - 5-Minute Demo: quickstart/5-minute-demo.md
+    - First Annotation: quickstart/first-annotation.md
+
+  - Setup:
+    - setup/index.md
+    - Requirements: setup/requirements.md
+    - Installation:
+      - setup/installation/index.md
+      - Pixi Environment: setup/installation/pixi-environment.md
+      - CVAT & Nuclio: setup/installation/cvat-nuclio.md
+      - Bridge Service: setup/installation/bridge-service.md
+      - ML Models: setup/installation/ml-models.md
+    - Configuration:
+      - setup/configuration/index.md
+      - Environment Variables: setup/configuration/environment-variables.md
+      - CVAT Projects: setup/configuration/cvat-projects.md
+      - Webhooks: setup/configuration/webhooks.md
+      - Nuclio Functions: setup/configuration/nuclio-functions.md
+    - Deployment:
+      - setup/deployment/index.md
+      - Docker Compose: setup/deployment/docker-compose.md
+      - Networking: setup/deployment/networking.md
+
+  - User Guide:
+    - user-guide/index.md
+    - Concepts:
+      - user-guide/concepts/index.md
+      - Pipeline Overview: user-guide/concepts/pipeline-overview.md
+      - Datasets: user-guide/concepts/datasets.md
+      - Taxonomies: user-guide/concepts/taxonomies.md
+      - Workflows: user-guide/concepts/workflows.md
+    - Tutorials:
+      - user-guide/tutorials/index.md
+      - Complete Pipeline: user-guide/tutorials/complete-pipeline.md
+      - Grid Detection: user-guide/tutorials/grid-detection.md
+      - Coral Segmentation (YOLO): user-guide/tutorials/coral-segmentation-yolo.md
+      - Coral Segmentation (DINOv2): user-guide/tutorials/coral-segmentation-dinov2.md
+      - Data Preparation: user-guide/tutorials/data-preparation.md
+      - Model Training: user-guide/tutorials/model-training.md
+      - Model Evaluation: user-guide/tutorials/model-evaluation.md
+    - How-To Guides:
+      - user-guide/how-to/index.md
+      - Annotate in CVAT: user-guide/how-to/annotate-in-cvat.md
+      - Run Inference: user-guide/how-to/run-inference.md
+      - Export Annotations: user-guide/how-to/export-annotations.md
+      - Manage Datasets: user-guide/how-to/manage-datasets.md
+      - Visualize Results: user-guide/how-to/visualize-results.md
+    - Modules:
+      - user-guide/modules/index.md
+      - Bridge: user-guide/modules/bridge.md
+      - Data Engineering: user-guide/modules/data-engineering.md
+      - Grid Pose Detection: user-guide/modules/grid-pose-detection.md
+      - Grid Inpainting: user-guide/modules/grid-inpainting.md
+      - Coral Segmentation (YOLO): user-guide/modules/coral-seg-yolo.md
+      - Coral Segmentation (DINOv2): user-guide/modules/dinov2-mmseg.md
+
+  - Developer Guide:
+    - developer-guide/index.md
+    - Architecture: developer-guide/architecture.md
+    - Contributing: developer-guide/contributing.md
+    - Code Style: developer-guide/code-style.md
+
+  - Community:
+    - community/index.md
+    - Getting Help: community/getting-help.md
+    - Publications: community/publications.md
+    - Citations: community/citations.md
+
+# Validation
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+    absolute_links: warn
+  links:
+    not_found: warn
+    absolute_links: warn
+    unrecognized_links: warn
+
+# Strict mode for production builds
+strict: true

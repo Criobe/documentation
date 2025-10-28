@@ -1,0 +1,103 @@
+/* Custom CSS for CRIOBE Documentation */
+
+/* Brand colors - customize as needed */
+:root {
+  --criobe-primary: #0277bd;
+  --criobe-accent: #00acc1;
+  --criobe-coral: #ff6f61;
+}
+
+/* Custom code block styling */
+.highlight .filename {
+  padding: 0.5em 1em;
+  background-color: var(--md-code-bg-color);
+  border-bottom: 0.05rem solid var(--md-default-fg-color--lightest);
+  font-weight: 700;
+  font-size: 0.85em;
+}
+
+/* Improved admonition styling */
+.md-typeset .admonition,
+.md-typeset details {
+  border-left: 0.2rem solid;
+  border-radius: 0.2rem;
+}
+
+/* Custom table styling */
+.md-typeset table:not([class]) {
+  border-radius: 0.2rem;
+  display: table;
+  font-size: 0.8rem;
+}
+
+.md-typeset table:not([class]) th {
+  font-weight: 700;
+  background-color: var(--md-default-fg-color--lightest);
+}
+
+/* Command line prompt styling */
+.md-typeset code.command-line::before {
+  content: "$ ";
+  color: var(--md-code-hl-comment-color);
+}
+
+/* Badge styling for version, status, etc. */
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}
+
+.badge-primary {
+  background-color: var(--criobe-primary);
+  color: white;
+}
+
+.badge-success {
+  background-color: #4caf50;
+  color: white;
+}
+
+.badge-warning {
+  background-color: #ff9800;
+  color: white;
+}
+
+.badge-danger {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Image captions */
+.md-typeset figure figcaption {
+  margin-top: 0.5em;
+  font-size: 0.85em;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Improved navigation breadcrumbs */
+.md-path {
+  font-size: 0.8rem;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Print-friendly styles */
+@media print {
+  .md-header,
+  .md-tabs,
+  .md-sidebar,
+  .md-footer {
+    display: none;
+  }
+
+  .md-content {
+    max-width: 100%;
+  }
+}
