@@ -1,6 +1,6 @@
 # 5-Minute Demo
 
-Get the CRIOBE coral segmentation pipeline running in 5 minutes using pre-downloaded test data and pre-trained models.
+Get the QUADRATSEG platform—developed by CRIOBE—running in 5 minutes using pre-downloaded test data and pre-trained models.
 
 !!! tip "What You'll Accomplish"
     - Download test images representing each pipeline stage
@@ -320,7 +320,7 @@ ls data/test_samples/
 ## Next Steps
 
 !!! success "Demo Complete!"
-    You've successfully run the CRIOBE coral segmentation pipeline!
+    You've successfully run the QUADRATSEG platform workflow!
 
 **What to do next**:
 

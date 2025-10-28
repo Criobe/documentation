@@ -1,6 +1,6 @@
 # Developer Guide
 
-Welcome to the CRIOBE developer documentation. This guide helps contributors understand the system architecture, development workflows, and contribution processes.
+Welcome to the QUADRATSEG developer documentation, covering the platform developed by CRIOBE. This guide helps contributors understand the system architecture, development workflows, and contribution processes.
 
 ## For Contributors
 

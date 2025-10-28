@@ -1,6 +1,6 @@
 # ML Models Installation
 
-Download and deploy pre-trained machine learning models for the CRIOBE coral segmentation pipeline.
+Download and deploy pre-trained machine learning models for the QUADRATSEG platform developed by CRIOBE.
 
 !!! tip "What You'll Download"
     - **Grid Detection Models**: Corner detection (4 points) and full grid detection (117 points)
@@ -14,7 +14,7 @@ Download and deploy pre-trained machine learning models for the CRIOBE coral seg
 
 ## Overview
 
-The CRIOBE pipeline uses different ML models at each processing stage:
+The QUADRATSEG platform uses different ML models at each processing stage:
 
 ```mermaid
 graph LR
@@ -269,7 +269,7 @@ Download all models for all modules in one script:
 
 cd ~/coral-segmentation
 
-echo "📥 Downloading all CRIOBE pipeline models..."
+echo "📥 Downloading all QUADRATSEG pipeline models..."
 
 # Grid detection models
 echo ""

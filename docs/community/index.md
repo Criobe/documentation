@@ -1,6 +1,6 @@
 # Community
 
-Welcome to the CRIOBE community! This section provides resources for getting help, contributing to research, and connecting with other users.
+Welcome to the QUADRATSEG community, brought to you by CRIOBE. This section provides resources for getting help, contributing to research, and connecting with other users.
 
 ## Community Resources
 

@@ -1,6 +1,6 @@
 # System Requirements
 
-Review hardware, software, and network requirements before installing the CRIOBE coral segmentation pipeline.
+Review hardware, software, and network requirements before installing the QUADRATSEG platform developed by CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement).
 
 ## Hardware Requirements
 

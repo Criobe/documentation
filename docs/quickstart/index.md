@@ -1,6 +1,6 @@
 # Quickstart Guide
 
-Get started with the CRIOBE coral segmentation pipeline in minutes. This section provides fast-track guides to help you see the system in action quickly.
+Get started with the QUADRATSEG platform—developed by CRIOBE—for coral segmentation in minutes. This section provides fast-track guides to help you see the system in action quickly.
 
 ## Available Quickstart Guides
 

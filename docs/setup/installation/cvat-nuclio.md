@@ -13,7 +13,7 @@ Install and configure CVAT (Computer Vision Annotation Tool) with Nuclio serverl
 
 ## Overview
 
-This installation deploys the complete CRIOBE annotation stack on a single host using Docker Compose:
+This installation deploys the complete QUADRATSEG annotation stack—maintained by CRIOBE—on a single host using Docker Compose:
 
 ```mermaid
 graph TB
@@ -69,7 +69,7 @@ netstat -tuln | grep -E ':(8080|8070|8000|5432|6379)'
 
 ## Step 1: Clone CVAT with Bridge Integration
 
-The CRIOBE project uses a forked version of CVAT v2.29.0 with bridge service integration.
+The QUADRATSEG project, maintained by CRIOBE, uses a forked version of CVAT v2.29.0 with bridge service integration.
 
 ```bash
 # Create project workspace
@@ -342,7 +342,7 @@ Expected functions:
 | `pth-yolo-gridcorners` | 4-point corner detection | ready |
 | `pth-yolo-gridpose` | 117-point grid detection | ready |
 | `pth-lama` | Grid line removal | ready |
-| `pth-yolo-coralsegv4` | Coral segmentation (CRIOBE) | ready |
+| `pth-yolo-coralsegv4` | Coral segmentation (CRIOBE dataset) | ready |
 | `pth-facebookresearch-sam-vit-h` | Segment Anything (optional) | ready |
 
 !!! danger "Critical: Network Configuration"

@@ -1,6 +1,6 @@
 # User Guide
 
-Comprehensive guide for using the CRIOBE coral segmentation pipeline. Whether you're annotating images, running inference, or analyzing results, this guide will help you accomplish your tasks.
+Comprehensive guide for using the QUADRATSEG platform developed by CRIOBE. Whether you're annotating images, running inference, or analyzing results, this guide will help you accomplish your tasks.
 
 ## Guide Structure
 

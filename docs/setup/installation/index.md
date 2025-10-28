@@ -1,10 +1,10 @@
 # Installation Guide
 
-Complete installation instructions for the CRIOBE coral segmentation pipeline.
+Complete installation instructions for the QUADRATSEG platform, the coral segmentation system developed by CRIOBE.
 
 ## Installation Overview
 
-The CRIOBE pipeline consists of four main components that must be installed in order:
+The QUADRATSEG platform consists of four main components that must be installed in order:
 
 ```mermaid
 graph TD

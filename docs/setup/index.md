@@ -1,6 +1,6 @@
 # Setup Guide
 
-Complete installation and configuration guide for deploying the CRIOBE coral segmentation pipeline in production or development environments.
+Complete installation and configuration guide for deploying the QUADRATSEG platform—developed by CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement)—in production or development environments.
 
 ## Setup Overview
 

@@ -1,6 +1,6 @@
 # Pixi Environment Setup
 
-Install and configure Pixi package manager for managing Python environments across all CRIOBE pipeline modules.
+Install and configure Pixi package manager for managing Python environments across all QUADRATSEG modules developed by CRIOBE.
 
 !!! tip "Why Pixi?"
     - **Isolated environments** per module with correct Python versions
@@ -14,7 +14,7 @@ Install and configure Pixi package manager for managing Python environments acro
 
 ## What is Pixi?
 
-[Pixi](https://pixi.sh/) is a modern package manager that creates isolated, reproducible Python environments. Each CRIOBE module (e.g., `coral_seg_yolo`, `grid_pose_detection`) has its own `pixi.toml` configuration defining dependencies and Python versions.
+[Pixi](https://pixi.sh/) is a modern package manager that creates isolated, reproducible Python environments. Each QUADRATSEG module maintained by CRIOBE (e.g., `coral_seg_yolo`, `grid_pose_detection`) has its own `pixi.toml` configuration defining dependencies and Python versions.
 
 **Key Features**:
 - Manages Python interpreters automatically
@@ -50,7 +50,7 @@ pixi --version
 ```
 
 !!! warning "Native Windows Support"
-    While Pixi supports native Windows, the CRIOBE pipeline is designed for Linux. **Use WSL2 with Ubuntu 22.04** for best results.
+    While Pixi supports native Windows, QUADRATSEG is designed for Linux. **Use WSL2 with Ubuntu 22.04** for best results.
 
 ### Alternative: Manual Installation
 
@@ -89,7 +89,7 @@ nvidia-smi
 
 ## Step 3: Clone Repository
 
-Clone the CRIOBE repository containing all modules:
+Clone the QUADRATSEG repository maintained by CRIOBE:
 
 ```bash
 # Clone repository
@@ -484,7 +484,7 @@ docker system prune -a
 
 ## Multiple CUDA Versions
 
-The CRIOBE pipeline uses different CUDA versions across modules. Pixi handles this automatically:
+The QUADRATSEG platform uses different CUDA versions across modules. Pixi handles this automatically:
 
 | Module | CUDA Version | PyTorch Version | Isolated? |
 |--------|--------------|-----------------|-----------|

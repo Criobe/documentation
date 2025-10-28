@@ -358,7 +358,7 @@ http://bridge.gateway:8000/detect-model-webhook?model_name=<MODEL_NAME>
 | `pth-yolo-gridcorners` | Corner detection (4 points) | None |
 | `pth-yolo-gridpose` | Grid pose (117 points) | None |
 | `pth-lama` | Grid removal | Used internally |
-| `pth-yolo-coralsegv4` | Coral segmentation (CRIOBE) | `&conv_mask_to_poly=true` |
+| `pth-yolo-coralsegv4` | Coral segmentation (CRIOBE dataset) | `&conv_mask_to_poly=true` |
 | `pth-yolo-coralsegbanggai` | Coral segmentation (Banggai) | `&conv_mask_to_poly=true` |
 | `pth-mmseg-coralscopsegformer` | Two-stage segmentation | `&conv_mask_to_poly=true` |
 
