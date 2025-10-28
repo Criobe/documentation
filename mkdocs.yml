@@ -3,8 +3,8 @@
 # Last Updated: 2025-10-28
 
 # Site Information
-site_name: CRIOBE Coral Segmentation
-site_description: Complete documentation for the CRIOBE automated coral reef monitoring and segmentation pipeline
+site_name: QUADRATSEG Platform
+site_description: Complete documentation for the QUADRATSEG automated coral reef monitoring and segmentation platform developed by CRIOBE
 site_author: CRIOBE Research Team
 site_url: https://criobe.github.io/coral-segmentation/  # Update with your actual URL
 
@@ -14,7 +14,7 @@ repo_url: https://github.com/criobe/coral-segmentation  # Update with your actua
 edit_uri: edit/main/documentation/docs/
 
 # Copyright
-copyright: Copyright &copy; 2025 CRIOBE Research Team
+copyright: Copyright &copy; 2025 CRIOBE Research Team. Partly funded by Marepolis.
 
 # Documentation Directory
 docs_dir: docs
@@ -111,8 +111,9 @@ plugins:
       redirect_maps:
         # Migrate old docs to new structure
         'en/setup_cvat_with_nuclio_and_bridge.md': 'setup/installation/cvat-nuclio.md'
-        'en/coral_segmentation_pipeline.md': 'user-guide/concepts/pipeline-overview.md'
-        'en/bridge/index.md': 'user-guide/modules/bridge.md'
+        # Uncomment when pages are created:
+        # 'en/coral_segmentation_pipeline.md': 'user-guide/concepts/pipeline-overview.md'
+        # 'en/bridge/index.md': 'user-guide/modules/bridge.md'
 
 # Markdown Extensions
 markdown_extensions:
@@ -231,61 +232,66 @@ nav:
       - CVAT & Nuclio: setup/installation/cvat-nuclio.md
       - Bridge Service: setup/installation/bridge-service.md
       - ML Models: setup/installation/ml-models.md
-    - Configuration:
-      - setup/configuration/index.md
-      - Environment Variables: setup/configuration/environment-variables.md
-      - CVAT Projects: setup/configuration/cvat-projects.md
-      - Webhooks: setup/configuration/webhooks.md
-      - Nuclio Functions: setup/configuration/nuclio-functions.md
-    - Deployment:
-      - setup/deployment/index.md
-      - Docker Compose: setup/deployment/docker-compose.md
-      - Networking: setup/deployment/networking.md
+    # Configuration pages - coming soon
+    # - Configuration:
+    #   - setup/configuration/index.md
+    #   - Environment Variables: setup/configuration/environment-variables.md
+    #   - CVAT Projects: setup/configuration/cvat-projects.md
+    #   - Webhooks: setup/configuration/webhooks.md
+    #   - Nuclio Functions: setup/configuration/nuclio-functions.md
+    # Deployment pages - coming soon
+    # - Deployment:
+    #   - setup/deployment/index.md
+    #   - Docker Compose: setup/deployment/docker-compose.md
+    #   - Networking: setup/deployment/networking.md
 
+  # User Guide - coming in Phase 3-5
   - User Guide:
     - user-guide/index.md
-    - Concepts:
-      - user-guide/concepts/index.md
-      - Pipeline Overview: user-guide/concepts/pipeline-overview.md
-      - Datasets: user-guide/concepts/datasets.md
-      - Taxonomies: user-guide/concepts/taxonomies.md
-      - Workflows: user-guide/concepts/workflows.md
-    - Tutorials:
-      - user-guide/tutorials/index.md
-      - Complete Pipeline: user-guide/tutorials/complete-pipeline.md
-      - Grid Detection: user-guide/tutorials/grid-detection.md
-      - Coral Segmentation (YOLO): user-guide/tutorials/coral-segmentation-yolo.md
-      - Coral Segmentation (DINOv2): user-guide/tutorials/coral-segmentation-dinov2.md
-      - Data Preparation: user-guide/tutorials/data-preparation.md
-      - Model Training: user-guide/tutorials/model-training.md
-      - Model Evaluation: user-guide/tutorials/model-evaluation.md
-    - How-To Guides:
-      - user-guide/how-to/index.md
-      - Annotate in CVAT: user-guide/how-to/annotate-in-cvat.md
-      - Run Inference: user-guide/how-to/run-inference.md
-      - Export Annotations: user-guide/how-to/export-annotations.md
-      - Manage Datasets: user-guide/how-to/manage-datasets.md
-      - Visualize Results: user-guide/how-to/visualize-results.md
-    - Modules:
-      - user-guide/modules/index.md
-      - Bridge: user-guide/modules/bridge.md
-      - Data Engineering: user-guide/modules/data-engineering.md
-      - Grid Pose Detection: user-guide/modules/grid-pose-detection.md
-      - Grid Inpainting: user-guide/modules/grid-inpainting.md
-      - Coral Segmentation (YOLO): user-guide/modules/coral-seg-yolo.md
-      - Coral Segmentation (DINOv2): user-guide/modules/dinov2-mmseg.md
+    # - Concepts:
+    #   - user-guide/concepts/index.md
+    #   - Pipeline Overview: user-guide/concepts/pipeline-overview.md
+    #   - Datasets: user-guide/concepts/datasets.md
+    #   - Taxonomies: user-guide/concepts/taxonomies.md
+    #   - Workflows: user-guide/concepts/workflows.md
+    # - Tutorials:
+    #   - user-guide/tutorials/index.md
+    #   - Complete Pipeline: user-guide/tutorials/complete-pipeline.md
+    #   - Grid Detection: user-guide/tutorials/grid-detection.md
+    #   - Coral Segmentation (YOLO): user-guide/tutorials/coral-segmentation-yolo.md
+    #   - Coral Segmentation (DINOv2): user-guide/tutorials/coral-segmentation-dinov2.md
+    #   - Data Preparation: user-guide/tutorials/data-preparation.md
+    #   - Model Training: user-guide/tutorials/model-training.md
+    #   - Model Evaluation: user-guide/tutorials/model-evaluation.md
+    # - How-To Guides:
+    #   - user-guide/how-to/index.md
+    #   - Annotate in CVAT: user-guide/how-to/annotate-in-cvat.md
+    #   - Run Inference: user-guide/how-to/run-inference.md
+    #   - Export Annotations: user-guide/how-to/export-annotations.md
+    #   - Manage Datasets: user-guide/how-to/manage-datasets.md
+    #   - Visualize Results: user-guide/how-to/visualize-results.md
+    # - Modules:
+    #   - user-guide/modules/index.md
+    #   - Bridge: user-guide/modules/bridge.md
+    #   - Data Engineering: user-guide/modules/data-engineering.md
+    #   - Grid Pose Detection: user-guide/modules/grid-pose-detection.md
+    #   - Grid Inpainting: user-guide/modules/grid-inpainting.md
+    #   - Coral Segmentation (YOLO): user-guide/modules/coral-seg-yolo.md
+    #   - Coral Segmentation (DINOv2): user-guide/modules/dinov2-mmseg.md
 
+  # Developer Guide - coming in Phase 6
   - Developer Guide:
     - developer-guide/index.md
-    - Architecture: developer-guide/architecture.md
-    - Contributing: developer-guide/contributing.md
-    - Code Style: developer-guide/code-style.md
+    # - Architecture: developer-guide/architecture.md
+    # - Contributing: developer-guide/contributing.md
+    # - Code Style: developer-guide/code-style.md
 
+  # Community - coming in Phase 6
   - Community:
     - community/index.md
-    - Getting Help: community/getting-help.md
-    - Publications: community/publications.md
-    - Citations: community/citations.md
+    # - Getting Help: community/getting-help.md
+    # - Publications: community/publications.md
+    # - Citations: community/citations.md
 
 # Validation
 validation:
@@ -299,4 +305,6 @@ validation:
     unrecognized_links: warn
 
 # Strict mode for production builds
-strict: true
+# Temporarily disabled while documentation is in progress
+# Enable this once all pages are created
+strict: false

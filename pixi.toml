@@ -6,7 +6,8 @@ platforms = ["linux-64", "osx-64"]
 version = "0.1.0"
 
 [tasks]
-build = "mkdocs build --strict"
+build = "mkdocs build"
+build-strict = "mkdocs build --strict"
 serve = "mkdocs serve"
 serve-8010 = "mkdocs serve --dev-addr 127.0.0.1:8010"
 

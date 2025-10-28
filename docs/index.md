@@ -1,6 +1,6 @@
-# CRIOBE Coral Segmentation Documentation
+# QUADRATSEG Platform Documentation
 
-Welcome to the comprehensive documentation for the **CRIOBE automated coral reef monitoring and segmentation pipeline**. This system enables researchers to process underwater photo quadrat images from capture through automated grid removal to species-level coral segmentation using state-of-the-art machine learning models.
+Welcome to the comprehensive documentation for **QUADRATSEG**, the automated coral reef monitoring and segmentation platform developed by CRIOBE. This system enables researchers to process underwater photo quadrat images from capture through automated grid removal to species-level coral segmentation using state-of-the-art machine learning models.
 
 <div class="grid cards" markdown>
 
@@ -42,9 +42,9 @@ Welcome to the comprehensive documentation for the **CRIOBE automated coral reef
 
 </div>
 
-## What is CRIOBE?
+## What is QUADRATSEG?
 
-The CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement) coral segmentation pipeline is a complete, automated system for analyzing coral reef photo quadrats. The system:
+QUADRATSEG is a complete, automated platform for analyzing coral reef photo quadrats, developed by CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement). The platform:
 
 - **Detects and corrects** grid corners for perspective normalization
 - **Removes grid overlays** using advanced inpainting techniques
@@ -149,16 +149,26 @@ graph LR
     - 💬 **Questions**: See our [Getting Help](community/getting-help.md) guide
     - 📧 **Email Support**: taiamiti.edmunds@ml4everyone.com
 
+## Acknowledgments
+
+QUADRATSEG was developed by [CRIOBE](https://www.criobe.pf/) (Centre de Recherches Insulaires et Observatoire de l'Environnement) and partly funded by [Marepolis](https://www.marepolis.fr/).
+
+!!! info "Funding & Support"
+    - **Developed by**: CRIOBE Research Team
+    - **Partly funded by**: Marepolis
+    - **Contributors**: See individual module READMEs for complete contributor lists
+
 ## Citation
 
-If you use this system in your research, please cite:
+If you use this platform in your research, please cite:
 
 ```bibtex
-@software{criobe_coral_segmentation_2025,
+@software{quadratseg_2025,
   author = {Edmunds, Taiamiti and CRIOBE Research Team},
-  title = {CRIOBE Automated Coral Reef Monitoring and Segmentation Pipeline},
+  title = {QUADRATSEG: Automated Coral Reef Monitoring and Segmentation Platform},
   year = {2025},
-  url = {https://github.com/criobe/coral-segmentation}
+  url = {https://github.com/criobe/coral-segmentation},
+  note = {Developed by CRIOBE, partly funded by Marepolis}
 }
 ```
 

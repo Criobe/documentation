@@ -11,21 +11,20 @@ Review hardware, software, and network requirements before installing the CRIOBE
 | **CPU** | 4 cores, 2.0 GHz |
 | **RAM** | 16 GB |
 | **Storage** | 100 GB available (SSD recommended) |
-| **GPU** | NVIDIA GPU with 6 GB VRAM, CUDA 11.7+ support |
-| **Network** | 10 Mbps download (for model/data downloads) |
+| **GPU** | NVIDIA GTX 1070 (8 GB VRAM) |
+| **Network** | Stable connection for downloads |
 
-!!! warning "GPU Required for ML Inference"
-    While the system can run on CPU, ML inference will be 10-50x slower. An NVIDIA GPU with CUDA support is **strongly recommended** for production use.
-
-### Recommended Requirements (Production/Multi-User)
+### Recommended Requirements (Desktop Production)
 
 | Component | Specification |
 |-----------|---------------|
 | **CPU** | 8+ cores, 3.0 GHz |
 | **RAM** | 32 GB+ |
 | **Storage** | 500 GB+ NVMe SSD |
-| **GPU** | NVIDIA GPU with 8+ GB VRAM (RTX 3070 or better) |
-| **Network** | 100 Mbps+ (1 Gbps for multi-user) |
+| **GPU** | NVIDIA RTX 3090 or RTX 4090 (24 GB VRAM) |
+| **Network** | Reliable broadband for model downloads |
+
+The platform currently targets a single high-end desktop with ample VRAM (16 GB minimum, 24 GB ideal) for local research use.
 
 ### Storage Breakdown
 
@@ -45,14 +44,11 @@ Review hardware, software, and network requirements before installing the CRIOBE
 
 | OS | Status | Notes |
 |----|--------|-------|
-| **Ubuntu 20.04/22.04 LTS** | ✅ Recommended | Best supported, all features work |
-| **Debian 11/12** | ✅ Supported | Fully compatible |
-| **Other Linux** | ⚠️ May work | Community tested |
-| **macOS 12+** | ⚠️ Partial | CPU only, no CUDA support |
-| **Windows 10/11** | ⚠️ Via WSL2 | Use WSL2 + Ubuntu for best experience |
+| **Ubuntu 22.04 LTS** | ✅ Primary | Training and inference tested with RTX 4090 |
+| **Windows 11 (Docker Desktop + WSL2)** | ⚠️ Deployment-only | Tested for running Nuclio containers; coding workflows unverified |
 
-!!! tip "Windows Users"
-    For Windows, install WSL2 with Ubuntu 22.04 for the best experience. Native Windows support is limited.
+!!! tip "Stick to Ubuntu for development"
+    All authoring, training, and inference workflows were executed on Ubuntu 22.04 with NVIDIA GPUs. Windows 11 has only been exercised to run the deployed Nuclio functions inside Docker containers.
 
 ### Required Software
 
@@ -123,30 +119,13 @@ sudo apt-get install git
 
 | GPU Model | VRAM | Status | Notes |
 |-----------|------|--------|-------|
-| **NVIDIA RTX 4090** | 24 GB | ✅ Excellent | Maximum performance |
-| **NVIDIA RTX 3090** | 24 GB | ✅ Excellent | Great for production |
-| **NVIDIA RTX 3080** | 10 GB | ✅ Good | Recommended minimum |
-| **NVIDIA RTX 3070** | 8 GB | ✅ Good | Works well with reduced batch size |
-| **NVIDIA GTX 1070** | 8 GB | ✅ Acceptable | Tested, slower but functional |
-| **NVIDIA T4** | 16 GB | ✅ Good | Cloud GPU option |
-| **NVIDIA V100** | 16/32 GB | ✅ Excellent | Cloud GPU option |
+| **NVIDIA RTX 4090** | 24 GB | ✅ Tested | Reference production setup on Ubuntu 22.04 |
+| **NVIDIA RTX 3090** | 24 GB | ⚠️ Recommended | Same class as 4090; slated for production but not field-tested |
+| **NVIDIA GTX 1070** | 8 GB | ✅ Tested | Development laptop; expect longer training/inference times |
 
 ### AMD GPU / Intel GPU
 
 **Not supported**. The pipeline requires NVIDIA CUDA. AMD ROCm and Intel oneAPI are not currently supported.
-
-### CPU-Only Mode
-
-**Possible but slow**. All modules can run on CPU, but inference is 10-50x slower:
-
-| Module | GPU Time | CPU Time | Speedup |
-|--------|----------|----------|---------|
-| Grid Detection | ~2s | ~10s | 5x |
-| Grid Removal | ~6s | ~60s | 10x |
-| YOLO Segmentation | ~7s | ~2min | 17x |
-| DINOv2 Segmentation | ~20s | ~15min | 45x |
-
-**Recommendation**: Use CPU mode only for testing/development with small datasets.
 
 ## Network Requirements
 
@@ -154,7 +133,7 @@ sudo apt-get install git
 
 **Required for**:
 - Initial setup (downloading Docker images, models, dependencies)
-- Optional: External CVAT access, cloud deployment
+- Optional: External CVAT access for remote reviewers
 
 ### Bandwidth Estimates
 
@@ -202,56 +181,17 @@ The following ports must be available:
 
 ## Deployment Scenarios
 
-### Single Server (Development)
+### Local Desktop Deployment
 
 **Suitable for**:
 - Individual researchers
-- Small-scale testing
-- Development work
+- Desktop workstations with high-end NVIDIA GPUs
+- On-premise experimentation without external dependencies
 
-**Requirements**:
-- Minimum specs listed above
-- All services on one machine
-- Shared GPU for inference
-
-### Multi-Server (Production)
-
-**Suitable for**:
-- Research teams
-- Production workflows
-- High-throughput processing
-
-**Architecture**:
-```
-Server 1: CVAT + Database + Redis
-Server 2: Nuclio + ML Functions (GPU required)
-Server 3: Bridge Service
-Storage: NFS/NAS for shared data
-```
-
-**Requirements per server**:
-- Server 1: 16 GB RAM, 4 cores, 100 GB storage
-- Server 2: 32 GB RAM, 8 cores, GPU with 8+ GB VRAM
-- Server 3: 8 GB RAM, 2 cores, 50 GB storage
-- Storage: 500+ GB shared storage
-
-### Cloud Deployment
-
-**Supported platforms**:
-- **AWS**: EC2 with GPU instances (p3/p4), ECS/EKS
-- **Google Cloud**: Compute Engine with GPU, GKE
-- **Azure**: GPU VMs, AKS
-
-**Recommended instance types**:
-
-| Provider | Instance Type | vCPU | RAM | GPU | Cost/hr* |
-|----------|---------------|------|-----|-----|----------|
-| **AWS** | p3.2xlarge | 8 | 61 GB | V100 (16GB) | ~$3.06 |
-| **AWS** | g4dn.xlarge | 4 | 16 GB | T4 (16GB) | ~$0.526 |
-| **GCP** | n1-standard-8 + T4 | 8 | 30 GB | T4 (16GB) | ~$0.80 |
-| **Azure** | NC6s_v3 | 6 | 112 GB | V100 (16GB) | ~$3.06 |
-
-*Approximate on-demand pricing, varies by region
+**Baseline**:
+- All services run on the same machine
+- Ubuntu 22.04 with Docker, Nuclio, and Pixi
+- RTX 3090/4090 preferred; GTX 1070 verified for smaller experiments
 
 ## Browser Requirements (for CVAT)
 
@@ -270,10 +210,10 @@ Use this checklist before proceeding to installation:
 - [ ] CPU meets minimum requirements (4+ cores)
 - [ ] RAM meets minimum requirements (16+ GB)
 - [ ] Storage has 100+ GB available
-- [ ] NVIDIA GPU with 6+ GB VRAM (or accepting CPU-only limitations)
+- [ ] NVIDIA GPU with 8+ GB VRAM (GTX 1070 tested; 24 GB recommended)
 
 ### Software
-- [ ] Operating system is supported (Linux recommended)
+- [ ] Operating system matches tested environments (Ubuntu 22.04 for development, Windows 11 for container runtime)
 - [ ] Docker Engine 20.10+ installed
 - [ ] Docker Compose v2.0+ installed
 - [ ] nvidia-docker installed (for GPU support)
@@ -297,7 +237,7 @@ Use this checklist before proceeding to installation:
 docker --version
 docker compose version
 
-# Check GPU (if applicable)
+# Check GPU
 nvidia-smi
 
 # Check Pixi
