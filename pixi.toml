@@ -1,0 +1,19 @@
+[workspace]
+authors = ["taiamiti <taiamiti.edmunds@ml4everyone.com>"]
+channels = ["conda-forge"]
+name = "documentation"
+platforms = ["linux-64", "osx-64"]
+version = "0.1.0"
+
+[tasks]
+build = "mkdocs build --strict"
+serve = "mkdocs serve"
+serve-8010 = "mkdocs serve --dev-addr 127.0.0.1:8010"
+
+[dependencies]
+pip = "*"
+python = "3.10.*"
+
+[pypi-dependencies]
+mkdocs = ">=1.5,<2.0"
+mkdocs-material = ">=9.5,<10.0"

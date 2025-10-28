@@ -1,0 +1,17 @@
+site_name: CRIOBE Documentation
+site_description: Technical guides for CVAT bridge deployment, Nuclio setup, and related tooling.
+docs_dir: docs
+theme:
+  name: material
+nav:
+  - Overview: index.md
+  - English:
+      - Coral Segmentation Pipeline: en/coral_segmentation_pipeline.md
+      - Platform Setup:
+          - CVAT + Nuclio Setup: en/setup_cvat_with_nuclio_and_bridge.md
+          - Bridge:
+              - Overview: en/bridge/index.md
+              - Deployment: en/bridge/deployment.md
+              - Operations: en/bridge/operations.md
+              - Troubleshooting: en/bridge/troubleshooting.md
+          - Serverless Setup: en/setup_nuclio.md
