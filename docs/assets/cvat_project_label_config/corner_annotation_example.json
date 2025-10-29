@@ -1,0 +1,40 @@
+[
+  {
+    "name": "quadrat_corner",
+    "id": 508,
+    "color": "#19fdf3",
+    "type": "skeleton",
+    "sublabels": [
+      {
+        "name": "1",
+        "attributes": [],
+        "type": "points",
+        "color": "#d12345",
+        "id": 509
+      },
+      {
+        "name": "2",
+        "attributes": [],
+        "type": "points",
+        "color": "#350dea",
+        "id": 510
+      },
+      {
+        "name": "3",
+        "attributes": [],
+        "type": "points",
+        "color": "#479ffe",
+        "id": 511
+      },
+      {
+        "name": "4",
+        "attributes": [],
+        "type": "points",
+        "color": "#4a649f",
+        "id": 512
+      }
+    ],
+    "svg": "<circle r=&quot;0.75&quot; cx=&quot;26.6722412109375&quot; cy=&quot;13.116639137268066&quot; data-type=&quot;element node&quot; data-element-id=&quot;1&quot; data-node-id=&quot;1&quot; data-label-id=&quot;509&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;61.28762435913086&quot; cy=&quot;12.447742462158203&quot; data-type=&quot;element node&quot; data-element-id=&quot;2&quot; data-node-id=&quot;2&quot; data-label-id=&quot;510&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;62.458194732666016&quot; cy=&quot;43.551422119140625&quot; data-type=&quot;element node&quot; data-element-id=&quot;3&quot; data-node-id=&quot;3&quot; data-label-id=&quot;511&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;26.505016326904297&quot; cy=&quot;44.55476760864258&quot; data-type=&quot;element node&quot; data-element-id=&quot;4&quot; data-node-id=&quot;4&quot; data-label-id=&quot;512&quot;></circle>",
+    "attributes": []
+  }
+]

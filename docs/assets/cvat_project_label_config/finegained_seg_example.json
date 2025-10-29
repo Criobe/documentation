@@ -1,0 +1,658 @@
+[
+  {
+    "name": "Acanthastrea",
+    "id": 448,
+    "color": "#98b9d6",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 771,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 432,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 433,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Acropora",
+    "id": 449,
+    "color": "#22db5a",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 434,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 435,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      },
+      {
+        "id": 772,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
+  },
+  {
+    "name": "Astreopora",
+    "id": 450,
+    "color": "#dc216e",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 773,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 436,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 437,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Atrea",
+    "id": 451,
+    "color": "#48cddd",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 438,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 439,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      },
+      {
+        "id": 774,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
+  },
+  {
+    "name": "Fungia",
+    "id": 454,
+    "color": "#f1a94c",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 775,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 444,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 445,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Goniastrea",
+    "id": 455,
+    "color": "#7172a4",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 446,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 447,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      },
+      {
+        "id": 776,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
+  },
+  {
+    "name": "Leptastrea",
+    "id": 456,
+    "color": "#68f971",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 777,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 448,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 449,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Merulinidae",
+    "id": 458,
+    "color": "#7098e9",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 778,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 452,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 453,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Millepora",
+    "id": 459,
+    "color": "#6f646f",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 779,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 454,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 455,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Montastrea",
+    "id": 460,
+    "color": "#398b38",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 456,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 457,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      },
+      {
+        "id": 780,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
+  },
+  {
+    "name": "Montipora",
+    "id": 461,
+    "color": "#a5d0e4",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 781,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 458,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 459,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Other",
+    "id": 462,
+    "color": "#51b90a",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 460,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 461,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      },
+      {
+        "id": 782,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
+  },
+  {
+    "name": "Pavona/Leptoseris",
+    "id": 464,
+    "color": "#7eede3",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 464,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 465,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      },
+      {
+        "id": 784,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
+  },
+  {
+    "name": "Pocillopora",
+    "id": 465,
+    "color": "#f7e33e",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 785,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 466,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 467,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  },
+  {
+    "name": "Porites",
+    "id": 466,
+    "color": "#83c08c",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 468,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 469,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      },
+      {
+        "id": 786,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
+  },
+  {
+    "name": "Psammocora",
+    "id": 467,
+    "color": "#188116",
+    "type": "any",
+    "attributes": [
+      {
+        "id": 787,
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": 470,
+        "name": "difficult",
+        "input_type": "radio",
+        "mutable": true,
+        "values": [
+          "true",
+          "false"
+        ],
+        "default_value": "false"
+      },
+      {
+        "id": 471,
+        "name": "label_id",
+        "input_type": "text",
+        "mutable": true,
+        "values": [
+          ""
+        ],
+        "default_value": ""
+      }
+    ]
+  }
+]
