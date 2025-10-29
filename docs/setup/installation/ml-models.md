@@ -613,8 +613,7 @@ Total disk space required per module:
 **Continue with**:
 
 - [Nuclio Functions Deployment](../configuration/nuclio-functions.md) - Deploy models to Nuclio
-- [5-Minute Demo](../../quickstart/5-minute-demo.md) - Test models with sample data
-- [First Annotation Tutorial](../../quickstart/first-annotation.md) - Use models in CVAT workflow
+- [First Annotation Tutorial](../../quickstart/first-annotation.md) - Test the complete pipeline with CVAT
 
 ## Quick Reference
 

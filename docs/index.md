@@ -8,10 +8,10 @@ Welcome to the comprehensive documentation for **QUADRATSEG**, the automated cor
 
     ---
 
-    Get up and running in minutes with our quick demo and first annotation guide.
+    Get up and running quickly with our quickstart guides for end users and developers.
 
-    [:octicons-arrow-right-24: 5-Minute Demo](quickstart/5-minute-demo.md)
-    [:octicons-arrow-right-24: First Annotation](quickstart/first-annotation.md)
+    [:octicons-arrow-right-24: Production Setup](quickstart/production-setup.md)
+    [:octicons-arrow-right-24: Developer Setup](quickstart/developer-setup.md)
 
 -   :material-cog:{ .lg .middle } **Setup**
 
@@ -89,9 +89,9 @@ graph LR
 ## Quick Navigation
 
 ### For New Users
-1. Start with the [**5-Minute Demo**](quickstart/5-minute-demo.md) to see the system in action
-2. Follow the [**Complete Pipeline Tutorial**](user-guide/tutorials/complete-pipeline.md) for step-by-step learning
-3. Explore [**Module Documentation**](user-guide/modules/index.md) for detailed references
+1. Start with the [**First Annotation Tutorial**](quickstart/first-annotation.md) to see the system in action
+2. Follow the [**Production Setup Guide**](quickstart/production-setup.md) to deploy the platform
+3. Configure your [**CVAT Projects and Webhooks**](setup/configuration/for-end-users/1-cvat-projects.md) for automation
 
 ### For Administrators
 1. Review [**System Requirements**](setup/requirements.md) for hardware and software needs
@@ -196,4 +196,4 @@ This project is licensed under the MIT License. See module-specific LICENSE file
 
 </div>
 
-**Ready to get started?** → [5-Minute Demo](quickstart/5-minute-demo.md){ .md-button .md-button--primary }
+**Ready to get started?** → [Quickstart Guide](quickstart/index.md){ .md-button .md-button--primary }

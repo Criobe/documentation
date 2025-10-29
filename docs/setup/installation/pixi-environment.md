@@ -556,7 +556,7 @@ Pixi includes `pixi-pycharm` dependency for integration:
 
 - [ML Models Installation](ml-models.md) - Download pre-trained models
 - [CVAT Projects Configuration](../configuration/cvat-projects.md) - Set up annotation projects
-- [5-Minute Demo](../../quickstart/5-minute-demo.md) - Test module environments with sample data
+- [First Annotation Tutorial](../../quickstart/first-annotation.md) - Test the complete pipeline
 
 ## Quick Reference
 
