@@ -17,20 +17,32 @@ Set up the QUADRATSEG development environment for **AI researchers and developer
 
 **Prerequisites**: Git, Pixi installed, Python 3.9+, NVIDIA GPU recommended
 
+## Repository Architecture
+
+QUADRATSEG uses a **multi-repository architecture** where each module is an independent Git repository:
+
+- **Clone only what you need**: Work on specific modules without the full codebase
+- **Independent versioning**: Each module has its own release cycle
+- **Shared data via symlinks**: Centralized data directory avoids duplication
+- **Flexible development**: Mix and match modules for your workflow
+
+!!! tip "Modular Development"
+    You don't need to clone all repositories. Start with the modules relevant to your work (e.g., just `coral_seg_yolo` for YOLO segmentation).
+
 ## Why Use Pixi for Development?
 
 Pixi is a fast, cross-platform package manager that handles all dependencies for each module:
 
-- **Isolated Environments**: Each module (grid detection, segmentation, etc.) has its own environment
+- **Isolated Environments**: Each module repository has its own environment
 - **Reproducible Builds**: Exact versions specified in `pixi.toml` files
 - **Fast Installation**: Parallel downloads and caching
 - **CUDA Management**: Handles PyTorch + CUDA dependencies automatically
 - **Cross-Platform**: Works on Linux, macOS, and Windows
 
 !!! warning "Production vs Development"
-    **End users** (coral researchers) do NOT need Pixi. The production system uses Docker with pre-packaged models.
+    **End users** (coral researchers) do NOT need Pixi or module repositories. The production system uses Docker with pre-packaged models.
 
-    **Developers** need Pixi to train, evaluate, and experiment with models before packaging them for deployment.
+    **Developers** need Pixi and individual module repositories to train, evaluate, and experiment with models before packaging them for deployment.
 
 ## Development Workflow Overview
 
@@ -96,34 +108,99 @@ nvidia-smi
 # If error, install NVIDIA drivers from nvidia.com
 ```
 
-## Step 1: Clone Repository
+## Step 1: Set Up Centralized Data Directory
+
+Create a shared data directory that all modules will access via symlinks:
 
 ```bash
-# Clone the repository
-git clone https://github.com/criobe/coral-segmentation.git
-cd coral-segmentation
+# Create centralized data directory
+mkdir -p ~/Projects/criobe_data
+
+# Set environment variable (add to ~/.bashrc for persistence)
+export DATA_ROOT=~/Projects/criobe_data
+echo 'export DATA_ROOT=~/Projects/criobe_data' >> ~/.bashrc
 ```
 
-## Step 2: Download Test Data
+!!! info "Why Centralized Data?"
+    This approach allows all modules to share test data, models, and datasets without duplication. Each module will have a `data` symlink pointing to `$DATA_ROOT`.
 
-All modules share the same test dataset. Download it once:
+## Step 2: Clone Module Repositories
+
+Clone only the modules you need. Here we'll clone the most common ones:
 
 ```bash
-cd coral_seg_yolo  # or any other module
+# Navigate to projects directory
+cd ~/Projects
+
+# Clone ML module repositories (work on main branch by default)
+git clone https://github.com/criobe/coral_seg_yolo.git
+git clone https://github.com/criobe/grid_pose_detection.git
+git clone https://github.com/criobe/grid_inpainting.git
+git clone https://github.com/criobe/data_engineering.git
+
+# Optional: Clone additional modules as needed
+# git clone https://github.com/criobe/DINOv2_mmseg.git
+```
+
+**All module repositories work on the `main` branch** (the default).
+
+!!! tip "Choose Your Modules"
+    You don't need all modules. Common combinations:
+
+    - **Coral segmentation only**: `coral_seg_yolo`, `data_engineering`
+    - **Grid detection only**: `grid_pose_detection`, `grid_inpainting`
+    - **Full pipeline**: All modules above
+
+## Step 3: Create Data Symlinks
+
+Link each module to the centralized data directory:
+
+```bash
+# Create symlink in each module
+cd ~/Projects/coral_seg_yolo
+ln -s $DATA_ROOT data
+
+cd ~/Projects/grid_pose_detection
+ln -s $DATA_ROOT data
+
+cd ~/Projects/grid_inpainting
+ln -s $DATA_ROOT data
+
+cd ~/Projects/data_engineering
+ln -s $DATA_ROOT data
+
+# Verify symlinks
+ls -l ~/Projects/coral_seg_yolo/data
+# Should show: data -> /home/user/Projects/criobe_data
+```
+
+## Step 4: Download Test Data
+
+Download shared test data once to the centralized directory:
+
+```bash
+cd $DATA_ROOT
 
 # Download test samples (contains all pipeline stages)
-./download_test_samples.sh
+wget https://storage.googleapis.com/criobe_public/test_samples/test_samples.tar.gz
+tar -xzf test_samples.tar.gz
+
+# Verify structure
+ls -la test_samples/
+# Should show: 1-raw_jpg/, 2-quadrat_corner_export/, etc.
 ```
 
-This creates `data/test_samples/` with subdirectories:
+**All modules now have access to test data via their `data` symlinks!**
+
+The test data includes subdirectories for each pipeline stage:
 
 | Directory | Stage | Content |
 |-----------|-------|---------|
-| `1-raw_jpg/` | Raw images | Original underwater quadrat photos |
-| `2-quadrat_corner_export/` | Corner annotations | Corner keypoint labels |
-| `3-image_warping/` | Warped images | Perspective-corrected quadrats |
-| `4-grid_pose_export/` | Grid annotations | Grid intersection keypoints |
-| `5-grid_removal/` | Clean images | Grid-removed coral images |
+| `test_samples/1-raw_jpg/` | Raw images | Original underwater quadrat photos |
+| `test_samples/2-quadrat_corner_export/` | Corner annotations | Corner keypoint labels |
+| `test_samples/3-image_warping/` | Warped images | Perspective-corrected quadrats |
+| `test_samples/4-grid_pose_export/` | Grid annotations | Grid intersection keypoints |
+| `test_samples/5-grid_removal/` | Clean images | Grid-removed coral images |
 
 ## Demo A: Complete YOLO Pipeline (Fastest)
 
@@ -132,13 +209,14 @@ Run the fastest end-to-end demo using YOLOv11 segmentation.
 ### Setup
 
 ```bash
-cd coral_seg_yolo
+# Navigate to module repository
+cd ~/Projects/coral_seg_yolo
 
 # Install environment
 pixi install -e coral-seg-yolo-dev
 
-# Download models
-./download_models.sh
+# Download models to shared data directory
+./download_models.sh  # Models will be in $DATA_ROOT/models/
 ```
 
 ### Run Inference
@@ -183,7 +261,8 @@ See how grid patterns are detected and removed.
 ### Grid Corner Detection (4 points)
 
 ```bash
-cd ../grid_pose_detection
+# Navigate to grid detection module
+cd ~/Projects/grid_pose_detection
 
 pixi install
 ./download_models.sh
@@ -229,7 +308,8 @@ Processing 10 images...
 ### Grid Removal (Inpainting)
 
 ```bash
-cd ../grid_inpainting
+# Navigate to grid inpainting module
+cd ~/Projects/grid_inpainting
 
 pixi install
 ./download_model.sh
@@ -261,11 +341,16 @@ Run the most accurate segmentation approach.
 ### Setup
 
 ```bash
-cd ../DINOv2_mmseg
+# Clone DINOv2 module if not already done
+cd ~/Projects
+git clone https://github.com/criobe/DINOv2_mmseg.git
+cd DINOv2_mmseg
+
+# Create data symlink
+ln -s $DATA_ROOT data
 
 pixi install -e dinov2-mmseg
 ./download_models.sh
-./download_test_samples.sh  # If not already downloaded
 ```
 
 ### Run Two-Stage Inference

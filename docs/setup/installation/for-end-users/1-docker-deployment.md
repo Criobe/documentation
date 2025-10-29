@@ -71,25 +71,32 @@ df -h
 
 ## Step 1: Clone Repository
 
-Clone CRIOBE's CVAT fork which includes the bridge service and serverless components:
+Clone CRIOBE's CVAT fork which includes the bridge service and serverless components. **Use the criobe branch**:
 
 ```bash
 # Create directory for the platform
 mkdir -p ~/quadratseg-platform
 cd ~/quadratseg-platform
 
-# Clone CRIOBE's CVAT repository
-git clone https://github.com/Criobe/cvat.git
+# Clone CRIOBE's CVAT repository (criobe branch)
+git clone -b criobe https://github.com/criobe/cvat.git
 cd cvat
+
+# Verify you're on the criobe branch
+git branch
+# Should show: * criobe
 
 # Verify repository structure
 ls -la
 # Should see: bridge/, components/, docker-compose.yml, etc.
 ```
 
-**Repository Structure**:
+!!! warning "Critical: Use criobe Branch"
+    The CRIOBE platform **requires** the `criobe` branch, **not** `main`. The criobe branch contains custom integrations with the bridge service and Nuclio serverless components that are essential for automated pipeline processing.
+
+**Repository Structure** (on criobe branch):
 ```
-cvat/
+cvat/  (criobe branch)
 ├── bridge/                      # Bridge automation service
 │   ├── docker-compose.bridge.yml
 │   └── .env.example

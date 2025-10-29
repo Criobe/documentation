@@ -58,57 +58,64 @@ cd ~/Projects/coral-segmentation
 
 ## Data Storage Structure
 
-Understanding the data organization:
+QUADRATSEG uses a **centralized data directory** accessed via symlinks:
 
 ```
-coral-segmentation/
-├── data/                           # Shared test data
-│   └── test_samples/
+~/Projects/
+├── criobe_data/                              # Centralized data (DATA_ROOT)
+│   ├── test_samples/                        # Shared test data for all modules
+│   │   ├── 1-raw_jpg/
+│   │   ├── 2-quadrat_corner_export/
+│   │   ├── 3-image_warping/
+│   │   ├── 4-grid_pose_export/
+│   │   └── 5-grid_removal/
+│   ├── media/                               # Images from CVAT (shared)
+│   │   ├── criobe_finegrained_annotated/
+│   │   └── banggai_extended_annotated/
+│   ├── pulled_from_cvat/                    # FiftyOne exports (shared)
+│   │   ├── criobe_finegrained/
+│   │   └── banggai_extended/
+│   ├── prepared_yolo/                       # YOLO format datasets (shared)
+│   │   ├── criobe_finegrained/
+│   │   └── banggai_extended/
+│   └── prepared_mmseg/                      # MMSeg format datasets (shared)
 │
-├── coral_seg_yolo/
-│   └── data/
-│       ├── media/
-│       │   ├── criobe_finegrained_annotated/    # Images from CVAT
-│       │   └── banggai_extended_annotated/
-│       ├── pulled_from_cvat/                    # FiftyOne exports
-│       │   ├── criobe_finegrained/
-│       │   └── banggai_extended/
-│       └── prepared_yolo/                       # YOLO format datasets
-│           ├── criobe_finegrained/
-│           └── banggai_extended/
+├── coral_seg_yolo/                          # Module repository
+│   ├── data -> ~/Projects/criobe_data      # Symlink to shared data
+│   └── src/
 │
-├── DINOv2_mmseg/
-│   └── data/
-│       ├── media/                               # Images
-│       ├── pulled_from_cvat/                    # FiftyOne exports
-│       └── prepared_mmseg/                      # MMSeg format
+├── grid_pose_detection/                     # Module repository
+│   ├── data -> ~/Projects/criobe_data      # Symlink to shared data
+│   └── src/
 │
-├── grid_pose_detection/
-│   └── data/
-│       ├── media/
-│       ├── pulled_from_cvat/
-│       └── prepared_yolo/
+├── grid_inpainting/                         # Module repository
+│   ├── data -> ~/Projects/criobe_data      # Symlink to shared data
+│   └── src/
 │
-└── data_engineering/
-    └── data/
-        └── fiftyone_datasets/                   # FiftyOne persistent storage
+└── data_engineering/                        # Module repository
+    ├── data -> ~/Projects/criobe_data      # Symlink to shared data
+    └── src/
 ```
+
+**Benefits of Centralized Data**:
+- Download test data once, accessible by all modules
+- Share CVAT images and annotations across modules
+- No duplication of large datasets (~20-30GB savings)
+- Consistent paths across all modules
 
 ## Step 1: Download Test Samples
 
-Start with small test datasets to verify everything works:
+Start with small test datasets to verify everything works. Test data is downloaded **once** to the centralized data directory:
 
 ### Download All Test Samples
 
 ```bash
-cd ~/Projects/coral-segmentation
+# Navigate to centralized data directory
+cd $DATA_ROOT  # or cd ~/Projects/criobe_data
 
-# Download test samples script (if available)
-./download_test_samples.sh
-
-# Or manually download
-mkdir -p data/test_samples
-cd data/test_samples
+# Create test_samples directory
+mkdir -p test_samples
+cd test_samples
 
 # Download from Google Cloud Storage
 wget https://storage.googleapis.com/criobe_public/test_samples/test_samples.tar.gz
@@ -119,12 +126,16 @@ tar -xzf test_samples.tar.gz
 # Verify structure
 ls -la
 # Should show: 1-raw_jpg/, 2-quadrat_corner_export/, etc.
+
+# All modules can now access via their data symlink!
+# Example: ~/Projects/coral_seg_yolo/data/test_samples/
 ```
 
 ### Test Sample Contents
 
 ```bash
-cd data/test_samples
+# Navigate to test samples (accessible from any module)
+cd $DATA_ROOT/test_samples
 
 # Raw images (5 samples)
 ls 1-raw_jpg/
@@ -147,14 +158,31 @@ ls 5-grid_removal/
 # Images with grid overlay removed via inpainting
 ```
 
+**Access from Modules**:
+All modules can access test data through their symlink:
+```bash
+# From coral_seg_yolo
+ls ~/Projects/coral_seg_yolo/data/test_samples/
+
+# From grid_pose_detection
+ls ~/Projects/grid_pose_detection/data/test_samples/
+
+# Both point to the same centralized data!
+```
+
 ## Step 2: Prepare Coral Segmentation Data
 
 ### Option A: Use Public Datasets (Recommended for Testing)
 
-Download pre-prepared coral segmentation datasets:
+Download pre-prepared coral segmentation datasets to the centralized data directory:
 
 ```bash
-cd ~/Projects/coral-segmentation/coral_seg_yolo/data
+# Navigate to centralized data directory
+cd $DATA_ROOT
+
+# Create prepared_yolo directory
+mkdir -p prepared_yolo
+cd prepared_yolo
 
 # Download CRIOBE Finegrained dataset
 wget https://storage.googleapis.com/criobe_public/datasets/criobe_finegrained.tar.gz
@@ -165,9 +193,12 @@ wget https://storage.googleapis.com/criobe_public/datasets/banggai_extended.tar.
 tar -xzf banggai_extended.tar.gz
 
 # Verify structure
-ls -la prepared_yolo/
+ls -la
 # criobe_finegrained/ (YOLO format)
 # banggai_extended/ (YOLO format)
+
+# All modules can now access via symlink!
+# Example: ~/Projects/coral_seg_yolo/data/prepared_yolo/
 ```
 
 **Dataset Structure** (YOLO format):
@@ -208,15 +239,18 @@ pixi run python create_fiftyone_dataset.py \
 **Then convert to training format**:
 
 ```bash
-cd ~/Projects/coral-segmentation/coral_seg_yolo
+# Navigate to coral_seg_yolo module
+cd ~/Projects/coral_seg_yolo
 
-# Convert FiftyOne dataset to YOLO format
+# Convert FiftyOne dataset to YOLO format (output goes to shared data)
 pixi run python src/data_preparation/prepare_yolo_dataset.py \
     --fiftyone-dataset "criobe_finegrained_annotated" \
     --output-dir data/prepared_yolo/criobe_finegrained \
     --train-split 0.7 \
     --val-split 0.2 \
     --test-split 0.1
+
+# Dataset is now in $DATA_ROOT/prepared_yolo/criobe_finegrained/
 ```
 
 ## Step 3: Prepare Grid Detection Data
@@ -224,7 +258,12 @@ pixi run python src/data_preparation/prepare_yolo_dataset.py \
 ### Download Grid Detection Datasets
 
 ```bash
-cd ~/Projects/coral-segmentation/grid_pose_detection/data
+# Navigate to centralized data directory
+cd $DATA_ROOT
+
+# Create prepared_yolo directory if not exists
+mkdir -p prepared_yolo
+cd prepared_yolo
 
 # Download corner detection dataset
 wget https://storage.googleapis.com/criobe_public/datasets/grid_corners.tar.gz
@@ -235,25 +274,31 @@ wget https://storage.googleapis.com/criobe_public/datasets/grid_pose.tar.gz
 tar -xzf grid_pose.tar.gz
 
 # Verify structure
-ls -la prepared_yolo/
+ls -la
 # grid_corners/ (4 keypoints per image)
 # grid_pose/ (117 keypoints per image)
+
+# Grid detection module can access via symlink:
+# ~/Projects/grid_pose_detection/data/prepared_yolo/
 ```
 
 ### Prepare from CVAT (Alternative)
 
 ```bash
-cd ~/Projects/coral-segmentation/data_engineering
+# Navigate to data_engineering module
+cd ~/Projects/data_engineering
 
-# Pull corner detection dataset
+# Pull corner detection dataset (saves to shared data)
 pixi run python create_fiftyone_dataset.py \
     --project-name "criobe_corner_annotation" \
     --output-dir data/pulled_from_cvat/corner_detection
 
-# Pull grid pose dataset
+# Pull grid pose dataset (saves to shared data)
 pixi run python create_fiftyone_dataset.py \
     --project-name "criobe_grid_annotation" \
     --output-dir data/pulled_from_cvat/grid_pose
+
+# Data is now in $DATA_ROOT/pulled_from_cvat/
 ```
 
 ## Step 4: Verify Dataset Preparation

@@ -10,31 +10,31 @@ Install and configure Pixi environments for all QUADRATSEG modules used in train
 
 ## Module Overview
 
-The QUADRATSEG repository contains 7 modules with Pixi environments:
+QUADRATSEG consists of **independent module repositories**, each with its own Pixi environment:
 
 ```mermaid
 graph TD
-    A[coral-segmentation] --> B[coral_seg_yolo]
+    A[Independent Module Repositories] --> B[coral_seg_yolo]
     A --> C[DINOv2_mmseg]
     A --> D[grid_pose_detection]
     A --> E[grid_inpainting]
     A --> F[data_engineering]
-    A --> G[bridge]
-    A --> H[documentation]
+    A --> G[documentation]
+    H[CVAT criobe branch] --> I[bridge]
 
     B --> B1[Training & Inference]
     C --> C1[Two-Stage Segmentation]
     D --> D1[Grid Detection]
     E --> E1[Grid Removal]
     F --> F1[Dataset Management]
-    G --> G1[Automation Service]
-    H --> H1[Docs Site]
+    I --> I1[Automation Service]
 
     style B fill:#e3f2fd
     style C fill:#e3f2fd
     style D fill:#e3f2fd
     style E fill:#e3f2fd
     style F fill:#fff9c4
+    style H fill:#ffeb3b
 ```
 
 ## Module Environments Reference
@@ -82,12 +82,19 @@ You don't need to install all modules immediately. Choose based on your needs:
 
 ## Step 1: Install Core ML Modules
 
-Install environments for the primary ML modules:
+Install environments for the primary ML module repositories:
+
+!!! info "Prerequisites"
+    Before proceeding, ensure you have:
+
+    - Cloned the module repositories ([Step 3 from Pixi Setup](1-pixi-setup.md#step-3-clone-module-repositories))
+    - Created data symlinks ([Step 4 from Pixi Setup](1-pixi-setup.md#step-4-create-data-symlinks))
 
 ### coral_seg_yolo (YOLO Coral Segmentation)
 
 ```bash
-cd ~/Projects/coral-segmentation/coral_seg_yolo
+# Navigate to module repository
+cd ~/Projects/coral_seg_yolo
 
 # Install default environment
 pixi install
@@ -124,7 +131,11 @@ pixi run -e coral-seg-yolo-dev jupyter lab
 ### DINOv2_mmseg (Two-Stage Segmentation)
 
 ```bash
-cd ~/Projects/coral-segmentation/DINOv2_mmseg
+# Clone if not already done
+cd ~/Projects
+git clone https://github.com/criobe/DINOv2_mmseg.git
+cd DINOv2_mmseg
+ln -s $DATA_ROOT data
 
 # Install environment
 pixi install
@@ -146,7 +157,8 @@ pixi run python -c "import mmseg; print(f'MMSeg {mmseg.__version__}')"
 ### grid_pose_detection (Grid Detection)
 
 ```bash
-cd ~/Projects/coral-segmentation/grid_pose_detection
+# Navigate to module repository
+cd ~/Projects/grid_pose_detection
 
 # Install default environment
 pixi install
@@ -164,7 +176,8 @@ pixi run python src/gridpose_inference.py --help
 ### grid_inpainting (Grid Removal)
 
 ```bash
-cd ~/Projects/coral-segmentation/grid_inpainting
+# Navigate to module repository
+cd ~/Projects/grid_inpainting
 
 # Install full environment
 pixi install
@@ -183,7 +196,8 @@ Essential for dataset management and CVAT integration:
 ### data_engineering
 
 ```bash
-cd ~/Projects/coral-segmentation/data_engineering
+# Navigate to module repository
+cd ~/Projects/data_engineering
 
 # Install environment
 pixi install
@@ -204,10 +218,13 @@ pixi run fiftyone app launch
 
 ### bridge (Automation Service)
 
-Only needed if you want to modify bridge code locally:
+Bridge is part of the CVAT repository. Only needed if you want to modify bridge code locally:
 
 ```bash
-cd ~/Projects/coral-segmentation/bridge
+# Clone CVAT repository with bridge (use criobe branch)
+cd ~/Projects
+git clone -b criobe https://github.com/criobe/cvat.git
+cd cvat/bridge
 
 # Install environment
 pixi install
@@ -220,14 +237,20 @@ pixi run python -m uvicorn main:app --reload
 ```
 
 !!! tip "Bridge in Docker"
-    For production, bridge runs in Docker (see [End User Guide](../for-end-users/1-docker-deployment.md)). This is only for local development.
+    For production, bridge runs in Docker (see [End User Guide](../for-end-users/1-docker-deployment.md)). The Pixi environment is only for local development.
+
+!!! warning "CVAT Branch"
+    The CVAT repository must use the **`criobe` branch**, not `main`. Always clone with `-b criobe` or checkout the branch after cloning.
 
 ### documentation (This Documentation Site)
 
 Only needed if you want to edit documentation:
 
 ```bash
-cd ~/Projects/coral-segmentation/documentation
+# Clone documentation repository if not already done
+cd ~/Projects
+git clone https://github.com/criobe/documentation.git
+cd documentation
 
 # Install environment
 pixi install
@@ -242,27 +265,24 @@ pixi run mkdocs build
 
 ## Step 4: Verify All Installations
 
-Run verification script to check all environments:
+Run verification tests to check all module environments:
 
 ```bash
-# From repository root
-cd ~/Projects/coral-segmentation
-
-# Test each module
+# Test each module repository
 echo "Testing coral_seg_yolo..."
-cd coral_seg_yolo && pixi run python -c "import torch, ultralytics; print('✓ coral_seg_yolo OK')" && cd ..
-
-echo "Testing DINOv2_mmseg..."
-cd DINOv2_mmseg && pixi run python -c "import torch, mmseg; print('✓ DINOv2_mmseg OK')" && cd ..
+cd ~/Projects/coral_seg_yolo && pixi run python -c "import torch, ultralytics; print('✓ coral_seg_yolo OK')"
 
 echo "Testing grid_pose_detection..."
-cd grid_pose_detection && pixi run python -c "import torch; print('✓ grid_pose_detection OK')" && cd ..
+cd ~/Projects/grid_pose_detection && pixi run python -c "import torch; print('✓ grid_pose_detection OK')"
 
 echo "Testing grid_inpainting..."
-cd grid_inpainting && pixi run python -c "from simple_lama_inpainting import SimpleLama; print('✓ grid_inpainting OK')" && cd ..
+cd ~/Projects/grid_inpainting && pixi run python -c "from simple_lama_inpainting import SimpleLama; print('✓ grid_inpainting OK')"
 
 echo "Testing data_engineering..."
-cd data_engineering && pixi run python -c "import fiftyone; print('✓ data_engineering OK')" && cd ..
+cd ~/Projects/data_engineering && pixi run python -c "import fiftyone; print('✓ data_engineering OK')"
+
+# Optional: Test DINOv2 if cloned
+# cd ~/Projects/DINOv2_mmseg && pixi run python -c "import torch, mmseg; print('✓ DINOv2_mmseg OK')"
 ```
 
 **Expected Output**:
@@ -285,28 +305,28 @@ Each module provides pre-trained models that need to be downloaded:
 
 ### Download All Models
 
-Most modules include a download script:
+Most modules include a download script. Models are stored in the centralized data directory:
 
 ```bash
 # coral_seg_yolo models
-cd ~/Projects/coral-segmentation/coral_seg_yolo
+cd ~/Projects/coral_seg_yolo
 ./download_models.sh
-# Downloads: coralsegv4_yolo11m_best.pt, coralsegbanggai_yolo11m_best.pt
-
-# DINOv2_mmseg models
-cd ~/Projects/coral-segmentation/DINOv2_mmseg
-./download_models.sh
-# Downloads: DINOv2 checkpoint, SegFormer weights, SAM checkpoint
+# Downloads to: $DATA_ROOT/models/ (accessible via data symlink)
 
 # grid_pose_detection models
-cd ~/Projects/coral-segmentation/grid_pose_detection
+cd ~/Projects/grid_pose_detection
 ./download_models.sh
-# Downloads: gridcorners_yolov11n_best.pt, gridpose_yolov11n_best.pt
+# Downloads to: assets/ directory
 
 # grid_inpainting models
-cd ~/Projects/coral-segmentation/grid_inpainting
+cd ~/Projects/grid_inpainting
 ./download_models.sh
-# Downloads: SimpleLama weights
+# Downloads to: assets/ directory
+
+# DINOv2_mmseg models (if cloned)
+# cd ~/Projects/DINOv2_mmseg
+# ./download_models.sh
+# Downloads to: assets/ directory
 ```
 
 ### Manual Model Download
@@ -315,22 +335,22 @@ If download scripts fail, manually download from Google Cloud Storage:
 
 ```bash
 # Example: coral_seg_yolo models
-mkdir -p ~/Projects/coral-segmentation/coral_seg_yolo/models
+mkdir -p $DATA_ROOT/models
 
 # Download via browser
 # https://storage.googleapis.com/criobe_public/models/coralsegv4_yolo11m_best.pt
 
 # Or using wget
-cd ~/Projects/coral-segmentation/coral_seg_yolo/models
+cd $DATA_ROOT/models
 wget https://storage.googleapis.com/criobe_public/models/coralsegv4_yolo11m_best.pt
 ```
 
 **Model Storage Locations**:
 ```
-coral_seg_yolo/models/          # YOLO weights
-DINOv2_mmseg/assets/           # DINOv2, SegFormer, SAM weights
-grid_pose_detection/assets/     # Grid detection weights
-grid_inpainting/assets/         # SimpleLama weights
+$DATA_ROOT/models/              # Shared YOLO and other model weights
+~/Projects/grid_pose_detection/assets/     # Grid detection models
+~/Projects/grid_inpainting/assets/         # SimpleLama weights
+~/Projects/DINOv2_mmseg/assets/           # DINOv2, SegFormer, SAM weights
 ```
 
 ## Environment Management

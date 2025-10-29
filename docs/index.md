@@ -43,13 +43,21 @@ Welcome to the comprehensive documentation for **QUADRATSEG**, the automated cor
 
 ## What is QUADRATSEG?
 
-QUADRATSEG is a complete, automated platform for analyzing coral reef photo quadrats, developed by CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement). The platform:
+QUADRATSEG is a complete, automated platform for analyzing coral reef photo quadrats, developed by CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement). The platform consists of **independent, modular repositories** that can be deployed together or separately based on your needs.
+
+**Key Features**:
 
 - **Detects and corrects** grid corners for perspective normalization
 - **Removes grid overlays** using advanced inpainting techniques
 - **Segments coral species** using YOLO or DINOv2-based models
 - **Integrates with CVAT** for annotation and quality control
 - **Manages datasets** through FiftyOne for reproducible research
+
+**Architecture**:
+
+- **Modular design**: Each component is an independent Git repository
+- **Flexible deployment**: Use only the modules you need
+- **Centralized data**: Shared datasets via symlinks—no duplication
 
 ## Pipeline Overview
 

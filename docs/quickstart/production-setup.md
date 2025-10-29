@@ -54,15 +54,22 @@ docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu20.04 nvidia-smi
 ## Step 1: Clone the Repository
 
 ```bash
-# Clone the CRIOBE fork of CVAT
-git clone https://github.com/criobe/cvat-fork.git
-cd cvat-fork
+# Clone the CRIOBE fork of CVAT (use criobe branch)
+git clone -b criobe https://github.com/criobe/cvat.git
+cd cvat
+
+# Verify you're on the criobe branch
+git branch
+# Should show: * criobe
 
 # The repository includes:
 # - cvat/ - CVAT core platform
 # - components/serverless/ - Nuclio serverless functions
 # - bridge/ - Automation service
 ```
+
+!!! warning "Important: Use criobe Branch"
+    The CRIOBE platform **must** use the `criobe` branch of the CVAT repository, **not** the `main` branch. The criobe branch includes custom integrations for the bridge service and serverless components.
 
 ## Step 2: Configure Environment Variables
 
@@ -145,11 +152,15 @@ LOG_LEVEL=INFO
 
 ## Step 4: Deploy the Complete Stack
 
-Deploy CVAT, Nuclio, and Bridge together:
+Deploy CVAT, Nuclio, and Bridge together. Ensure you're in the CVAT repository on the criobe branch:
 
 ```bash
-# Return to CVAT root directory
-cd ..
+# Verify you're in the CVAT directory on criobe branch
+pwd
+# Should show: /path/to/cvat
+
+git branch
+# Should show: * criobe
 
 # Deploy the complete stack
 docker compose \

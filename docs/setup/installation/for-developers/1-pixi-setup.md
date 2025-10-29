@@ -99,50 +99,130 @@ pixi --version
 !!! success "Pixi Installed"
     If you see the version number, Pixi is correctly installed!
 
-## Step 2: Clone Repository
+## Step 2: Set Up Centralized Data Directory
 
-Clone the QUADRATSEG repository to your local machine:
+QUADRATSEG uses a **centralized data directory** that all modules access via symlinks to avoid data duplication:
 
 ```bash
 # Navigate to your projects directory
 cd ~/Projects  # or your preferred location
 
-# Clone repository
-git clone https://github.com/criobe/coral-segmentation.git
+# Create centralized data directory
+mkdir -p criobe_data
 
-# Enter repository
-cd coral-segmentation
+# Set environment variable
+export DATA_ROOT=~/Projects/criobe_data
 
-# Verify repository structure
+# Make permanent (add to shell profile)
+echo 'export DATA_ROOT=~/Projects/criobe_data' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify
+echo $DATA_ROOT
+# Should output: /home/your-username/Projects/criobe_data
+```
+
+!!! info "Why Centralized Data?"
+    This approach allows all module repositories to share test samples, models, and datasets without duplication. Each module will create a symlink `data -> $DATA_ROOT`.
+
+## Step 3: Clone Module Repositories
+
+QUADRATSEG uses a **multi-repository architecture**. Each module is an independent Git repository. Clone only the modules you need:
+
+```bash
+# Navigate to projects directory
+cd ~/Projects
+
+# Clone module repositories (work on main branch by default)
+git clone https://github.com/criobe/coral_seg_yolo.git
+git clone https://github.com/criobe/grid_pose_detection.git
+git clone https://github.com/criobe/grid_inpainting.git
+git clone https://github.com/criobe/data_engineering.git
+
+# Optional: Clone additional modules as needed
+# git clone https://github.com/criobe/DINOv2_mmseg.git
+# git clone https://github.com/criobe/documentation.git
+
+# Verify
 ls -la
-# You should see: bridge/, coral_seg_yolo/, DINOv2_mmseg/,
-#                 data_engineering/, grid_inpainting/,
-#                 grid_pose_detection/, documentation/, etc.
+# You should see: criobe_data/, coral_seg_yolo/, grid_pose_detection/, etc.
 ```
 
-## Step 3: Understand Repository Structure
+**All module repositories use the `main` branch** (default when cloning).
 
-The repository is organized into multiple modules, each with its own Pixi environment:
+!!! tip "Modular Approach"
+    You don't need to clone all repositories. Start with modules relevant to your work:
+
+    - **Coral segmentation**: `coral_seg_yolo`, `data_engineering`
+    - **Grid detection**: `grid_pose_detection`, `grid_inpainting`
+    - **Documentation**: `documentation`
+
+## Step 4: Create Data Symlinks
+
+Link each module repository to the centralized data directory:
+
+```bash
+# Create symlinks in each cloned module
+cd ~/Projects/coral_seg_yolo
+ln -s $DATA_ROOT data
+
+cd ~/Projects/grid_pose_detection
+ln -s $DATA_ROOT data
+
+cd ~/Projects/grid_inpainting
+ln -s $DATA_ROOT data
+
+cd ~/Projects/data_engineering
+ln -s $DATA_ROOT data
+
+# If you cloned DINOv2_mmseg
+# cd ~/Projects/DINOv2_mmseg
+# ln -s $DATA_ROOT data
+
+# Verify symlinks
+ls -l ~/Projects/coral_seg_yolo/data
+# Expected: data -> /home/your-username/Projects/criobe_data
+```
+
+!!! success "Data Access"
+    All modules can now access shared data through their `data` symlink! Download test data once, use everywhere.
+
+## Step 5: Understand Repository Structure
+
+Each module is an **independent Git repository** with its own Pixi environment:
 
 ```
-coral-segmentation/
-├── coral_seg_yolo/           # YOLO-based coral segmentation
-│   └── pixi.toml            # Environments: coral-seg-yolo, coral-seg-yolo-dev
-├── DINOv2_mmseg/            # DINOv2-based segmentation
-│   └── pixi.toml            # Environment: dinov2-mmseg
-├── grid_pose_detection/     # Grid corner and pose detection
-│   └── pixi.toml            # Environments: grid-pose, grid-pose-dev
-├── grid_inpainting/         # Grid removal via inpainting
-│   └── pixi.toml            # Environments: grid-inpainting, grid-inpainting-deploy
-├── data_engineering/        # Dataset management with FiftyOne
-│   └── pixi.toml            # Environment: default
-├── bridge/                  # Webhook automation service
-│   └── pixi.toml            # Environment: bridge
-└── documentation/           # This documentation
-    └── pixi.toml            # Environment: default (MkDocs)
+~/Projects/
+├── criobe_data/                      # Centralized data (DATA_ROOT)
+│   ├── test_samples/                # Shared test data
+│   ├── media/                       # Images from CVAT
+│   ├── models/                      # Pre-trained models
+│   └── pulled_from_cvat/            # FiftyOne exports
+├── coral_seg_yolo/                  # Independent repo (main branch)
+│   ├── data -> ~/Projects/criobe_data  # Symlink to shared data
+│   ├── src/
+│   ├── pixi.toml                   # Environments: coral-seg-yolo, coral-seg-yolo-dev
+│   └── CLAUDE.md
+├── grid_pose_detection/             # Independent repo (main branch)
+│   ├── data -> ~/Projects/criobe_data  # Symlink to shared data
+│   ├── src/
+│   ├── pixi.toml                   # Environments: grid-pose, grid-pose-dev
+│   └── CLAUDE.md
+├── grid_inpainting/                 # Independent repo (main branch)
+│   ├── data -> ~/Projects/criobe_data  # Symlink to shared data
+│   ├── pixi.toml                   # Environments: grid-inpainting, grid-inpainting-deploy
+│   └── CLAUDE.md
+└── data_engineering/                # Independent repo (main branch)
+    ├── data -> ~/Projects/criobe_data  # Symlink to shared data
+    ├── pixi.toml                   # Environment: default
+    └── CLAUDE.md
 ```
 
-**Each module is independent** with its own dependencies and environments.
+**Key Points**:
+
+- Each module is independent with its own Git history
+- All modules work on `main` branch (except CVAT, which uses `criobe` branch)
+- Symlinks provide access to shared data without duplication
 
 ## Step 4: Configure Pixi (Optional)
 
@@ -176,21 +256,21 @@ pixi config get cache-dir
 !!! tip "Large Cache"
     Pixi's cache can grow to several GB. Ensure your home directory or cache location has sufficient space.
 
-## Step 5: Test Pixi Installation
+## Step 6: Test Pixi Installation
 
-Test that Pixi can create and manage environments:
+Test that Pixi can create and manage environments in a module repository:
 
 ### Create Test Environment
 
 ```bash
-# Navigate to a module
-cd grid_pose_detection/
+# Navigate to a module repository
+cd ~/Projects/grid_pose_detection
 
 # Install environment (this will take a few minutes the first time)
 pixi install
 
 # Expected output:
-# ✔ Project in /path/to/coral-segmentation/grid_pose_detection is ready to use!
+# ✔ Project in /home/your-username/Projects/grid_pose_detection is ready to use!
 ```
 
 ### Activate Environment
@@ -231,28 +311,25 @@ pixi run python src/gridpose_inference.py --help
 !!! tip "Pixi Shell vs Run"
     Use `pixi shell` for interactive work (Jupyter, debugging). Use `pixi run` for automated scripts and CI/CD pipelines.
 
-## Step 6: Verify Module Environments
+## Step 7: Verify Module Environments
 
-Check that Pixi can access all module environments:
+Check that Pixi can access environments in each module repository:
 
 ```bash
-# From repository root
-cd ~/Projects/coral-segmentation
-
-# List all environments in current module
-cd coral_seg_yolo/
+# Navigate to each module and check environments
+cd ~/Projects/coral_seg_yolo
 pixi info
 # Shows: coral-seg-yolo, coral-seg-yolo-dev
 
-cd ../DINOv2_mmseg/
-pixi info
-# Shows: dinov2-mmseg
-
-cd ../grid_pose_detection/
+cd ~/Projects/grid_pose_detection
 pixi info
 # Shows: grid-pose, grid-pose-dev
 
-cd ../data_engineering/
+cd ~/Projects/grid_inpainting
+pixi info
+# Shows: grid-inpainting, grid-inpainting-deploy
+
+cd ~/Projects/data_engineering
 pixi info
 # Shows: default environment
 ```
