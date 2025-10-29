@@ -3,7 +3,7 @@
     "name": "Acanthastrea",
     "id": 448,
     "color": "#98b9d6",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 771,
@@ -44,7 +44,7 @@
     "name": "Acropora",
     "id": 449,
     "color": "#22db5a",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 434,
@@ -85,7 +85,7 @@
     "name": "Astreopora",
     "id": 450,
     "color": "#dc216e",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 773,
@@ -126,7 +126,7 @@
     "name": "Atrea",
     "id": 451,
     "color": "#48cddd",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 438,
@@ -167,7 +167,7 @@
     "name": "Fungia",
     "id": 454,
     "color": "#f1a94c",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 775,
@@ -208,7 +208,7 @@
     "name": "Goniastrea",
     "id": 455,
     "color": "#7172a4",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 446,
@@ -249,7 +249,7 @@
     "name": "Leptastrea",
     "id": 456,
     "color": "#68f971",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 777,
@@ -290,7 +290,7 @@
     "name": "Merulinidae",
     "id": 458,
     "color": "#7098e9",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 778,
@@ -331,7 +331,7 @@
     "name": "Millepora",
     "id": 459,
     "color": "#6f646f",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 779,
@@ -372,7 +372,7 @@
     "name": "Montastrea",
     "id": 460,
     "color": "#398b38",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 456,
@@ -413,7 +413,7 @@
     "name": "Montipora",
     "id": 461,
     "color": "#a5d0e4",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 781,
@@ -454,7 +454,7 @@
     "name": "Other",
     "id": 462,
     "color": "#51b90a",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 460,
@@ -495,7 +495,7 @@
     "name": "Pavona/Leptoseris",
     "id": 464,
     "color": "#7eede3",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 464,
@@ -536,7 +536,7 @@
     "name": "Pocillopora",
     "id": 465,
     "color": "#f7e33e",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 785,
@@ -577,7 +577,7 @@
     "name": "Porites",
     "id": 466,
     "color": "#83c08c",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 468,
@@ -618,7 +618,7 @@
     "name": "Psammocora",
     "id": 467,
     "color": "#188116",
-    "type": "any",
+    "type": "polygon",
     "attributes": [
       {
         "id": 787,

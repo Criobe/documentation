@@ -6,16 +6,28 @@ Copy-paste ready JSON templates for all CVAT label configurations used in the QU
 
 This reference provides all label configurations needed for the complete coral annotation pipeline. Each template is ready to paste into CVAT's **Raw** label configuration editor.
 
+!!! important "CVAT vs FiftyOne Label Type Naming"
+    The system uses different terminology between CVAT (annotation interface) and FiftyOne (dataset management):
+
+    **CVAT → FiftyOne mapping:**
+
+    - **Skeleton** (CVAT) → **Keypoints** (FiftyOne) - Used for corner detection (4 points) and grid detection (117 points)
+    - **Polygon** (CVAT) → **Polylines** with `closed=True, filled=True` (FiftyOne) - Used for coral segmentation
+
+    **Important:**
+    - Corner and grid detection use CVAT's **Skeleton** label type with numbered sublabels, not independent points
+    - Coral segmentation uses CVAT's **Polygon** label type for each genus (closed shapes around coral colonies)
+
 ## Quick Reference
 
-| Template | Use Case | Annotation Type | Count | Guides |
-|----------|----------|-----------------|-------|--------|
-| [4-Point Corners](#4-point-corner-detection) | Quadrat corner detection | Skeleton (points) | 4 joints | B, C |
-| [117-Point Grid](#117-point-grid-detection) | Grid intersection detection | Skeleton (points) | 117 joints | C |
-| [16 Genera Segmentation](#16-genera-coral-segmentation-finegrained) | Coral instance segmentation | Polyline | 16 classes | A, B, C |
-| [10 Class Extended](#10-class-extended-taxonomy) | Simplified coral segmentation | Polyline | 10 classes | - |
-| [7 Class Main Families](#7-class-main-families) | Family-level segmentation | Polyline | 7 classes | - |
-| [Binary Coral](#binary-coral-detection) | Coral vs background | Polyline | 1 class | - |
+| Template | Use Case | CVAT Type | FiftyOne Type | Count | Guides |
+|----------|----------|-----------|---------------|-------|--------|
+| [4-Point Corners](#4-point-corner-detection) | Quadrat corner detection | Skeleton | Keypoints | 4 sublabels | B, C |
+| [117-Point Grid](#117-point-grid-detection) | Grid intersection detection | Skeleton | Keypoints | 117 sublabels | C |
+| [16 Genera Segmentation](#16-genera-coral-segmentation-finegrained) | Coral instance segmentation | Polygon | Polylines (closed) | 16 classes | A, B, C |
+| [10 Class Extended](#10-class-extended-taxonomy) | Simplified coral segmentation | Polygon | Polylines (closed) | 10 classes | - |
+| [7 Class Main Families](#7-class-main-families) | Family-level segmentation | Polygon | Polylines (closed) | 7 classes | - |
+| [Binary Coral](#binary-coral-detection) | Coral vs background | Polygon | Polylines (closed) | 1 class | - |
 
 ---
 
@@ -25,31 +37,57 @@ This reference provides all label configurations needed for the complete coral a
 
 **Pipeline stage**: Stage 1 (corner detection and warping)
 
-**Annotation type**: Skeleton with 4 points
+**CVAT annotation type**: Skeleton with 4 numbered sublabels
+
+**FiftyOne import type**: Keypoints
 
 ### JSON Template
 
 ```json
 [
   {
-    "name": "corner",
-    "color": "#ff0000",
-    "attributes": [],
-    "type": "points"
+    "name": "quadrat_corner",
+    "color": "#19fdf3",
+    "type": "skeleton",
+    "sublabels": [
+      {
+        "name": "1",
+        "type": "points",
+        "color": "#d12345"
+      },
+      {
+        "name": "2",
+        "type": "points",
+        "color": "#350dea"
+      },
+      {
+        "name": "3",
+        "type": "points",
+        "color": "#479ffe"
+      },
+      {
+        "name": "4",
+        "type": "points",
+        "color": "#4a649f"
+      }
+    ],
+    "svg": "",
+    "attributes": []
   }
 ]
 ```
 
 ### Configuration Notes
 
-- **Total points**: 4 (one for each quadrat corner)
+- **Label name**: `quadrat_corner` (not just "corner")
+- **Label type**: `skeleton` (not independent points)
+- **Sublabels**: 4 numbered points (1, 2, 3, 4)
 - **Point order**: **CRITICAL** - Must follow clockwise order:
     1. Top-left corner
     2. Top-right corner
     3. Bottom-right corner
     4. Bottom-left corner
-- **Skeleton**: CVAT auto-creates skeleton structure with 4 joints when points are added
-- **Edges**: Automatically connects corners in quadrilateral shape
+- **SVG field**: Can be empty `""` or contain SVG path definition for skeleton visualization
 
 ### Visual Guide
 
@@ -78,27 +116,44 @@ This reference provides all label configurations needed for the complete coral a
 
 **Pipeline stage**: Stage 2 (grid pose detection)
 
-**Annotation type**: Skeleton with 117 points
+**CVAT annotation type**: Skeleton with 117 numbered sublabels
+
+**FiftyOne import type**: Keypoints
 
 ### JSON Template
+
+!!! info "Full Configuration File"
+    The complete JSON with all 117 sublabels is available at:
+    `docs/assets/cvat_project_label_config/grid_annotation_example.json`
+
+**Simplified structure:**
 
 ```json
 [
   {
-    "name": "grid_point",
-    "color": "#00ff00",
-    "attributes": [],
-    "type": "points"
+    "name": "grid",
+    "color": "#7571e6",
+    "type": "skeleton",
+    "sublabels": [
+      {"name": "1", "type": "points", "color": "#d12345"},
+      {"name": "2", "type": "points", "color": "#350dea"},
+      {"name": "3", "type": "points", "color": "#479ffe"},
+      ...
+      {"name": "117", "type": "points", "color": "#______"}
+    ],
+    "svg": "...",
+    "attributes": []
   }
 ]
 ```
 
 ### Configuration Notes
 
-- **Total points**: 117 (complete grid of 9×13 intersection points)
+- **Label name**: `grid` (not "grid_point")
+- **Label type**: `skeleton` (not independent points)
+- **Sublabels**: 117 numbered points (1-117)
 - **Grid structure**: 9 rows × 13 columns = 117 keypoints
-- **Skeleton**: CVAT creates 117-joint skeleton
-- **Edges**: Connects adjacent grid points horizontally and vertically
+- **SVG field**: Contains edge connections for grid visualization
 
 ### Grid Structure
 
@@ -145,7 +200,9 @@ The skeleton connects adjacent points with edges. Here's the complete edge list 
 
 **Pipeline stage**: Final stage (coral segmentation)
 
-**Annotation type**: Polyline (closed shapes around coral colonies)
+**CVAT annotation type**: Polygon (closed shapes around coral colonies)
+
+**FiftyOne import type**: Polylines with `closed=True, filled=True`
 
 ### JSON Template
 
@@ -155,97 +212,97 @@ The skeleton connects adjacent points with edges. Here's the complete edge list 
     "name": "Acanthastrea",
     "color": "#ff0000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Acropora",
     "color": "#00ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Astreopora",
     "color": "#0000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Atrea",
     "color": "#ffff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Fungia",
     "color": "#ff00ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Goniastrea",
     "color": "#00ffff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Leptastrea",
     "color": "#ff8000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Merulinidae",
     "color": "#8000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Millepora",
     "color": "#00ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montastrea",
     "color": "#ff0080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montipora",
     "color": "#80ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Other",
     "color": "#808080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pavona/Leptoseris",
     "color": "#ff8080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pocillopora",
     "color": "#8080ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Porites",
     "color": "#80ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Psammocora",
     "color": "#ff80ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   }
 ]
 ```
@@ -260,7 +317,9 @@ This configuration uses the **finegrained taxonomy** with 16 genera. See [Taxono
 
 **Use case**: Simplified coral segmentation with merged genera
 
-**Annotation type**: Polyline
+**CVAT annotation type**: Polygon (closed shapes around coral colonies)
+
+**FiftyOne import type**: Polylines with `closed=True, filled=True`
 
 ### JSON Template
 
@@ -270,61 +329,61 @@ This configuration uses the **finegrained taxonomy** with 16 genera. See [Taxono
     "name": "Acropora",
     "color": "#00ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Astreopora",
     "color": "#0000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Fungia",
     "color": "#ff00ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Group1",
     "color": "#ffff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Millepora",
     "color": "#00ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montipora",
     "color": "#80ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Other",
     "color": "#808080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pavona/Leptoseris",
     "color": "#ff8080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pocillopora",
     "color": "#8080ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Porites",
     "color": "#80ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   }
 ]
 ```
@@ -340,7 +399,9 @@ This configuration uses the **finegrained taxonomy** with 16 genera. See [Taxono
 
 **Use case**: Family-level coral classification
 
-**Annotation type**: Polyline
+**CVAT annotation type**: Polygon (closed shapes around coral colonies)
+
+**FiftyOne import type**: Polylines with `closed=True, filled=True`
 
 ### JSON Template
 
@@ -350,43 +411,43 @@ This configuration uses the **finegrained taxonomy** with 16 genera. See [Taxono
     "name": "Acropora",
     "color": "#00ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Atrea",
     "color": "#ffff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montipora",
     "color": "#80ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Other",
     "color": "#808080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pavona/Leptoseris",
     "color": "#ff8080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pocillopora",
     "color": "#8080ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Porites",
     "color": "#80ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   }
 ]
 ```
@@ -397,7 +458,9 @@ This configuration uses the **finegrained taxonomy** with 16 genera. See [Taxono
 
 **Use case**: Coral vs background segmentation (coral cover analysis)
 
-**Annotation type**: Polyline
+**CVAT annotation type**: Polygon (closed shapes around coral colonies)
+
+**FiftyOne import type**: Polylines with `closed=True, filled=True`
 
 ### JSON Template
 
@@ -407,7 +470,7 @@ This configuration uses the **finegrained taxonomy** with 16 genera. See [Taxono
     "name": "Coral",
     "color": "#00ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   }
 ]
 ```
@@ -530,13 +593,15 @@ http://bridge:8000/remove-grid-and-create-new-task-webhook?target_proj_id=8
 
 ## Annotation Best Practices
 
-### Polyline Annotation Tips
+### Polygon Annotation Tips (Coral Segmentation)
 
 1. **Colony boundaries**: Follow the actual living tissue boundary, not shadows or substrate
 2. **Overlapping colonies**: Separate into individual instances, don't merge
 3. **Minimum size**: Annotate colonies ≥2cm diameter (adjust based on image resolution)
 4. **Partial colonies**: Annotate if ≥50% visible
 5. **Uncertain identification**: Use "Other" label rather than guessing
+6. **Closing polygons**: Press `N` key or double-click first point to close the polygon
+7. **Tool selection**: Use CVAT's Polygon tool (not Polyline tool) for coral annotation
 
 ### Skeleton Annotation Tips
 
@@ -574,13 +639,13 @@ Before marking a task complete:
     - Add points in the specified order during annotation
     - CVAT will automatically create edges between points
 
-??? warning "Polylines don't close automatically"
+??? warning "Polygons don't close automatically"
     **Cause**: Expected behavior - must manually close
 
     **Solution**:
-    - Press `N` key to close polyline
-    - Or double-click on last point
-    - Verify shape is closed (solid fill appears)
+    - Press `N` key to close polygon
+    - Or double-click on first point to complete the shape
+    - Verify shape is closed (solid fill appears in the annotated region)
 
 ---
 

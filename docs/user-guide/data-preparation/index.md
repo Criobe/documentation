@@ -93,7 +93,7 @@ Each pipeline stage requires specific label configurations in CVAT:
 
 - **Corner Detection**: 4-point skeleton for quadrat corners
 - **Grid Detection**: 117-point skeleton for grid intersection points
-- **Coral Segmentation**: 16 coral genera as polyline labels
+- **Coral Segmentation**: 16 coral genera as polygon labels (in CVAT, imported as polylines in FiftyOne)
 
 All configurations are provided as **copy-paste ready JSON templates** in the guides.
 

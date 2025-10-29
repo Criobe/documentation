@@ -35,7 +35,7 @@ This guide shows you how to set up **the simplest annotation workflow** for cora
 At the end of this guide, you will have:
 
 - A CVAT project with labeled coral images
-- High-quality polyline annotations for 16 coral genera
+- High-quality polygon annotations for 16 coral genera (CVAT polygons → FiftyOne polylines)
 - A FiftyOne dataset ready for YOLO or MMSeg training
 - Understanding of semi-automatic annotation workflows
 
@@ -84,97 +84,97 @@ In the project creation dialog, you need to configure the labels. CVAT provides 
     "name": "Acanthastrea",
     "color": "#ff0000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Acropora",
     "color": "#00ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Astreopora",
     "color": "#0000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Atrea",
     "color": "#ffff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Fungia",
     "color": "#ff00ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Goniastrea",
     "color": "#00ffff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Leptastrea",
     "color": "#ff8000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Merulinidae",
     "color": "#8000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Millepora",
     "color": "#00ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montastrea",
     "color": "#ff0080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montipora",
     "color": "#80ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Other",
     "color": "#808080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pavona/Leptoseris",
     "color": "#ff8080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pocillopora",
     "color": "#8080ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Porites",
     "color": "#80ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Psammocora",
     "color": "#ff80ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   }
 ]
 ```
@@ -472,7 +472,7 @@ python create_fiftyone_dataset.py \
 **What this does:**
 
 - Connects to CVAT using credentials from `.env`
-- Downloads all images and polyline annotations
+- Downloads all images and polygon annotations (converted to FiftyOne polylines)
 - Creates a persistent FiftyOne dataset
 - Stores data in `data/media/my_coral_segmentation/`
 

@@ -51,10 +51,22 @@ This project is for detecting the 4 corners of coral quadrat images.
 2. **Create**: Click **+** button (Create new project)
 3. **Fill Project Details**:
     - **Name**: `corner_detection`
-    - **Labels**: (click "Add label")
-        - Label name: `corner`
-        - Label type: **Points** or **Skeleton**
-        - Color: (auto-assigned, or choose)
+    - **Labels**: Use the **Raw** editor and paste:
+        ```json
+        [
+          {
+            "name": "quadrat_corner",
+            "type": "skeleton",
+            "sublabels": [
+              {"name": "1", "type": "points"},
+              {"name": "2", "type": "points"},
+              {"name": "3", "type": "points"},
+              {"name": "4", "type": "points"}
+            ],
+            "svg": ""
+          }
+        ]
+        ```
     - **Bug tracker**: (optional)
     - **Source storage**: (leave default)
     - **Target storage**: (leave default)
@@ -80,14 +92,15 @@ http://localhost:8080/projects/1
 ### Understanding Labels
 
 **Corner Detection Labels**:
-- **Type**: Points (keypoints)
-- **Count**: 4 points per image
-- **Purpose**: Mark the 4 corners of the quadrat grid for perspective correction
+- **Type**: Skeleton (structured keypoints)
+- **Count**: 4 numbered sublabels (1, 2, 3, 4)
+- **Purpose**: Mark the 4 corners of the quadrat grid for perspective correction in clockwise order
 
 **Label Configuration**:
 ```
-Name: corner
-Type: points
+Name: quadrat_corner
+Type: skeleton
+Sublabels: 4 numbered points (1-4)
 Attributes: (none needed)
 ```
 
@@ -100,16 +113,29 @@ This project is for detecting all 117 intersection points of the grid overlay.
 1. **Navigate**: Projects → **+** (Create new project)
 2. **Fill Project Details**:
     - **Name**: `grid_detection`
-    - **Labels**: (click "Add label")
-        - **Option A (Simple)**:
-            - Label name: `grid_point`
-            - Label type: **Points**
-        - **Option B (Advanced - Skeleton)**:
-            - Label name: `grid`
-            - Label type: **Skeleton**
-            - Number of points: 117
-            - (Define skeleton structure if needed)
+    - **Labels**: Use the **Raw** editor. For the full 117-point skeleton configuration, see:
+        `docs/assets/cvat_project_label_config/grid_annotation_example.json`
+
+    Or use this simplified structure (paste into Raw editor):
+    ```json
+    [
+      {
+        "name": "grid",
+        "type": "skeleton",
+        "sublabels": [
+          {"name": "1", "type": "points"},
+          {"name": "2", "type": "points"},
+          ...
+          {"name": "117", "type": "points"}
+        ],
+        "svg": ""
+      }
+    ]
+    ```
 3. **Submit**
+
+!!! tip "Skeleton Configuration"
+    Grid detection uses a **Skeleton** type with 117 numbered sublabels. This ensures proper grid structure and point ordering.
 
 ### Note Project ID
 
@@ -120,15 +146,16 @@ From URL: `http://localhost:8080/projects/2`
 ### Understanding Labels
 
 **Grid Detection Labels**:
-- **Type**: Points or Skeleton (117 keypoints)
-- **Count**: 117 points per image
+- **Type**: Skeleton (structured keypoints)
+- **Count**: 117 numbered sublabels (1-117)
 - **Purpose**: Mark all grid intersections for precise grid removal
-- **Pattern**: 9x13 grid = 117 intersection points
+- **Pattern**: 9 rows × 13 columns = 117 intersection points
 
-**Label Configuration** (Simple):
+**Label Configuration**:
 ```
-Name: grid_point
-Type: points
+Name: grid
+Type: skeleton
+Sublabels: 117 numbered points (1-117)
 Attributes: (none needed)
 ```
 
@@ -150,56 +177,57 @@ For each coral genus/species, click "Add label" and configure:
 **Recommended Labels** (CRIOBE Finegrained dataset):
 
 1. **Acropora**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
     - Color: Auto-assigned
 
 2. **Pocillopora**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 3. **Porites**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 4. **Montipora**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 5. **Pavona**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 6. **Fungia**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 7. **Millepora**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 8. **Leptastrea**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 9. **Goniastrea**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 10. **Psammocora**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
 
 11. **Other**
-    - Type: **Polygon** or **Mask**
+    - Type: **Polygon**
     - Purpose: For corals not matching above categories
 
 !!! tip "Customize Labels"
     Add or remove labels based on your specific research needs. The platform supports any coral classification scheme.
 
-### Label Type: Polygon vs Mask
+### Why Polygon Type?
 
-**Polygon** (Recommended):
-- Draws polygon around coral outline
-- More precise for complex shapes
-- Easier to edit
-- Smaller file size
+**Polygon** is the correct annotation type for coral instance segmentation:
+- Draws closed shapes around individual coral colonies
+- Easy to edit vertices and boundaries
+- Efficient file size for storage and training
+- Compatible with YOLO and MMSegmentation training pipelines
+- Imports to FiftyOne as "Polylines" (closed=true, filled=true)
 
-**Mask**:
-- Pixel-level segmentation
-- More detailed
-- Larger file size
-- Use if you need pixel-perfect segmentation
+**How to annotate:**
+1. Select the Polygon tool in CVAT
+2. Click points around the coral colony boundary
+3. Close the polygon by pressing `N` or clicking the first point
+4. Adjust vertices as needed for accuracy
 
 ### Submit and Note ID
 

@@ -40,7 +40,7 @@ graph LR
 
 ### What You'll Learn
 
-- Create two CVAT projects with different label configurations (skeleton + polyline)
+- Create two CVAT projects with different label configurations (skeleton + polygon)
 - Deploy corner detection model as Nuclio function
 - Configure Bridge webhooks for automatic task creation
 - Set up end-to-end pipeline automation
@@ -188,7 +188,7 @@ Set up automatic corner detection when jobs are opened:
 
 !!! info "Webhook Parameters"
     - `model_name=pth-yolo-gridcorners`: The deployed Nuclio function name
-    - `conv_mask_to_poly=false`: Don't convert to polylines (we're using points/skeleton)
+    - `conv_mask_to_poly=false`: Don't convert masks to polygons (we're using points/skeleton for this stage)
 
 ### Step 1.6: Run Semi-Automatic Corner Detection
 
@@ -246,97 +246,97 @@ Click **Raw** tab and paste:
     "name": "Acanthastrea",
     "color": "#ff0000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Acropora",
     "color": "#00ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Astreopora",
     "color": "#0000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Atrea",
     "color": "#ffff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Fungia",
     "color": "#ff00ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Goniastrea",
     "color": "#00ffff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Leptastrea",
     "color": "#ff8000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Merulinidae",
     "color": "#8000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Millepora",
     "color": "#00ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montastrea",
     "color": "#ff0080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montipora",
     "color": "#80ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Other",
     "color": "#808080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pavona/Leptoseris",
     "color": "#ff8080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pocillopora",
     "color": "#8080ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Porites",
     "color": "#80ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Psammocora",
     "color": "#ff80ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   }
 ]
 ```
@@ -431,7 +431,7 @@ Add a webhook to the `banggai_coral_segmentation` project:
 ### Step 2.7: Annotate Corals on Warped Images
 
 1. Open a job in the auto-created segmentation task
-2. Model automatically runs and adds coral polylines (wait ~10-30 sec, then refresh)
+2. Model automatically runs and adds coral polygons (wait ~10-30 sec, then refresh)
 3. Review and correct predictions (see Guide A Step 4.5 for correction workflow)
 4. Save frequently (`Ctrl+S`)
 5. Mark job as complete when done

@@ -512,97 +512,97 @@ Click **Raw** tab and paste the complete 16-genera configuration:
     "name": "Acanthastrea",
     "color": "#ff0000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Acropora",
     "color": "#00ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Astreopora",
     "color": "#0000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Atrea",
     "color": "#ffff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Fungia",
     "color": "#ff00ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Goniastrea",
     "color": "#00ffff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Leptastrea",
     "color": "#ff8000",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Merulinidae",
     "color": "#8000ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Millepora",
     "color": "#00ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montastrea",
     "color": "#ff0080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Montipora",
     "color": "#80ff00",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Other",
     "color": "#808080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pavona/Leptoseris",
     "color": "#ff8080",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Pocillopora",
     "color": "#8080ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Porites",
     "color": "#80ff80",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   },
   {
     "name": "Psammocora",
     "color": "#ff80ff",
     "attributes": [],
-    "type": "polyline"
+    "type": "polygon"
   }
 ]
 ```
@@ -655,9 +655,9 @@ nuctl get functions --platform local | grep coralseg
 ### Step 4.6: Semi-Automatic Coral Segmentation
 
 1. Open a job in segmentation task
-2. Model runs automatically, creating polyline annotations
+2. Model runs automatically, creating polygon annotations in CVAT
 3. Wait 15-30 seconds (depends on coral density), then refresh
-4. Coral polylines should appear!
+4. Coral polygons should appear!
 
 **Manual correction workflow:**
 
@@ -835,7 +835,7 @@ The FiftyOne datasets now contain:
 
 - **criobe_corners_fo**: Raw images + 4-point corner annotations
 - **criobe_grid_fo**: Warped images + 117-point grid annotations
-- **criobe_finegrained_fo**: Clean images + coral polyline annotations
+- **criobe_finegrained_fo**: Clean images + coral annotations (FiftyOne polylines from CVAT polygons)
 
 **Verify in FiftyOne app:**
 

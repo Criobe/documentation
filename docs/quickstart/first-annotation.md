@@ -67,9 +67,27 @@ You'll need two CVAT projects for this tutorial:
 3. **Create New Project**:
     - Click **"Projects"** → **"+"** (Create new project)
     - **Name**: `tutorial_corner_detection`
-    - **Labels**: Create one label named `corner`
+    - **Labels**: Use the **Raw** editor to paste:
+        ```json
+        [
+          {
+            "name": "quadrat_corner",
+            "type": "skeleton",
+            "sublabels": [
+              {"name": "1", "type": "points"},
+              {"name": "2", "type": "points"},
+              {"name": "3", "type": "points"},
+              {"name": "4", "type": "points"}
+            ],
+            "svg": ""
+          }
+        ]
+        ```
     - **Subset**: Leave default (training/validation/test)
     - Click **Submit**
+
+!!! tip "Label Configuration"
+    Corner detection uses a **Skeleton** type with 4 numbered sublabels. This ensures proper point ordering (clockwise from top-left).
 
 4. **Note the Project ID**: After creation, check the URL or project details. You'll see something like:
     ```
@@ -81,14 +99,17 @@ You'll need two CVAT projects for this tutorial:
 
 1. **Create New Project** again:
     - **Name**: `tutorial_coral_segmentation`
-    - **Labels**: Create labels for coral species:
-        - `Acropora`
-        - `Pocillopora`
-        - `Porites`
-        - `Other`
+    - **Labels**: Create labels for coral species (each with type **Polygon**):
+        - **Name**: `Acropora`, **Type**: **Polygon**
+        - **Name**: `Pocillopora`, **Type**: **Polygon**
+        - **Name**: `Porites`, **Type**: **Polygon**
+        - **Name**: `Other`, **Type**: **Polygon**
     - Click **Submit**
 
 2. **Note the Project ID**: Again, note the ID (likely `2`). **Write this down**.
+
+!!! info "Label Type: Polygon"
+    For coral segmentation, use **Polygon** type in CVAT to draw closed shapes around coral colonies. These polygons will be imported as polylines (with closed=true) in FiftyOne for dataset management and training.
 
 ## Step 2: Upload Test Images
 
