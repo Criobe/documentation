@@ -46,14 +46,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('pixi.toml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -c "import tomllib; f=open('pixi.toml','rb'); data=tomllib.load(f); deps=data.get('pypi-dependencies',{}); print('\n'.join(f'{k}{v}' for k,v in deps.items()))" > requirements.txt
           pip install -r requirements.txt
 
       - name: Build documentation
@@ -98,7 +97,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -c "import tomllib; f=open('pixi.toml','rb'); data=tomllib.load(f); deps=data.get('pypi-dependencies',{}); print('\n'.join(f'{k}{v}' for k,v in deps.items()))" > requirements.txt
           pip install -r requirements.txt
 
       - name: Build documentation (no strict)
