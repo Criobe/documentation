@@ -97,12 +97,88 @@ mkdocs build
 The generated site will be written to the `site/` directory (ignored by git).
 
 ### GitHub Actions
+
 The repository includes a GitHub Actions workflow (`.github/workflows/docs.yml`) that automatically:
 - Builds the documentation on push to `main` or pull requests
 - Deploys to GitHub Pages on merge to `main`
 - Runs link checks on pull requests
 
-To enable GitHub Pages deployment:
-1. Go to repository Settings → Pages
-2. Set Source to "GitHub Actions"
-3. Push to `main` branch
+#### Setting Up GitHub Pages
+
+**Step 1: Enable GitHub Pages with GitHub Actions**
+
+1. Go to your repository on GitHub: `https://github.com/Criobe/documentation`
+2. Click on **Settings** (top menu bar)
+3. In the left sidebar, scroll down and click on **Pages** (under "Code and automation")
+4. Under **"Build and deployment"** section:
+    - **Source**: Select **"GitHub Actions"** from the dropdown
+    - (You don't need to select a branch when using GitHub Actions)
+5. Click **Save** if prompted
+
+**Step 2: Verify Workflow Permissions**
+
+1. Still in **Settings**, go to **Actions** > **General** (in the left sidebar)
+2. Scroll down to **"Workflow permissions"**
+3. Ensure that **"Read repository contents and packages permissions"** is selected
+4. Click **Save** if you made changes
+
+**Step 3: Push Your Changes**
+
+```bash
+cd documentation/
+
+# Check current status
+git status
+
+# Add all changes
+git add .
+
+# Commit with a descriptive message
+git commit -m "Configure GitHub Actions workflow for documentation deployment"
+
+# Push to main branch
+git push origin main
+```
+
+**Step 4: Monitor the Deployment**
+
+1. Go to the **Actions** tab in your GitHub repository
+2. You should see a workflow run called "Deploy Documentation"
+3. Click on it to watch the progress:
+    - **Build Documentation** job should complete first
+    - **Deploy to GitHub Pages** job will run after the build succeeds
+4. Once complete, you'll see a green checkmark
+
+**Step 5: Access Your Documentation**
+
+After successful deployment, your documentation will be available at:
+```
+https://criobe.github.io/documentation/
+```
+
+Or check the exact URL in **Settings** > **Pages** - you'll see a box that says **"Your site is live at [URL]"**
+
+Add this url into the website field in the About section (use the settings icon in the top right corner of the About section)
+
+
+#### Troubleshooting
+
+**Check the workflow logs**:
+1. Go to Actions tab
+2. Click on the failed workflow run
+3. Click on the failed job to see error details
+
+**Common issues**:
+- **404 on deployment**: Make sure the `site/` directory was created in the build step
+- **Permission denied**: Check that workflow permissions are set to "Read and write"
+- **Build warnings with strict mode**: The workflow uses `--strict` flag, which fails on warnings. Check the build output for any warnings.
+
+**Manual trigger**:
+1. Go to Actions tab
+2. Click "Deploy Documentation" in the left sidebar
+3. Click "Run workflow" button
+4. Select `main` branch and click "Run workflow"
+
+#### Future Updates
+
+After the initial setup, any push to the `main` branch that modifies `docs/**`, `mkdocs.yml`, or `.github/workflows/docs.yml` will automatically trigger a rebuild and redeployment.
