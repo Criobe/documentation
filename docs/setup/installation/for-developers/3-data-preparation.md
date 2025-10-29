@@ -34,11 +34,10 @@ graph LR
 
 | Dataset | Purpose | Size | Annotations | Module |
 |---------|---------|------|-------------|--------|
-| **CRIOBE Finegrained** | Coral segmentation | ~500 images | 18 species, polygons | coral_seg_yolo, DINOv2_mmseg |
+| **CRIOBE Finegrained** | Coral segmentation | ~500 images | 16 genera, polygons | coral_seg_yolo, DINOv2_mmseg |
 | **Banggai Extended** | Coral segmentation | ~300 images | 10 genera, polygons | coral_seg_yolo, DINOv2_mmseg |
 | **Grid Corners** | Corner detection | ~800 images | 4 keypoints | grid_pose_detection |
 | **Grid Pose** | Grid detection | ~800 images | 117 keypoints | grid_pose_detection |
-| **CoralMask** | Semantic segmentation | Public dataset | Binary masks | DINOv2_mmseg |
 
 ### Test Datasets
 
@@ -293,8 +292,8 @@ print(f'Train labels: {len(train_labels)}')
 **Expected Output**:
 ```
 Dataset: data/prepared_yolo/criobe_finegrained
-Classes: 18
-Names: ['Acropora', 'Pocillopora', 'Porites', 'Montipora', 'Pavona'] ...
+Classes: 16
+Names: ['Acanthastrea', 'Acropora', 'Astreopora', 'Atrea', 'Fungia'] ...
 Train images: 350
 Val images: 100
 Train labels: 350
@@ -389,28 +388,26 @@ val: images/val
 test: images/test
 
 # Number of classes
-nc: 18
+nc: 16
 
-# Class names
+# Class names (genus-level identification)
 names:
-  0: Acropora
-  1: Pocillopora
-  2: Porites
-  3: Montipora
-  4: Pavona
-  5: Fungia
-  6: Millepora
-  7: Leptastrea
-  8: Goniastrea
-  9: Psammocora
-  10: Acanthastrea
-  11: Astreopora
-  12: Leptoseris
-  13: Merulinidae
-  14: Montastrea
-  15: Turbinaria
-  16: Other
-  17: Background
+  0: Acanthastrea
+  1: Acropora
+  2: Astreopora
+  3: Atrea
+  4: Fungia
+  5: Goniastrea
+  6: Leptastrea
+  7: Merulinidae
+  8: Millepora
+  9: Montastrea
+  10: Montipora
+  11: Other
+  12: Pavona/Leptoseris
+  13: Pocillopora
+  14: Porites
+  15: Psammocora
 ```
 
 ### MMSegmentation Dataset Configuration

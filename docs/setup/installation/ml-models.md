@@ -479,7 +479,7 @@ nuctl deploy --project-name cvat \
 
 **CoralSegV4 (CRIOBE Finegrained)**:
 - **Architecture**: YOLOv11-medium instance segmentation
-- **Dataset**: 18 coral species
+- **Dataset**: 16 coral genera (genus-level identification)
 - **Input size**: 1920x1920
 - **Output**: Polygon masks per instance
 - **Inference time**: ~7s on GTX 1070
@@ -496,7 +496,7 @@ nuctl deploy --project-name cvat \
 
 **SegFormer (Semantic Segmentation)**:
 - **Architecture**: DINOv2-ViT-B14 + SegFormer head
-- **Dataset**: CRIOBE Finegrained (18 classes)
+- **Dataset**: CRIOBE Finegrained (16 genera)
 - **Input size**: Multi-scale (512, 768, 1024, 1280)
 - **Output**: Semantic segmentation map
 - **Inference time**: ~8s on GTX 1070

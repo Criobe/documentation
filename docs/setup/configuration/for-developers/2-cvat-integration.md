@@ -46,7 +46,7 @@ QUADRATSEG uses multiple CVAT projects for different pipeline stages:
 
 | Project Name | Purpose | Annotations | Classes | Module |
 |--------------|---------|-------------|---------|--------|
-| **criobe_finegrained_annotated** | Coral segmentation | Polylines | 18 species | coral_seg_yolo, DINOv2_mmseg |
+| **criobe_finegrained_annotated** | Coral segmentation | Polylines | 16 genera | coral_seg_yolo, DINOv2_mmseg |
 | **banggai_extended_annotated** | Coral segmentation | Polylines | 10 genera | coral_seg_yolo, DINOv2_mmseg |
 | **criobe_corner_annotation** | Grid corners | 4 keypoints | 1 class | grid_pose_detection |
 | **criobe_grid_annotation** | Grid pose | 117 keypoints | 1 class | grid_pose_detection |
@@ -213,7 +213,7 @@ Importing task: test_batch_01 (ID: 45)
   Imported 30 samples, 30 have annotations
   Added 30 samples
 Import completed: added 300 new samples
-Found 18 classes: ['Acropora', 'Acanthastrea', 'Astreopora', ...]
+Found 16 classes: ['Acanthastrea', 'Acropora', 'Astreopora', 'Atrea', 'Fungia', ...]
 Dataset created with 300 samples across 4 tasks
 Tasks: ['train_batch_01', 'train_batch_02', 'val_batch_01', 'test_batch_01']
 Subsets: ['train', 'val', 'test']
@@ -387,7 +387,7 @@ print(f"Years: {years}")
 # Class distribution
 classes = dataset.default_classes
 print(f"Classes ({len(classes)}): {classes}")
-# Classes (18): ['Acropora', 'Acanthastrea', 'Astreopora', ...]
+# Classes (16): ['Acanthastrea', 'Acropora', 'Astreopora', 'Atrea', 'Fungia', ...]
 
 # Annotation statistics
 num_polylines = sum(dataset.count_values(f"gt_polylines.polylines").values())
@@ -505,26 +505,24 @@ train: images/train
 val: images/val
 test: images/test
 
-nc: 18
+nc: 16
 names:
-  0: Acropora
-  1: Acanthastrea
+  0: Acanthastrea
+  1: Acropora
   2: Astreopora
-  3: Fungia
-  4: Goniastrea
-  5: Leptastrea
-  6: Leptoseris
+  3: Atrea
+  4: Fungia
+  5: Goniastrea
+  6: Leptastrea
   7: Merulinidae
   8: Millepora
   9: Montastrea
   10: Montipora
   11: Other
-  12: Pavona
-  13: Pavona/Leptoseris
-  14: Pocillopora
-  15: Porites
-  16: Psammocora
-  17: Turbinaria
+  12: Pavona/Leptoseris
+  13: Pocillopora
+  14: Porites
+  15: Psammocora
 ```
 
 **YOLO label format** (txt files):
@@ -595,8 +593,8 @@ print(f'Paired correctly: {img_stems == lbl_stems}')
 
 ```
 Dataset: /home/user/coral-segmentation/coral_seg_yolo/data/coral_annotation_yolo_seg/criobe_finegrained_annotated
-Classes: 18
-Names: ['Acropora', 'Acanthastrea', 'Astreopora', 'Fungia', 'Goniastrea'] ...
+Classes: 16
+Names: ['Acanthastrea', 'Acropora', 'Astreopora', 'Atrea', 'Fungia'] ...
 Train images: 220
 Train labels: 220
 Paired correctly: True
@@ -612,8 +610,8 @@ Defined in `/home/taiamiti/Projects/criobe/data_engineering/tools.py`:
 
 | Taxonomy | Classes | Description | Use Case |
 |----------|---------|-------------|----------|
-| **Finegrained** | 20 | All coral genera (Acropora, Pocillopora, etc.) | Species-level classification |
-| **Extended** | 11 | Main genera + Group1 (merged minor) | Balanced dataset |
+| **Finegrained** | 16 | All coral genera (genus-level identification) | Genus-level classification |
+| **Extended** | 10 | Main genera + Group1 (merged minor genera) | Balanced dataset |
 | **Main Families** | 7 | Major coral families only | High-level classification |
 | **Agnostic** | 1 | Binary coral vs background | Detection only |
 
@@ -622,30 +620,32 @@ Defined in `/home/taiamiti/Projects/criobe/data_engineering/tools.py`:
 ```python
 # From data_engineering/tools.py
 
-# Finegrained (20 classes) - Identity mapping
+# Finegrained (16 classes) - Genus-level identification
+# Merges Pavona and Leptoseris (too similar on quadrat images)
 MERGE_MAP_FINEGRAINED = {
-    'Acropora': "Acropora",
-    'Pocillopora': "Pocillopora",
-    'Porites': "Porites",
-    'Montipora': "Montipora",
-    'Pavona': "Pavona/Leptoseris",
-    'Leptoseris': "Pavona/Leptoseris",
-    'Fungia': "Fungia",
-    'Millepora': "Millepora",
     'Acanthastrea': "Acanthastrea",
+    'Acropora': "Acropora",
     'Astreopora': "Astreopora",
+    'Atrea': "Atrea",
+    'Fungia': "Fungia",
     'Goniastrea': "Goniastrea",
     'Leptastrea': "Leptastrea",
+    'Leptoseris': "Pavona/Leptoseris",
     'Merulinidae': "Merulinidae",
+    'Millepora': "Millepora",
     'Montastrea': "Montastrea",
+    'Montipora': "Montipora",
+    'Pavona': "Pavona/Leptoseris",
+    'Pavona/Leptoseris': "Pavona/Leptoseris",
+    'Pocillopora': "Pocillopora",
+    'Porites': "Porites",
     'Psammocora': "Psammocora",
-    'Atrea': "Atrea",
     'Other': "Other",
     'Corail mou': "Other",
     'Empty': None,  # Remove
 }
 
-# Extended (11 classes) - Groups minor genera
+# Extended (10 classes) - Groups minor genera into Group1
 MERGE_MAP_EXTENDED = {
     'Acropora': "Acropora",
     'Astreopora': "Astreopora",
@@ -1265,7 +1265,7 @@ session = fo.launch_app(dataset)
 
 ### Available Datasets
 
-- `criobe_finegrained_annotated` - 18 coral species (finegrained)
+- `criobe_finegrained_annotated` - 16 coral genera (finegrained)
 - `banggai_extended_annotated` - 10 coral genera (extended)
 
 ### Troubleshooting Checklist

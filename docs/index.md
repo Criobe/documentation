@@ -81,9 +81,9 @@ graph LR
     - **FiftyOne integration**: Manage datasets with a single source of truth
 
 !!! note "Flexible Taxonomies"
-    - **Finegrained**: 18-20 coral species classes
-    - **Extended**: 10-11 grouped families
-    - **Main families**: 7 major coral groups
+    - **Finegrained**: 16 coral genera (genus-level identification)
+    - **Extended**: 10 classes (main genera + grouped minor genera as "Group1")
+    - **Main families**: 7 major coral families
     - **Agnostic**: Binary coral vs. background
 
 ## Quick Navigation
@@ -107,9 +107,8 @@ graph LR
 
 | Dataset | Classes | Description | Status |
 |---------|---------|-------------|--------|
-| **CRIOBE Finegrained** | 18 species | Fine-grained coral classification | ✅ Available |
+| **CRIOBE Finegrained** | 16 genera | Fine-grained coral classification at genus level | ✅ Available |
 | **Banggai Extended** | 10 genera | Regional coral species (Banggai) | ✅ Available |
-| **CoralMask** | Multiple | Public benchmark dataset | ✅ Supported |
 
 ## Performance Benchmarks
 
