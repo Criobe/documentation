@@ -1,23 +1,85 @@
 # Setup Guide
 
-Complete installation and configuration guide for deploying the QUADRATSEG platform—developed by CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement)—in production or development environments.
+Complete installation and configuration guide for the QUADRATSEG platform—developed by CRIOBE (Centre de Recherches Insulaires et Observatoire de l'Environnement)—for coral researchers and AI developers.
 
-## Setup Overview
+## Choose Your Setup Path
 
-The setup process consists of three main stages:
+The QUADRATSEG platform supports two distinct use cases with different setup requirements:
 
 ```mermaid
-graph LR
-    A[Requirements] --> B[Installation]
-    B --> C[Configuration]
-    C --> D[Deployment]
-    D --> E[Verification]
+graph TD
+    Start[I want to...] --> Choice{What's your goal?}
+    Choice -->|Process coral images| EndUser[End User Path]
+    Choice -->|Train/experiment with models| Dev[Developer Path]
 
-    style A fill:#e1f5ff
-    style E fill:#c8e6c9
+    EndUser --> EU1[Install: Docker + CVAT + Nuclio + Bridge]
+    EU1 --> EU2[Configure: Projects + Webhooks]
+    EU2 --> EU3[Ready to process images!]
+
+    Dev --> D1[Install: Pixi + Module Environments]
+    D1 --> D2[Configure: CVAT Integration + Training]
+    D2 --> D3[Ready to train models!]
+
+    style EndUser fill:#e3f2fd
+    style Dev fill:#fff9c4
+    style EU3 fill:#c8e6c9
+    style D3 fill:#c8e6c9
 ```
 
-## Setup Sections
+## Setup Paths
+
+<div class="grid cards" markdown>
+
+-   :material-image-multiple:{ .lg .middle } **End User Path**
+
+    ---
+
+    **For coral researchers who want to process images**
+
+    Install the platform stack (CVAT + Nuclio + Bridge) to automatically process coral quadrat images through the complete pipeline.
+
+    **What you'll install**:
+    - Docker containers (CVAT, Nuclio, Bridge)
+    - Pre-trained ML models as serverless functions
+    - Automated workflow with webhooks
+
+    **No Pixi or Python environments needed!**
+
+    [:octicons-arrow-right-24: End User Setup](installation/index.md#for-end-users)
+
+-   :material-code-braces:{ .lg .middle } **Developer Path**
+
+    ---
+
+    **For AI researchers who want to train models**
+
+    Set up Pixi-managed Python environments to train, evaluate, and experiment with ML models using your own datasets.
+
+    **What you'll install**:
+    - Pixi package manager
+    - Module-specific environments
+    - Training frameworks and tools
+    - Optional: CVAT integration for dataset management
+
+    **For continuous learning and experimentation!**
+
+    [:octicons-arrow-right-24: Developer Setup](installation/index.md#for-developers)
+
+</div>
+
+## Setup Comparison
+
+| Aspect | End User Path | Developer Path |
+|--------|--------------|----------------|
+| **Target Users** | Coral researchers | AI researchers, developers |
+| **Purpose** | Process coral images | Train/experiment with models |
+| **Installation** | Docker deployment | Pixi environments |
+| **Components** | CVAT + Nuclio + Bridge | Python modules + training tools |
+| **Prerequisites** | Docker, nvidia-docker | Docker, Pixi, CUDA |
+| **Time Estimate** | 1-2 hours | 1.5-2.5 hours |
+| **Complexity** | ⭐⭐ Moderate | ⭐⭐⭐ Advanced |
+
+## Quick Navigation
 
 <div class="grid cards" markdown>
 
@@ -33,66 +95,68 @@ graph LR
 
     ---
 
-    Install all components: Pixi environments, CVAT + Nuclio, bridge service, and ML models.
+    Install components based on your chosen path: platform deployment or development environment.
 
-    [:octicons-arrow-right-24: Install System](installation/index.md)
+    [:octicons-arrow-right-24: Installation Guide](installation/index.md)
 
 -   :material-cog:{ .lg .middle } **Configuration**
 
     ---
 
-    Configure environment variables, CVAT projects, webhooks, and Nuclio functions.
+    Configure your installation: projects and webhooks for end users, or training configs for developers.
 
-    [:octicons-arrow-right-24: Configure System](configuration/index.md)
-
--   :material-rocket-launch:{ .lg .middle } **Deployment**
-
-    ---
-
-    Deploy with Docker Compose, configure networking, and verify the installation.
-
-    [:octicons-arrow-right-24: Deploy System](deployment/index.md)
+    [:octicons-arrow-right-24: Configuration Guide](configuration/index.md)
 
 </div>
 
 ## Quick Setup Checklist
 
-Use this checklist to track your setup progress:
+=== "End User Checklist"
 
-### Phase 1: Pre-Installation
-- [ ] Verify hardware meets minimum requirements
-- [ ] Install Docker and Docker Compose
-- [ ] Install Pixi package manager
-- [ ] Clone the repository
+    Track your platform deployment progress:
 
-### Phase 2: Installation
-- [ ] Install CVAT with Nuclio
-- [ ] Set up module environments with Pixi
-- [ ] Download pre-trained ML models
-- [ ] Deploy bridge service
+    **Prerequisites**:
+    - [ ] Verify hardware meets minimum requirements
+    - [ ] Install Docker and Docker Compose
+    - [ ] Install nvidia-docker for GPU support
+    - [ ] Clone CRIOBE's CVAT repository
 
-### Phase 3: Configuration
-- [ ] Create `.env` files for each module
-- [ ] Set up CVAT projects
-- [ ] Configure webhooks
-- [ ] Deploy Nuclio functions
+    **Installation**:
+    - [ ] Deploy Docker stack (CVAT + Nuclio + Bridge)
+    - [ ] Deploy 6 ML models as Nuclio functions
+    - [ ] Verify all services are running
 
-### Phase 4: Verification
-- [ ] Test CVAT accessibility
-- [ ] Verify Nuclio dashboard
-- [ ] Test bridge service health check
-- [ ] Run end-to-end pipeline test
+    **Configuration**:
+    - [ ] Create 3 CVAT projects (Corner, Grid, Coral)
+    - [ ] Configure 5 webhooks for automation
+    - [ ] Test complete workflow with sample image
 
-## Estimated Setup Time
+    **Total Time**: 1-2 hours
 
-| Component | Time | Difficulty |
-|-----------|------|------------|
-| Requirements Review | 15 min | ⭐ Easy |
-| CVAT + Nuclio Installation | 30-60 min | ⭐⭐⭐ Advanced |
-| Module Installation | 20-30 min | ⭐⭐ Moderate |
-| Configuration | 30-45 min | ⭐⭐ Moderate |
-| Deployment & Testing | 20-30 min | ⭐⭐ Moderate |
-| **Total** | **2-3 hours** | |
+=== "Developer Checklist"
+
+    Track your development environment setup:
+
+    **Prerequisites**:
+    - [ ] Verify hardware meets minimum requirements
+    - [ ] Install Docker and Docker Compose (optional)
+    - [ ] Install CUDA toolkit and drivers
+    - [ ] Install Pixi package manager
+    - [ ] Clone the coral-segmentation repository
+
+    **Installation**:
+    - [ ] Set up module environments with Pixi
+    - [ ] Download pre-trained models
+    - [ ] Prepare datasets
+    - [ ] Verify GPU configuration
+
+    **Configuration**:
+    - [ ] Create `.env` files for each module
+    - [ ] Configure CVAT integration (optional)
+    - [ ] Set up training configurations
+    - [ ] Test training and inference
+
+    **Total Time**: 1.5-2.5 hours
 
 ## Architecture Overview
 
@@ -138,21 +202,21 @@ graph TD
     style D fill:#f3e5f5
 ```
 
-## Deployment Scenarios
+## Platform Deployment Scenarios
 
-Choose the deployment scenario that matches your needs:
+For end users deploying the platform:
 
-=== "Development / Single User"
-    - Deploy on local machine or single server
+=== "Single Machine"
+    - Deploy all services on one server
     - All services on same host
     - Shared GPU for all ML functions
-    - **Best for**: Testing, development, small-scale use
+    - **Best for**: Individual researchers, testing, small-scale use
 
-=== "Production / Multi-User"
-    - Distributed deployment across multiple servers
-    - Separate hosts for CVAT, Nuclio, and storage
+=== "Multi-User Production"
+    - Distributed deployment across servers
+    - Separate hosts for CVAT, Nuclio, storage
     - Dedicated GPUs for ML inference
-    - **Best for**: Research teams, production workflows
+    - **Best for**: Research teams, lab deployments
 
 === "Cloud Deployment"
     - Kubernetes or cloud-native deployment
@@ -160,33 +224,48 @@ Choose the deployment scenario that matches your needs:
     - Managed databases and storage
     - **Best for**: Large-scale operations, high availability
 
-## Support Matrix
+## System Support Matrix
 
-| Component | Linux | macOS | Windows | Docker |
-|-----------|-------|-------|---------|--------|
-| CVAT + Nuclio | ✅ | ✅ | ✅* | ✅ Required |
-| Bridge Service | ✅ | ✅ | ✅ | ✅ Recommended |
-| ML Modules | ✅ | ✅** | ❌ | ✅ Recommended |
-| GPU Support | ✅ CUDA | ❌ | ✅ CUDA | ✅ nvidia-docker |
+| Component | Linux | macOS | Windows | Notes |
+|-----------|-------|-------|---------|-------|
+| **End User Path** | | | | |
+| CVAT + Nuclio | ✅ | ✅ | ✅* | Docker required |
+| Bridge Service | ✅ | ✅ | ✅ | Docker recommended |
+| GPU Support | ✅ CUDA | ❌ | ✅ CUDA | nvidia-docker required |
+| **Developer Path** | | | | |
+| Pixi Environments | ✅ | ✅ | ⚠️** | Native or WSL2 |
+| Training Tools | ✅ | ⚠️*** | ❌ | CUDA required for GPU |
+| FiftyOne/Jupyter | ✅ | ✅ | ✅ | CPU compatible |
 
 *Windows: Use WSL2 for best experience
-**macOS: CPU only, no CUDA support
+**Windows: WSL2 recommended for Pixi
+***macOS: CPU-only training, no CUDA support
 
 ## Getting Help
 
 !!! question "Need Assistance with Setup?"
-    - **Documentation**: Read through each setup section carefully
-    - **Issues**: Check [troubleshooting guides](deployment/index.md#troubleshooting)
-    - **Community**: See [Getting Help](../community/getting-help.md)
-    - **GitHub Issues**: Report setup problems on [GitHub](https://github.com/criobe/coral-segmentation/issues)
+    - **Documentation**: Read through each section carefully
+    - **Installation Issues**: Check the troubleshooting sections in each guide
+    - **Community**: See [Getting Help](../community/index.md)
+    - **GitHub Issues**: Report problems on [GitHub](https://github.com/criobe/coral-segmentation/issues)
 
 ## Next Steps
 
-1. **Start Here**: [Review Requirements](requirements.md)
-2. **Then**: Follow the [Installation Guide](installation/index.md)
-3. **After Setup**: Try the [Quickstart Demo](../quickstart/5-minute-demo.md)
+**Choose your path and get started**:
+
+=== "End User Path"
+    1. **[Review Requirements](requirements.md)** - Check your hardware
+    2. **[Install Platform](installation/index.md#for-end-users)** - Deploy CVAT + Nuclio + Bridge
+    3. **[Configure Workflow](configuration/index.md#for-end-users)** - Set up projects and webhooks
+    4. **[Try First Annotation](../quickstart/first-annotation.md)** - Process your first image
+
+=== "Developer Path"
+    1. **[Review Requirements](requirements.md)** - Check your hardware and CUDA
+    2. **[Install Development Environment](installation/index.md#for-developers)** - Set up Pixi and modules
+    3. **[Configure Training](configuration/index.md#for-developers)** - Set up CVAT integration
+    4. **[Start Training](../quickstart/developer-setup.md)** - Train your first model
 
 ---
 
 !!! tip "Bookmark This Page"
-    You'll refer back to setup documentation during configuration and troubleshooting. Bookmark this page for easy access.
+    This page helps you navigate the complete setup process. Bookmark it for easy reference during installation and configuration.

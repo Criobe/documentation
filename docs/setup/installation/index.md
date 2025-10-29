@@ -1,469 +1,218 @@
 # Installation Guide
 
-Complete installation instructions for the QUADRATSEG platform, the coral segmentation system developed by CRIOBE.
+Complete installation instructions for the QUADRATSEG platform—developed by CRIOBE. Choose your installation path based on your role.
 
-## Installation Overview
+## Who Are You?
 
-The QUADRATSEG platform consists of four main components that must be installed in order:
+QUADRATSEG has two distinct installation paths depending on your use case:
 
-```mermaid
-graph TD
-    A[1. Pixi Package Manager] --> B[2. CVAT + Nuclio + Bridge]
-    B --> C[3. ML Models]
-    C --> D[4. Verification]
+<div class="grid cards" markdown>
 
-    style A fill:#e1f5ff
-    style B fill:#fff9c4
-    style C fill:#c8e6c9
-    style D fill:#f3e5f5
-```
+-   :material-docker:{ .lg .middle } **End User - Platform Deployment**
 
-**Total Installation Time**: 1-2 hours (depending on download speeds)
+    ---
 
-## Prerequisites
+    Deploy the production platform for **processing coral images** and getting automated segmentation results.
 
-Before starting, ensure you have:
+    **Use Case**: Run the CVAT + Nuclio + Bridge platform
 
-- ✅ [System requirements](../requirements.md) met
-- ✅ Ubuntu 20.04+ or WSL2 with Ubuntu (Windows users)
-- ✅ Docker Engine 20.10+ installed
-- ✅ Docker Compose v2.0+ installed
-- ✅ Git installed
-- ✅ 100+ GB free disk space
-- ✅ NVIDIA GPU with 6+ GB VRAM (recommended)
-- ✅ Internet connection for downloads
+    **Tools**: Docker, Docker Compose (no Pixi)
 
-!!! warning "Check Requirements First"
-    Don't skip the [requirements check](../requirements.md)! Missing dependencies cause most installation failures.
+    [:octicons-arrow-right-24: Platform Installation](for-end-users/1-docker-deployment.md)
 
-## Installation Steps
+-   :material-code-braces:{ .lg .middle } **Developer - Development Environment**
 
-### Step 1: Install Pixi
+    ---
 
-[Pixi](pixi-environment.md) manages Python environments for all pipeline modules.
+    Set up the development environment for **training models, experimenting with architectures**, and iterating on the ML pipeline.
 
-```bash
-# Install Pixi
-curl -fsSL https://pixi.sh/install.sh | bash
+    **Use Case**: Train/eval/experiment with models
 
-# Verify
-pixi --version
-```
+    **Tools**: Pixi, Python, CUDA
 
-**Time**: 2-3 minutes
+    [:octicons-arrow-right-24: Development Installation](for-developers/1-pixi-setup.md)
 
-**→ [Complete Pixi Installation Guide](pixi-environment.md)**
+</div>
 
-### Step 2: Install CVAT + Nuclio + Bridge
+## Installation Comparison
 
-Deploy the annotation platform with serverless ML functions.
+| Aspect | Platform Deployment | Development Environment |
+|--------|-------------------|------------------------|
+| **Target Users** | Coral researchers, biologists | AI researchers, ML engineers |
+| **Purpose** | Process images, get results | Train models, experiment |
+| **Components** | CVAT + Nuclio + Bridge | Pixi environments per module |
+| **Package Manager** | Docker only | Pixi (+ Docker optional) |
+| **GPU Usage** | For inference (Nuclio functions) | For training and inference |
+| **Pixi Required** | ❌ No | ✅ Yes |
+| **Time Estimate** | 1.5-2 hours | 1.5-2 hours |
+| **Complexity** | ⭐⭐ Moderate | ⭐⭐⭐ Advanced |
 
-```bash
-# Clone CVAT with bridge integration
-mkdir -p ~/criobe-platform
-cd ~/criobe-platform
-git clone https://github.com/Criobe/bridge.git cvat
-cd cvat
+!!! info "Key Distinction"
+    **Platform deployment** runs models as Docker services (no code access needed). **Development environment** provides code access for training and experimentation.
 
-# Configure bridge
-cat > bridge/.env << 'EOF'
-CVAT_URL=http://cvat-server:8080
-CVAT_USER=admin
-CVAT_PWD=change_me_to_secure_password
-CACHE_DIR=/tmp/cvat_cache
-AUTO_ANN_TIMEOUT=900
-EOF
+## Platform Deployment Path
 
-# Deploy stack
-docker compose \
-  -f docker-compose.yml \
-  -f bridge/docker-compose.bridge.yml \
-  -f components/serverless/docker-compose.serverless.yml \
-  up -d --build
+For end users who want to deploy and use the platform:
 
-# Create admin user
-docker exec -it cvat_server \
-  bash -ic 'python3 ~/manage.py createsuperuser'
-```
+### Installation Steps
 
-**Time**: 30-45 minutes
+1. **[Docker Deployment](for-end-users/1-docker-deployment.md)** - Deploy CVAT + Nuclio + Bridge stack
+    - Clone CRIOBE's CVAT repository
+    - Configure environment variables
+    - Deploy with Docker Compose
+    - Create admin user
+    - **Time**: 30-45 minutes
 
-**→ [Complete CVAT + Nuclio Installation Guide](cvat-nuclio.md)**
+2. **[ML Models Deployment](for-end-users/2-ml-models-deployment.md)** - Deploy serverless ML functions
+    - Install nuctl CLI
+    - Deploy 6 Nuclio functions (models auto-download)
+    - Verify function deployment
+    - **Time**: 40-60 minutes
 
-### Step 3: Install Module Environments
+3. **[Verification](for-end-users/3-verification.md)** - Verify installation
+    - Health checks for all services
+    - GPU availability test
+    - Single inference test
+    - **Time**: 10-15 minutes
 
-Install Pixi environments for each module you'll use.
+### After Installation
 
-```bash
-cd ~/coral-segmentation
-
-# Essential modules
-cd coral_seg_yolo && pixi install -e coral-seg-yolo-dev && cd ..
-cd grid_pose_detection && pixi install -e grid-pose-dev && cd ..
-cd grid_inpainting && pixi install && cd ..
-
-# Optional: DINOv2 (for highest accuracy)
-cd DINOv2_mmseg && pixi install -e dinov2-mmseg && cd ..
-```
-
-**Time**: 15-30 minutes
-
-**→ [Complete Pixi Environment Guide](pixi-environment.md)**
-
-### Step 4: Download ML Models
-
-Download pre-trained models for each module.
-
-```bash
-cd ~/coral-segmentation
-
-# Download all models
-cd grid_pose_detection && ./download_models.sh && cd ..
-cd grid_inpainting && ./download_model.sh && cd ..
-cd coral_seg_yolo && ./download_models.sh && cd ..
-cd DINOv2_mmseg && ./download_models.sh && cd ..
-```
-
-**Time**: 15-30 minutes (depending on connection speed)
-
-**→ [Complete ML Models Installation Guide](ml-models.md)**
-
-### Step 5: Deploy Nuclio Functions
-
-Deploy ML models as serverless functions for CVAT integration.
-
-```bash
-cd ~/criobe-platform/cvat
-
-# Grid detection
-nuctl deploy --project-name cvat \
-  --path "./serverless/pytorch/yolo/gridcorners/nuclio/" --platform local -v
-
-nuctl deploy --project-name cvat \
-  --path "./serverless/pytorch/yolo/gridpose/nuclio/" --platform local -v
-
-# Grid removal
-nuctl deploy --project-name cvat \
-  --path "./serverless/pytorch/lama/nuclio/" --platform local -v
-
-# Coral segmentation
-nuctl deploy --project-name cvat \
-  --path "./serverless/pytorch/yolo/coralsegv4/nuclio/" \
-  --file "./serverless/pytorch/yolo/coralsegv4/nuclio/function.yaml" \
-  --platform local -v
-```
-
-**Time**: 10-20 minutes
-
-**→ See [CVAT Installation Step 6](cvat-nuclio.md#step-6-deploy-nuclio-functions)**
-
-## Verify Installation
-
-Run through this verification checklist:
-
-### Service Health Checks
-
-```bash
-# CVAT
-curl http://localhost:8080/api/server/about
-# Expected: {"name":"CVAT","version":"2.29.0",...}
-
-# Nuclio
-curl http://localhost:8070/api/healthz
-# Expected: OK
-
-# Bridge
-curl http://localhost:8000/health
-# Expected: {"status":"healthy"}
-```
-
-### Web Interface Access
-
-| Service | URL | Expected |
-|---------|-----|----------|
-| CVAT | http://localhost:8080/ | Login page |
-| Nuclio Dashboard | http://localhost:8070/projects/cvat/functions | Function list |
-| Bridge API Docs | http://localhost:8000/docs | FastAPI docs |
-
-### Module Environment Tests
-
-```bash
-# Test YOLO environment
-cd ~/coral-segmentation/coral_seg_yolo
-pixi run -e coral-seg-yolo-dev python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
-# Expected: PyTorch: 2.5.0+cu121, CUDA: True
-
-# Test DINOv2 environment
-cd ~/coral-segmentation/DINOv2_mmseg
-pixi run -e dinov2-mmseg python -c "import mmseg; print(f'MMSeg: {mmseg.__version__}')"
-# Expected: MMSeg: 1.x.x
-```
-
-### Model Tests
-
-```bash
-# Test YOLO model loads
-cd ~/coral-segmentation/coral_seg_yolo
-pixi run -e coral-seg-yolo-dev python -c "
-from src.inference_engine import YOLOPredictor
-predictor = YOLOPredictor('models/coralsegv4_yolo11m_best.pt')
-print('✅ YOLO model loaded')
-"
-```
-
-### Run Quick Demo
-
-Test the complete pipeline with sample data:
-
-```bash
-cd ~/coral-segmentation/coral_seg_yolo
-
-# Download test samples
-./download_test_samples.sh
-
-# Run inference demo
-pixi run -e coral-seg-yolo-dev python src/inference_demo.py \
-    data/test_samples/5-grid_removal/ \
-    results/demo/ \
-    models/coralsegv4_yolo11m_best.pt
-```
-
-**→ [5-Minute Demo](../../quickstart/5-minute-demo.md)** for complete testing
-
-## Installation Options
-
-### Minimal Installation (CPU Only)
-
-For development/testing without GPU:
-
-**Components**:
-- ✅ Pixi
-- ✅ CVAT + Bridge (skip Nuclio)
-- ✅ YOLO module only
-- ❌ Skip DINOv2 (requires GPU)
-
-**Time**: 30-45 minutes
-
-### Standard Installation (GPU)
-
-Recommended for most users:
-
-**Components**:
-- ✅ All components
-- ✅ YOLO + Grid modules
-- ✅ Nuclio functions
-- ⚠️ DINOv2 optional
-
-**Time**: 1-1.5 hours
-
-### Full Installation (Production)
-
-For production deployments:
-
-**Components**:
-- ✅ All components
-- ✅ All modules including DINOv2
-- ✅ All Nuclio functions
-- ✅ Multi-server setup (optional)
-
-**Time**: 1.5-2 hours
-
-## Platform-Specific Notes
-
-### Ubuntu / Debian
-
-Follow instructions as written. Recommended platform.
-
-### Windows (WSL2)
-
-1. Install WSL2 with Ubuntu 22.04
-2. Install Docker Desktop for Windows
-3. Enable WSL2 integration in Docker Desktop settings
-4. Follow Ubuntu instructions inside WSL2 terminal
-
-**→ [Windows-specific notes](cvat-nuclio.md#platform-specific-instructions)**
-
-### macOS
-
-**Limitations**:
-- No CUDA support (CPU-only mode)
-- Slower inference (10-50x)
-- Good for development, not production
-
-**Gateway IP**: Use `192.168.65.1` instead of `172.17.0.1` for network configuration
-
-## Troubleshooting
-
-### Common Installation Issues
-
-#### Docker Permission Denied
-
-**Error**: `Got permission denied while trying to connect to the Docker daemon socket`
-
-**Solution**:
-```bash
-sudo usermod -aG docker $USER
-# Log out and back in
-```
-
-#### Port Already in Use
-
-**Error**: `bind: address already in use`
-
-**Solution**:
-```bash
-# Find process using port
-sudo lsof -i :8080
-
-# Kill process or change CVAT port
-```
-
-#### Out of Disk Space
-
-**Error**: `no space left on device`
-
-**Solution**:
-```bash
-# Check space
-df -h
-
-# Clean Docker
-docker system prune -a
-
-# Clean Pixi cache
-pixi clean cache
-```
-
-#### CUDA Not Available
-
-**Error**: `torch.cuda.is_available()` returns `False`
-
-**Solution**:
-```bash
-# Check NVIDIA drivers
-nvidia-smi
-
-# If missing, install drivers:
-# Ubuntu: sudo ubuntu-drivers autoinstall
-# Reboot after installation
-```
-
-### Installation Fails Midway
-
-**General approach**:
-1. Check logs for specific error
-2. Remove failed container/environment
-3. Re-run installation step
-4. Consult specific guide for troubleshooting
-
-**Examples**:
-```bash
-# CVAT installation failed
-docker compose -f docker-compose.yml ... down
-# Fix issue, then retry
-
-# Pixi installation failed
-pixi clean -e <env-name>
-pixi install -e <env-name> -v
-```
-
-## Post-Installation
-
-After successful installation:
-
-1. **Configure Projects**: [CVAT Projects Setup](../configuration/cvat-projects.md)
-2. **Set Up Webhooks**: [Webhooks Configuration](../configuration/webhooks.md)
-3. **Run First Annotation**: [First Annotation Tutorial](../../quickstart/first-annotation.md)
-
-## Uninstallation
-
-To completely remove the installation:
-
-### Remove Docker Stack
-
-```bash
-cd ~/criobe-platform/cvat
-
-# Stop and remove all containers and volumes
-docker compose \
-  -f docker-compose.yml \
-  -f bridge/docker-compose.bridge.yml \
-  -f components/serverless/docker-compose.serverless.yml \
-  down -v
-
-# Remove images (optional)
-docker system prune -a
-```
-
-### Remove Pixi Environments
-
-```bash
-# Remove per-project environments
-cd ~/coral-segmentation/<module>
-pixi clean
-
-# Remove global Pixi cache
-pixi clean cache
-
-# Uninstall Pixi
-rm -rf ~/.pixi
-rm ~/.local/bin/pixi
-```
-
-### Remove Source Code
-
-```bash
-# Remove CVAT/bridge
-rm -rf ~/criobe-platform
-
-# Remove module source
-rm -rf ~/coral-segmentation
-```
-
-## Next Steps
-
-!!! success "Installation Complete!"
-    You're ready to start annotating and processing coral images!
-
-**Recommended next steps**:
-
-1. 📋 **[Configuration Guide](../configuration/index.md)** - Configure CVAT projects and webhooks
-2. 🚀 **[5-Minute Demo](../../quickstart/5-minute-demo.md)** - Test the pipeline with sample data
-3. 📝 **[First Annotation Tutorial](../../quickstart/first-annotation.md)** - Create your first automated workflow
-
-## Quick Reference
-
-### Installation Commands
-
-```bash
-# 1. Pixi
-curl -fsSL https://pixi.sh/install.sh | bash
-
-# 2. CVAT + Nuclio + Bridge
-git clone https://github.com/Criobe/bridge.git ~/criobe-platform/cvat
-cd ~/criobe-platform/cvat
-docker compose -f docker-compose.yml -f bridge/docker-compose.bridge.yml \
-  -f components/serverless/docker-compose.serverless.yml up -d --build
-
-# 3. Module environments
-cd ~/coral-segmentation/<module>
-pixi install -e <env-name>
-
-# 4. Download models
-./download_models.sh  # in each module directory
-
-# 5. Deploy Nuclio functions
-nuctl deploy --project-name cvat --path "./serverless/pytorch/..." --platform local -v
-```
-
-### Service URLs
-
-```
-CVAT Web:          http://localhost:8080/
-Nuclio Dashboard:  http://localhost:8070/
-Bridge API:        http://localhost:8000/docs
-```
+Once installed, proceed to [Configuration](../configuration/for-end-users/1-cvat-projects.md) to set up projects and webhooks.
 
 ---
 
-**Questions?** See [Getting Help](../../community/getting-help.md) or consult individual installation guides linked above.
+## Development Environment Path
+
+For developers who want to train and experiment with models:
+
+### Installation Steps
+
+1. **[Pixi Setup](for-developers/1-pixi-setup.md)** - Install Pixi package manager
+    - Install Pixi
+    - Clone coral-segmentation repository
+    - Understand repository structure
+    - **Time**: 10-15 minutes
+
+2. **[Module Environments](for-developers/2-module-environments.md)** - Set up module environments
+    - Install Pixi environments per module
+    - Download pre-trained models
+    - Download test data
+    - **Time**: 30-45 minutes
+
+3. **[Data Preparation](for-developers/3-data-preparation.md)** - Set up FiftyOne and datasets
+    - Configure FiftyOne
+    - Connect to CVAT
+    - Pull datasets
+    - **Time**: 20-30 minutes
+
+4. **[GPU Configuration](for-developers/4-gpu-configuration.md)** - Configure CUDA
+    - CUDA version management
+    - GPU memory configuration
+    - Multi-GPU setup
+    - **Time**: 15-20 minutes
+
+### After Installation
+
+Once installed, proceed to [Configuration](../configuration/for-developers/1-environment-variables.md) to configure environments and training setups.
+
+---
+
+## Prerequisites by Path
+
+### For Platform Deployment
+
+- [x] Docker Engine 20.10+
+- [x] Docker Compose v2.0+
+- [x] NVIDIA GPU with 8GB+ VRAM
+- [x] NVIDIA Docker runtime
+- [x] 20GB+ disk space
+- [x] Git
+
+### For Development Environment
+
+- [x] All platform deployment prerequisites (if deploying locally)
+- [x] Pixi package manager
+- [x] Python 3.9+ (managed by Pixi)
+- [x] 50GB+ disk space (for datasets and experiments)
+- [x] Git
+
+!!! tip "Can I Do Both?"
+    Yes! You can install both the platform (for deployment) and the development environment (for training). They are independent and complementary.
+
+## Architecture Overview
+
+Understanding how components relate helps choose your path:
+
+```mermaid
+graph TB
+    subgraph "Platform Deployment (End Users)"
+        A[CVAT Web UI]
+        B[Bridge Service]
+        C[Nuclio Functions<br/>Pre-packaged Models]
+        D[PostgreSQL + Redis]
+
+        A --> B
+        B --> C
+        A --> D
+    end
+
+    subgraph "Development Environment (Developers)"
+        E[Pixi Environments]
+        F[Training Code]
+        G[FiftyOne Datasets]
+        H[CVAT Connection<br/>Optional]
+
+        E --> F
+        F --> G
+        G -.-> H
+        H -.-> A
+    end
+
+    F -.Package as.-> C
+
+    style A fill:#e3f2fd
+    style C fill:#f3e5f5
+    style E fill:#fff9c4
+    style F fill:#fff9c4
+```
+
+**Platform Deployment**: Self-contained Docker services for production use
+
+**Development Environment**: Code-level access for model training and experimentation
+
+## Quick Decision Tree
+
+Not sure which path to follow? Use this decision tree:
+
+```mermaid
+graph TD
+    Start[What do you want to do?] --> Q1{Process coral images<br/>and get results?}
+    Q1 -->|Yes| EndUser[Platform Deployment Path]
+    Q1 -->|No| Q2{Train or experiment<br/>with models?}
+    Q2 -->|Yes| Dev[Development Environment Path]
+    Q2 -->|No| Q3{Both?}
+    Q3 -->|Yes| Both[Install Both<br/>Start with Platform]
+    Q3 -->|No| Help[See Getting Help]
+
+    EndUser --> EndSteps[1. Docker Deployment<br/>2. ML Models<br/>3. Verification]
+    Dev --> DevSteps[1. Pixi Setup<br/>2. Module Environments<br/>3. Data Prep<br/>4. GPU Config]
+    Both --> BothSteps[1. Platform First<br/>2. Then Development]
+
+    style EndUser fill:#c8e6c9
+    style Dev fill:#fff9c4
+    style Both fill:#e1bee7
+```
+
+## Getting Help
+
+!!! question "Need Assistance?"
+    - **Platform Deployment Issues**: Check [troubleshooting](for-end-users/3-verification.md#troubleshooting)
+    - **Development Setup Issues**: Check [GPU configuration](for-developers/4-gpu-configuration.md#troubleshooting)
+    - **General Help**: See [Getting Help](../../community/getting-help.md)
+    - **GitHub Issues**: [Report problems](https://github.com/criobe/coral-segmentation/issues)
+
+## Next Steps
+
+**Choose your path above and start installing!**
+
+After installation, you'll proceed to the [Configuration](../configuration/index.md) section to complete your setup.

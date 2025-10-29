@@ -229,22 +229,25 @@ nav:
     - Requirements: setup/requirements.md
     - Installation:
       - setup/installation/index.md
-      - Pixi Environment: setup/installation/pixi-environment.md
-      - CVAT & Nuclio: setup/installation/cvat-nuclio.md
-      - Bridge Service: setup/installation/bridge-service.md
-      - ML Models: setup/installation/ml-models.md
-    # Configuration pages - coming soon
-    # - Configuration:
-    #   - setup/configuration/index.md
-    #   - Environment Variables: setup/configuration/environment-variables.md
-    #   - CVAT Projects: setup/configuration/cvat-projects.md
-    #   - Webhooks: setup/configuration/webhooks.md
-    #   - Nuclio Functions: setup/configuration/nuclio-functions.md
-    # Deployment pages - coming soon
-    # - Deployment:
-    #   - setup/deployment/index.md
-    #   - Docker Compose: setup/deployment/docker-compose.md
-    #   - Networking: setup/deployment/networking.md
+      - For End Users:
+        - Docker Deployment: setup/installation/for-end-users/1-docker-deployment.md
+        - ML Models Deployment: setup/installation/for-end-users/2-ml-models-deployment.md
+        - Installation Verification: setup/installation/for-end-users/3-verification.md
+      - For Developers:
+        - Pixi Setup: setup/installation/for-developers/1-pixi-setup.md
+        - Module Environments: setup/installation/for-developers/2-module-environments.md
+        - Data Preparation: setup/installation/for-developers/3-data-preparation.md
+        - GPU Configuration: setup/installation/for-developers/4-gpu-configuration.md
+    - Configuration:
+      - setup/configuration/index.md
+      - For End Users:
+        - CVAT Projects: setup/configuration/for-end-users/1-cvat-projects.md
+        - Webhooks Setup: setup/configuration/for-end-users/2-webhooks-setup.md
+        - Workflow Testing: setup/configuration/for-end-users/3-workflow-testing.md
+      - For Developers:
+        - Environment Variables: setup/configuration/for-developers/1-environment-variables.md
+        - CVAT Integration: setup/configuration/for-developers/2-cvat-integration.md
+        - Training Configuration: setup/configuration/for-developers/3-training-config.md
 
   # User Guide - coming in Phase 3-5
   - User Guide:
