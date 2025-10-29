@@ -412,4 +412,4 @@ Other
 
 ---
 
-**Questions?** See [webhooks setup guide](2-webhooks-setup.md) or [Getting Help](../../../community/getting-help.md).
+**Questions?** See [webhooks setup guide](2-webhooks-setup.md) or [Getting Help](../../../community/index.md).

@@ -513,4 +513,4 @@ curl -X POST http://bridge.gateway:8000/health \
 
 ---
 
-**Questions?** See [workflow testing](3-workflow-testing.md) or [Getting Help](../../../community/getting-help.md).
+**Questions?** See [workflow testing](3-workflow-testing.md) or [Getting Help](../../../community/index.md).

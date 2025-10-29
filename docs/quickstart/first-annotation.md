@@ -345,10 +345,10 @@ docker logs bridge -f
 4. **Implement Continuous Learning**: Set up the feedback loop (annotate → review → retrain → deploy)
 
 **Advanced Tutorials**:
-- [Complete 3-Stage Pipeline](../user-guide/tutorials/complete-pipeline.md)
-- [Data Preparation](../user-guide/tutorials/data-preparation.md) (for developers)
-- [Model Training](../user-guide/tutorials/model-training.md) (for developers)
-- [Model Evaluation](../user-guide/tutorials/model-evaluation.md) (for developers)
+- [Complete 3-Stage Pipeline](../user-guide/data-preparation/index.md)
+- [Data Preparation](../user-guide/data-preparation/index.md) (for developers)
+- [Model Training](../user-guide/training-and-deployment/index.md) (for developers)
+- [Model Evaluation](../user-guide/training-and-deployment/yolo-segmentation.md) (for developers)
 
 ## Quick Reference
 
@@ -398,4 +398,4 @@ curl -X POST http://localhost:8000/test-webhook?target_proj_id=1 \
 
 ---
 
-**Questions?** See [Getting Help](../community/getting-help.md) or check [Troubleshooting](../setup/deployment/docker-compose.md#troubleshooting).
+**Questions?** See [Getting Help](../community/index.md) or check [Troubleshooting](../setup/installation/for-end-users/1-docker-deployment.md).

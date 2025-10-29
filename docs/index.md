@@ -26,19 +26,18 @@ Welcome to the comprehensive documentation for **QUADRATSEG**, the automated cor
 
     ---
 
-    Learn core concepts, follow tutorials, and discover how-to guides for common tasks.
+    Create annotated datasets, train models, and deploy to production.
 
-    [:octicons-arrow-right-24: Concepts](user-guide/concepts/index.md)
-    [:octicons-arrow-right-24: Tutorials](user-guide/tutorials/index.md)
+    [:octicons-arrow-right-24: Data Preparation](user-guide/data-preparation/index.md)
+    [:octicons-arrow-right-24: Training & Deployment](user-guide/training-and-deployment/index.md)
 
 -   :material-code-braces:{ .lg .middle } **Developer Guide**
 
     ---
 
-    Understand the architecture and learn how to contribute to the project.
+    Technical documentation and development resources.
 
-    [:octicons-arrow-right-24: Architecture](developer-guide/architecture.md)
-    [:octicons-arrow-right-24: Contributing](developer-guide/contributing.md)
+    [:octicons-arrow-right-24: Developer Guide](developer-guide/index.md)
 
 </div>
 
@@ -91,17 +90,13 @@ graph LR
 ### For New Users
 1. Start with the [**First Annotation Tutorial**](quickstart/first-annotation.md) to see the system in action
 2. Follow the [**Production Setup Guide**](quickstart/production-setup.md) to deploy the platform
-3. Configure your [**CVAT Projects and Webhooks**](setup/configuration/for-end-users/1-cvat-projects.md) for automation
-
-### For Administrators
-1. Review [**System Requirements**](setup/requirements.md) for hardware and software needs
-2. Follow the [**Installation Guide**](setup/installation/index.md) to deploy the system
-3. Configure [**CVAT Projects and Webhooks**](setup/configuration/webhooks.md) for automation
+3. Explore [**Data Preparation Guides**](user-guide/data-preparation/index.md) to create annotated datasets
 
 ### For Developers
-1. Understand the [**System Architecture**](developer-guide/architecture.md)
-2. Read the [**Contributing Guidelines**](developer-guide/contributing.md)
-3. Explore individual module READMEs for technical details
+1. Review [**System Requirements**](setup/requirements.md) for hardware and software needs
+2. Follow the [**Installation Guide**](setup/installation/index.md) to deploy the system
+3. Configure [**CVAT Projects and Webhooks**](setup/configuration/for-end-users/1-cvat-projects.md) for automation
+4. Train and deploy models with [**Training & Deployment Guides**](user-guide/training-and-deployment/index.md)
 
 ## Supported Datasets
 
@@ -144,9 +139,8 @@ graph LR
 ## Getting Help
 
 !!! question "Need Assistance?"
-    - 📖 **Documentation Issues**: Open an issue on [GitHub](https://github.com/criobe/coral-segmentation/issues)
-    - 💬 **Questions**: See our [Getting Help](community/getting-help.md) guide
-    - 📧 **Email Support**: taiamiti.edmunds@ml4everyone.com
+    - 📖 **Documentation**: Use the search bar or browse the [User Guide](user-guide/index.md)
+    - 📧 **Contact**: taiamiti.edmunds@ml4everyone.com
 
 ## Acknowledgments
 
@@ -171,8 +165,6 @@ If you use this platform in your research, please cite:
 }
 ```
 
-For detailed citation information, see [How to Cite](community/citations.md).
-
 ## License
 
 This project is licensed under the MIT License. See module-specific LICENSE files for details.
@@ -182,16 +174,14 @@ This project is licensed under the MIT License. See module-specific LICENSE file
 <div class="grid" markdown>
 
 !!! example "Example Workflows"
-    - [Run inference on new images](user-guide/how-to/run-inference.md)
-    - [Train custom models](user-guide/tutorials/model-training.md)
-    - [Export annotations from CVAT](user-guide/how-to/export-annotations.md)
+    - [Create annotated datasets](user-guide/data-preparation/1-single-stage-segmentation.md)
+    - [Train YOLO models](user-guide/training-and-deployment/yolo-segmentation.md)
+    - [Deploy models to production](user-guide/training-and-deployment/model-deployment.md)
 
 !!! info "Latest Updates"
     - **2025-10**: Documentation site launched
     - **2025-09**: DINOv2 integration complete
     - **2025-08**: YOLO v11 models released
-
-    See [Publications](community/publications.md) for research papers
 
 </div>
 

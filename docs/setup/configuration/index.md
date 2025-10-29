@@ -144,7 +144,7 @@ graph TB
 !!! question "Need Configuration Help?"
     - **Platform Configuration Issues**: Check [workflow testing troubleshooting](for-end-users/3-workflow-testing.md#troubleshooting)
     - **Development Configuration Issues**: Check [training config guide](for-developers/3-training-config.md#troubleshooting)
-    - **General Help**: See [Getting Help](../../community/getting-help.md)
+    - **General Help**: See [Getting Help](../../community/index.md)
 
 ## Next Steps
 

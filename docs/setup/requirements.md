@@ -264,9 +264,9 @@ nproc
 **Continue to**:
 
 - [Installation Guide](installation/index.md) - Begin installing components
-- [Pixi Environment Setup](installation/pixi-environment.md) - Set up Pixi first
-- [CVAT + Nuclio Installation](installation/cvat-nuclio.md) - Deploy core services
+- [Pixi Environment Setup](installation/for-developers/1-pixi-setup.md) - Set up Pixi first
+- [CVAT + Nuclio Installation](installation/for-end-users/1-docker-deployment.md) - Deploy core services
 
 ---
 
-**Questions about requirements?** See [Getting Help](../community/getting-help.md).
+**Questions about requirements?** See [Getting Help](../community/index.md).

@@ -559,4 +559,4 @@ docker compose -f docker-compose.yml \
 
 ---
 
-**Questions?** Check the [verification guide](3-verification.md) or see [Getting Help](../../../community/getting-help.md).
+**Questions?** Check the [verification guide](3-verification.md) or see [Getting Help](../../../community/index.md).

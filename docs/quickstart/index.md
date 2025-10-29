@@ -73,10 +73,10 @@ Once you've completed your setup path:
 
 **Developers**:
 
-1. Explore the [pipeline architecture](../user-guide/concepts/pipeline-overview.md)
-2. Follow [data preparation tutorials](../user-guide/tutorials/data-preparation.md)
-3. Learn to [train custom models](../user-guide/tutorials/model-training.md)
-4. Package models as [Nuclio functions](../user-guide/modules/bridge.md)
+1. Explore the [pipeline architecture](../index.md)
+2. Follow [data preparation tutorials](../user-guide/data-preparation/index.md)
+3. Learn to [train custom models](../user-guide/training-and-deployment/index.md)
+4. Package models as [Nuclio functions](../user-guide/training-and-deployment/model-deployment.md)
 
 ## Prerequisites by Role
 
@@ -100,8 +100,8 @@ Once you've completed your setup path:
 
 ## Getting Help
 
-- **Documentation Issues**: Check [troubleshooting guides](../setup/deployment/docker-compose.md#troubleshooting)
-- **Questions**: See [Getting Help](../community/getting-help.md)
+- **Documentation Issues**: Check [troubleshooting guides](../setup/installation/for-end-users/1-docker-deployment.md)
+- **Questions**: See [Getting Help](../community/index.md)
 - **Bug Reports**: Open an issue on [GitHub](https://github.com/criobe/coral-segmentation/issues)
 
 ---

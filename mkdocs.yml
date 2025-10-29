@@ -110,10 +110,7 @@ plugins:
   - redirects:
       redirect_maps:
         # Migrate old docs to new structure
-        'en/setup_cvat_with_nuclio_and_bridge.md': 'setup/installation/cvat-nuclio.md'
-        # Uncomment when pages are created:
-        # 'en/coral_segmentation_pipeline.md': 'user-guide/concepts/pipeline-overview.md'
-        # 'en/bridge/index.md': 'user-guide/modules/bridge.md'
+        'en/setup_cvat_with_nuclio_and_bridge.md': 'setup/installation/for-end-users/1-docker-deployment.md'
 
 # Markdown Extensions
 markdown_extensions:
@@ -249,53 +246,31 @@ nav:
         - CVAT Integration: setup/configuration/for-developers/2-cvat-integration.md
         - Training Configuration: setup/configuration/for-developers/3-training-config.md
 
-  # User Guide - coming in Phase 3-5
+  # User Guide - Practical workflow-oriented guides
   - User Guide:
     - user-guide/index.md
-    # - Concepts:
-    #   - user-guide/concepts/index.md
-    #   - Pipeline Overview: user-guide/concepts/pipeline-overview.md
-    #   - Datasets: user-guide/concepts/datasets.md
-    #   - Taxonomies: user-guide/concepts/taxonomies.md
-    #   - Workflows: user-guide/concepts/workflows.md
-    # - Tutorials:
-    #   - user-guide/tutorials/index.md
-    #   - Complete Pipeline: user-guide/tutorials/complete-pipeline.md
-    #   - Grid Detection: user-guide/tutorials/grid-detection.md
-    #   - Coral Segmentation (YOLO): user-guide/tutorials/coral-segmentation-yolo.md
-    #   - Coral Segmentation (DINOv2): user-guide/tutorials/coral-segmentation-dinov2.md
-    #   - Data Preparation: user-guide/tutorials/data-preparation.md
-    #   - Model Training: user-guide/tutorials/model-training.md
-    #   - Model Evaluation: user-guide/tutorials/model-evaluation.md
-    # - How-To Guides:
-    #   - user-guide/how-to/index.md
-    #   - Annotate in CVAT: user-guide/how-to/annotate-in-cvat.md
-    #   - Run Inference: user-guide/how-to/run-inference.md
-    #   - Export Annotations: user-guide/how-to/export-annotations.md
-    #   - Manage Datasets: user-guide/how-to/manage-datasets.md
-    #   - Visualize Results: user-guide/how-to/visualize-results.md
-    # - Modules:
-    #   - user-guide/modules/index.md
-    #   - Bridge: user-guide/modules/bridge.md
-    #   - Data Engineering: user-guide/modules/data-engineering.md
-    #   - Grid Pose Detection: user-guide/modules/grid-pose-detection.md
-    #   - Grid Inpainting: user-guide/modules/grid-inpainting.md
-    #   - Coral Segmentation (YOLO): user-guide/modules/coral-seg-yolo.md
-    #   - Coral Segmentation (DINOv2): user-guide/modules/dinov2-mmseg.md
+    - Data Preparation:
+      - user-guide/data-preparation/index.md
+      - Guide A - Single-Stage Segmentation: user-guide/data-preparation/1-single-stage-segmentation.md
+      - Guide B - Two-Stage Banggai: user-guide/data-preparation/2-two-stage-banggai.md
+      - Guide C - Three-Stage CRIOBE: user-guide/data-preparation/3-three-stage-criobe.md
+    - Training & Deployment:
+      - user-guide/training-and-deployment/index.md
+      - YOLO Segmentation: user-guide/training-and-deployment/yolo-segmentation.md
+      - DINOv2 Segmentation: user-guide/training-and-deployment/mmseg-segmentation.md
+      - Grid Detection: user-guide/training-and-deployment/grid-detection.md
+      - Grid Removal: user-guide/training-and-deployment/grid-removal.md
+      - Model Deployment: user-guide/training-and-deployment/model-deployment.md
+    - Reference:
+      - CVAT Label Templates: user-guide/reference/cvat-label-templates.md
 
-  # Developer Guide - coming in Phase 6
+  # Developer Guide - coming later
   - Developer Guide:
     - developer-guide/index.md
-    # - Architecture: developer-guide/architecture.md
-    # - Contributing: developer-guide/contributing.md
-    # - Code Style: developer-guide/code-style.md
 
-  # Community - coming in Phase 6
+  # Community
   - Community:
     - community/index.md
-    # - Getting Help: community/getting-help.md
-    # - Publications: community/publications.md
-    # - Citations: community/citations.md
 
 # Validation
 validation:

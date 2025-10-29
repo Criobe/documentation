@@ -508,4 +508,4 @@ docker compose down && docker compose up -d
 
 ---
 
-**Questions?** See [Getting Help](../../../community/getting-help.md) or report issues on [GitHub](https://github.com/criobe/coral-segmentation/issues).
+**Questions?** See [Getting Help](../../../community/index.md) or report issues on [GitHub](https://github.com/criobe/coral-segmentation/issues).

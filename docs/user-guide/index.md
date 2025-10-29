@@ -32,30 +32,6 @@ This user guide is organized into practical workflow-oriented sections:
 
     [:octicons-arrow-right-24: View Reference](reference/cvat-label-templates.md)
 
--   :material-lightbulb:{ .lg .middle } **Concepts**
-
-    ---
-
-    Understand core concepts, pipeline stages, datasets, and workflows (coming soon).
-
-    [:octicons-arrow-right-24: Learn Concepts](concepts/index.md)
-
--   :material-school:{ .lg .middle } **Tutorials**
-
-    ---
-
-    Step-by-step learning paths that teach you how to use the system (coming soon).
-
-    [:octicons-arrow-right-24: Start Learning](tutorials/index.md)
-
--   :material-hammer-wrench:{ .lg .middle } **How-To Guides**
-
-    ---
-
-    Task-oriented guides for specific problems (coming soon).
-
-    [:octicons-arrow-right-24: Find Solutions](how-to/index.md)
-
 </div>
 
 ## Quick Reference
@@ -111,23 +87,15 @@ Choose a learning path based on your role:
 === "ML Engineer / Developer"
     **Goal**: Train and deploy custom coral segmentation models
 
-    1. Complete a data preparation workflow ([Guide A](data-preparation/1-single-stage-segmentation.md) minimum)
-    2. Review [Training & Deployment overview](training-and-deployment/index.md)
-    3. Train models:
+    1. Complete [Installation guides](../setup/installation/index.md) and [CVAT with Nuclio](../setup/installation/for-end-users/2-ml-models-deployment.md)
+    2. Complete a data preparation workflow ([Guide A](data-preparation/1-single-stage-segmentation.md) minimum)
+    3. Review [Training & Deployment overview](training-and-deployment/index.md)
+    4. Train models:
         - Start with [YOLO Segmentation](training-and-deployment/yolo-segmentation.md) for speed
         - Try [DINOv2 + MMSeg](training-and-deployment/mmseg-segmentation.md) for accuracy
         - Train grid models if needed ([Grid Detection](training-and-deployment/grid-detection.md))
-    4. Deploy models with [Nuclio](training-and-deployment/model-deployment.md)
-    5. Integrate into production pipelines
-
-=== "System Administrator"
-    **Goal**: Deploy and maintain the QUADRATSEG platform
-
-    1. Complete [Installation guides](../setup/installation/index.md)
-    2. Set up [CVAT with Nuclio](../setup/installation/for-end-users/2-ml-models-deployment.md)
-    3. Deploy all [pre-trained models](training-and-deployment/model-deployment.md)
-    4. Configure [webhook automation](reference/cvat-label-templates.md#webhook-configurations)
-    5. Monitor and troubleshoot deployments
+    5. Deploy models with [Nuclio](training-and-deployment/model-deployment.md)
+    6. Configure [webhook automation](reference/cvat-label-templates.md#webhook-configurations) and integrate into production pipelines
 
 ## Documentation Conventions
 
@@ -172,15 +140,14 @@ dataset = fo.load_dataset("criobe_finegrained_annotated")
 Before using this guide, ensure you have:
 
 - [x] Completed [system installation](../setup/installation/index.md)
-- [x] Configured [environment variables](../setup/configuration/environment-variables.md)
+- [x] Configured [environment variables](../setup/configuration/for-developers/1-environment-variables.md)
 - [x] Access to CVAT instance (if using webhooks)
 
 ## Need Help?
 
 !!! question "Can't Find What You Need?"
     - **Search**: Use the search bar at the top of this page
-    - **Ask**: See [Getting Help](../community/getting-help.md)
-    - **Contribute**: Help improve docs via [GitHub](https://github.com/criobe/coral-segmentation)
+    - **Contact**: See [Community](../community/index.md) for contact information
 
 ## What's Next?
 

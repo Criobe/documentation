@@ -570,4 +570,4 @@ nuctl delete project cvat --platform local
 
 ---
 
-**Questions?** Check [verification guide](3-verification.md) or see [Getting Help](../../../community/getting-help.md).
+**Questions?** Check [verification guide](3-verification.md) or see [Getting Help](../../../community/index.md).

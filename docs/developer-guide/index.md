@@ -1,69 +1,28 @@
 # Developer Guide
 
-Welcome to the QUADRATSEG developer documentation, covering the platform developed by CRIOBE. This guide helps contributors understand the system architecture, development workflows, and contribution processes.
-
-## For Contributors
-
-<div class="grid cards" markdown>
-
--   :material-vector-triangle:{ .lg .middle } **Architecture**
-
-    ---
-
-    Understand the system design, module interactions, and technology stack.
-
-    [:octicons-arrow-right-24: System Architecture](architecture.md)
-
--   :material-source-pull:{ .lg .middle } **Contributing**
-
-    ---
-
-    Learn how to contribute code, documentation, or bug reports to the project.
-
-    [:octicons-arrow-right-24: Contribution Guide](contributing.md)
-
--   :material-code-tags:{ .lg .middle } **Code Style**
-
-    ---
-
-    Follow project coding standards, naming conventions, and best practices.
-
-    [:octicons-arrow-right-24: Code Standards](code-style.md)
-
-</div>
-
-## Quick Links
-
-| Resource | Purpose |
-|----------|---------|
-| [Architecture Overview](architecture.md) | High-level system design |
-| [Contributing Guide](contributing.md) | How to contribute |
-| [Code Style Guide](code-style.md) | Coding standards |
-| [Module READMEs](../../) | Technical module details |
+Welcome to the QUADRATSEG developer documentation, covering the platform developed by CRIOBE. This guide helps developers understand the system architecture and development workflows.
 
 ## Development Workflow
 
 ```mermaid
 graph LR
-    A[Fork Repo] --> B[Create Branch]
+    A[Clone Repo] --> B[Setup Environment]
     B --> C[Make Changes]
     C --> D[Test Locally]
     D --> E[Commit]
     E --> F[Push]
-    F --> G[Create PR]
-    G --> H[Code Review]
-    H --> I[Merge]
+    F --> G[Deploy]
 
     style A fill:#e1f5ff
-    style I fill:#c8e6c9
+    style G fill:#c8e6c9
 ```
 
 ## Getting Started
 
-1. **Understand the Architecture**: Read [Architecture Overview](architecture.md)
-2. **Set Up Development Environment**: Follow [Contributing Guide](contributing.md)
-3. **Learn Coding Standards**: Review [Code Style Guide](code-style.md)
-4. **Pick an Issue**: Check [GitHub Issues](https://github.com/criobe/coral-segmentation/issues)
+1. **Review System Requirements**: See [Requirements](../setup/requirements.md)
+2. **Install Development Environment**: Follow [Developer Setup](../quickstart/developer-setup.md)
+3. **Explore User Guides**: Review [Data Preparation](../user-guide/data-preparation/index.md) and [Training Guides](../user-guide/training-and-deployment/index.md)
+4. **Check Module READMEs**: Each module has detailed technical documentation
 
 ## Module Structure
 
@@ -123,48 +82,21 @@ Each module has:
 - **End-to-End Tests**: Test complete pipeline workflows
 - **Manual Testing**: Visual inspection of segmentation results
 
-## Contributing Areas
+## Contributing
 
-We welcome contributions in:
+Contributions are welcome! Ways to contribute:
 
-- 🐛 **Bug Fixes**: Fix issues reported on GitHub
-- ✨ **Features**: Add new functionality
+- 🐛 **Bug Reports**: File issues on GitHub
+- ✨ **Feature Requests**: Suggest new capabilities
 - 📝 **Documentation**: Improve guides and examples
-- 🧪 **Tests**: Increase test coverage
-- 🎨 **Models**: Add new segmentation models
-- 🔧 **Infrastructure**: Improve deployment and CI/CD
+- 💻 **Code**: Submit pull requests
 
-## Code Review Process
+## Communication
 
-All contributions go through code review:
-
-1. **Automated Checks**: Linting, formatting, tests
-2. **Peer Review**: At least one maintainer reviews
-3. **Testing**: Verify changes work as expected
-4. **Documentation**: Check docs are updated
-5. **Merge**: Approved PRs merged to main
-
-## Release Process
-
-- **Semantic Versioning**: MAJOR.MINOR.PATCH
-- **Changelog**: Updated with each release
-- **Tags**: Git tags for version tracking
-- **Announcements**: Release notes on GitHub
-
-## Communication Channels
-
-- **GitHub Issues**: Bug reports and feature requests
-- **GitHub Discussions**: General questions and ideas
-- **Pull Requests**: Code contributions
+- **GitHub**: [criobe/coral-segmentation](https://github.com/criobe/coral-segmentation)
 - **Email**: taiamiti.edmunds@ml4everyone.com
-
-## Resources
-
-- **Main Repository**: [GitHub](https://github.com/criobe/coral-segmentation)
 - **Documentation**: This site
-- **Module Documentation**: Individual module README files
-- **Research Papers**: [Publications](../community/publications.md)
 
 ---
 
-**Ready to contribute?** → [Contributing Guide](contributing.md){ .md-button .md-button--primary }
+**Need help?** → [Contact](../community/index.md){ .md-button }

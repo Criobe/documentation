@@ -45,7 +45,7 @@ graph TD
 
     **No Pixi or Python environments needed!**
 
-    [:octicons-arrow-right-24: End User Setup](installation/index.md#for-end-users)
+    [:octicons-arrow-right-24: End User Setup](installation/for-end-users/1-docker-deployment.md)
 
 -   :material-code-braces:{ .lg .middle } **Developer Path**
 
@@ -63,7 +63,7 @@ graph TD
 
     **For continuous learning and experimentation!**
 
-    [:octicons-arrow-right-24: Developer Setup](installation/index.md#for-developers)
+    [:octicons-arrow-right-24: Developer Setup](installation/for-developers/1-pixi-setup.md)
 
 </div>
 
@@ -255,14 +255,14 @@ For end users deploying the platform:
 
 === "End User Path"
     1. **[Review Requirements](requirements.md)** - Check your hardware
-    2. **[Install Platform](installation/index.md#for-end-users)** - Deploy CVAT + Nuclio + Bridge
-    3. **[Configure Workflow](configuration/index.md#for-end-users)** - Set up projects and webhooks
+    2. **[Install Platform](installation/for-end-users/1-docker-deployment.md)** - Deploy CVAT + Nuclio + Bridge
+    3. **[Configure Workflow](configuration/for-end-users/1-cvat-projects.md)** - Set up projects and webhooks
     4. **[Try First Annotation](../quickstart/first-annotation.md)** - Process your first image
 
 === "Developer Path"
     1. **[Review Requirements](requirements.md)** - Check your hardware and CUDA
-    2. **[Install Development Environment](installation/index.md#for-developers)** - Set up Pixi and modules
-    3. **[Configure Training](configuration/index.md#for-developers)** - Set up CVAT integration
+    2. **[Install Development Environment](installation/for-developers/1-pixi-setup.md)** - Set up Pixi and modules
+    3. **[Configure Training](configuration/for-developers/1-environment-variables.md)** - Set up CVAT integration
     4. **[Start Training](../quickstart/developer-setup.md)** - Train your first model
 
 ---

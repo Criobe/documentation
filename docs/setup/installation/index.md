@@ -8,7 +8,7 @@ QUADRATSEG has two distinct installation paths depending on your use case:
 
 <div class="grid cards" markdown>
 
--   :material-docker:{ .lg .middle } **End User - Platform Deployment**
+-   :material-docker:{ .lg .middle } **End User - Platform Deployment** {#for-end-users}
 
     ---
 
@@ -20,7 +20,7 @@ QUADRATSEG has two distinct installation paths depending on your use case:
 
     [:octicons-arrow-right-24: Platform Installation](for-end-users/1-docker-deployment.md)
 
--   :material-code-braces:{ .lg .middle } **Developer - Development Environment**
+-   :material-code-braces:{ .lg .middle } **Developer - Development Environment** {#for-developers}
 
     ---
 
@@ -208,7 +208,7 @@ graph TD
 !!! question "Need Assistance?"
     - **Platform Deployment Issues**: Check [troubleshooting](for-end-users/3-verification.md#troubleshooting)
     - **Development Setup Issues**: Check [GPU configuration](for-developers/4-gpu-configuration.md#troubleshooting)
-    - **General Help**: See [Getting Help](../../community/getting-help.md)
+    - **General Help**: See [Getting Help](../../community/index.md)
     - **GitHub Issues**: [Report problems](https://github.com/criobe/coral-segmentation/issues)
 
 ## Next Steps

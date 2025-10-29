@@ -625,4 +625,4 @@ http://bridge.gateway:8000/detect-model-webhook?model_name=<MODEL_NAME>&conv_mas
 
 ---
 
-**Questions?** See [Getting Help](../community/getting-help.md) or check the [first annotation tutorial](first-annotation.md).
+**Questions?** See [Getting Help](../community/index.md) or check the [first annotation tutorial](first-annotation.md).

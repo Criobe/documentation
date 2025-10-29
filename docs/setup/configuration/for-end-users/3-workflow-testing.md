@@ -489,4 +489,4 @@ docker compose restart cvat_worker_webhooks
 
 ---
 
-**Questions?** See [Getting Help](../../../community/getting-help.md) or [troubleshooting guides](../../installation/for-end-users/3-verification.md#troubleshooting).
+**Questions?** See [Getting Help](../../../community/index.md) or [troubleshooting guides](../../installation/for-end-users/3-verification.md#troubleshooting).
