@@ -3,16 +3,25 @@
 Create your first automated coral annotation workflow in CVAT with webhook-triggered processing.
 
 !!! tip "What You'll Accomplish"
-    - Create a CVAT project for coral annotations
+    - Create CVAT projects for the processing pipeline
     - Upload sample images
     - Configure webhooks to trigger automated processing
     - Run the complete pipeline from raw image to coral segmentation
+    - Review and export results
 
 **Time Required**: 15-20 minutes
+
 **Prerequisites**:
-- CVAT + Nuclio deployed and running
-- Bridge service deployed
-- At least one test image
+
+!!! warning "Complete Production Setup First"
+    This tutorial assumes you've completed the [Production Setup](production-setup.md) guide with:
+
+    - [x] CVAT + Nuclio deployed and running
+    - [x] Bridge service deployed and accessible
+    - [x] All ML models deployed as Nuclio functions
+    - [x] Services verified with health checks
+
+    If you haven't set up the system yet, **[start with Production Setup](production-setup.md)** first.
 
 ## Overview
 
@@ -56,28 +65,28 @@ You'll need two CVAT projects for this tutorial:
 1. **Open CVAT**: Navigate to http://localhost:8080
 2. **Login** with your credentials (default: `admin` / password from setup)
 3. **Create New Project**:
-   - Click **"Projects"** → **"+"** (Create new project)
-   - **Name**: `tutorial_corner_detection`
-   - **Labels**: Create one label named `corner`
-   - **Subset**: Leave default (training/validation/test)
-   - Click **Submit**
+    - Click **"Projects"** → **"+"** (Create new project)
+    - **Name**: `tutorial_corner_detection`
+    - **Labels**: Create one label named `corner`
+    - **Subset**: Leave default (training/validation/test)
+    - Click **Submit**
 
 4. **Note the Project ID**: After creation, check the URL or project details. You'll see something like:
-   ```
-   http://localhost:8080/projects/1
-   ```
-   The project ID is `1`. **Write this down**.
+    ```
+    http://localhost:8080/projects/1
+    ```
+    The project ID is `1`. **Write this down**.
 
 ### Project 2: Coral Segmentation
 
 1. **Create New Project** again:
-   - **Name**: `tutorial_coral_segmentation`
-   - **Labels**: Create labels for coral species:
-     - `Acropora`
-     - `Pocillopora`
-     - `Porites`
-     - `Other`
-   - Click **Submit**
+    - **Name**: `tutorial_coral_segmentation`
+    - **Labels**: Create labels for coral species:
+        - `Acropora`
+        - `Pocillopora`
+        - `Porites`
+        - `Other`
+    - Click **Submit**
 
 2. **Note the Project ID**: Again, note the ID (likely `2`). **Write this down**.
 
@@ -87,14 +96,14 @@ Let's upload one test image to the corner detection project.
 
 1. **Navigate to Project 1** (`tutorial_corner_detection`)
 2. **Create New Task**:
-   - Click **"+"** (Create new task)
-   - **Name**: `test_task_001`
-   - **Subset**: `training`
-   - **Select files**: Upload one image from:
-     - Option A: Your own coral quadrat image
-     - Option B: Download sample: `https://storage.googleapis.com/data_criobe/test_samples/1-raw_jpg/Tetiaroa_1994_01.jpg`
-   - **Image Quality**: 100
-   - Click **Submit**
+    - Click **"+"** (Create new task)
+    - **Name**: `test_task_001`
+    - **Subset**: `training`
+    - **Select files**: Upload one image from:
+        - Option A: Your own coral quadrat image
+        - Option B: Download sample: `https://storage.googleapis.com/data_criobe/test_samples/1-raw_jpg/Tetiaroa_1994_01.jpg`
+    - **Image Quality**: 100
+    - Click **Submit**
 
 3. **Verify Task Created**: You should see the task in the task list with status "New"
 
@@ -108,24 +117,24 @@ Now configure the automation that will process images when tasks complete.
 2. **Click Actions → Setup Webhooks**
 3. **Click "+ Add webhook"**
 4. **Configure**:
-   - **Target URL**:
-     ```
-     http://bridge.gateway:8000/crop-quadrat-and-detect-corals-webhook?target_proj_id=2
-     ```
-     (Replace `2` with your Project 2 ID)
-   - **Content type**: Select `application/json` from dropdown
-   - **Secret**: Leave empty
-   - **Enable SSL verification**: Unchecked (for local development)
-   - **Active**: ✅ Checked
-   - **Events**: Select **"Select individual events"** radio button
-     - ✅ Check `task` event
-     - ✅ Check `job` event
-   - **Description**: `Auto-process to coral segmentation`
+    - **Target URL**:
+        ```
+        http://bridge.gateway:8000/crop-quadrat-and-detect-corals-webhook?target_proj_id=2
+        ```
+        (Replace `2` with your Project 2 ID)
+    - **Content type**: Select `application/json` from dropdown
+    - **Secret**: Leave empty
+    - **Enable SSL verification**: Unchecked (for local development)
+    - **Active**: ✅ Checked
+    - **Events**: Select **"Select individual events"** radio button
+        - ✅ Check `task` event
+        - ✅ Check `job` event
+    - **Description**: `Auto-process to coral segmentation`
 
 5. **Test Connection**:
-   - Click **Ping** button
-   - Should show "✅ Success (200)" in deliveries table
-   - If failed, check bridge service logs and network configuration
+    - Click **Ping** button
+    - Should show "✅ Success (200)" in deliveries table
+    - If failed, check bridge service logs and network configuration
 
 6. **Click Submit** to save webhook
 
@@ -138,14 +147,14 @@ If you want automatic model inference:
 
 1. **Add another webhook** to Project 2 (`tutorial_coral_segmentation`)
 2. **Configure**:
-   - **Target URL**:
-     ```
-     http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask_to_poly=true
-     ```
-   - **Content type**: `application/json`
-   - **Active**: ✅ Checked
-   - **Events**: ✅ Check `job` event only
-   - **Description**: `Auto-detect corals with YOLO`
+    - **Target URL**:
+        ```
+        http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask_to_poly=true
+        ```
+    - **Content type**: `application/json`
+    - **Active**: ✅ Checked
+    - **Events**: ✅ Check `job` event only
+    - **Description**: `Auto-detect corals with YOLO`
 
 3. **Ping** to test, then **Submit**
 
@@ -158,22 +167,22 @@ For this tutorial, you can either:
 1. **Open the task** in Project 1
 2. **Start annotation**: Click "Open" on the job
 3. **Annotate 4 corners**:
-   - Use **Point** tool (or **Keypoint** if available)
-   - Mark the 4 corners of the quadrat grid
-   - Label each as `corner`
+    - Use **Point** tool (or **Keypoint** if available)
+    - Mark the 4 corners of the quadrat grid
+    - Label each as `corner`
 4. **Save** annotations
 5. **Change task status**:
-   - Click task menu → **Change task status**
-   - Set to **Completed**
+    - Click task menu → **Change task status**
+    - Set to **Completed**
 
 ### Option B: Auto-Detection (Recommended)
 
 If you deployed the corner detection Nuclio function:
 
 1. **Add detection webhook** to Project 1:
-   ```
-   http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-gridcorners
-   ```
+    ```
+    http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-gridcorners
+    ```
 2. **Open the task** → The job state changes to "in progress"
 3. **Wait ~5 seconds** for auto-detection
 4. **Refresh page** to see detected corners
@@ -187,20 +196,20 @@ Once you mark the task as **Completed**:
 ### What Happens Automatically:
 
 1. **Task completion webhook fires**:
-   - Bridge receives CVAT webhook
-   - Downloads corner annotations
-   - Crops and warps the quadrat image
+    - Bridge receives CVAT webhook
+    - Downloads corner annotations
+    - Crops and warps the quadrat image
 
 2. **New task created in Project 2**:
-   - Bridge creates task in `tutorial_coral_segmentation`
-   - Uploads the warped image
-   - Task status: "New"
+    - Bridge creates task in `tutorial_coral_segmentation`
+    - Uploads the warped image
+    - Task status: "New"
 
 3. **Job state change triggers model**:
-   - When you open the job (state → "in progress")
-   - Model detection webhook fires
-   - YOLO model runs coral segmentation
-   - Results uploaded to CVAT
+    - When you open the job (state → "in progress")
+    - Model detection webhook fires
+    - YOLO model runs coral segmentation
+    - Results uploaded to CVAT
 
 ### Verify the Pipeline:
 
@@ -230,16 +239,16 @@ docker logs bridge -f
 The auto-detected coral annotations are now ready for review:
 
 1. **Review each polygon**:
-   - Check species labels are correct
-   - Adjust boundaries if needed
-   - Delete false positives
-   - Add missing corals
+    - Check species labels are correct
+    - Adjust boundaries if needed
+    - Delete false positives
+    - Add missing corals
 
 2. **Export annotations**:
-   - Click task menu → **Actions**
-   - **Export task dataset**
-   - Format: **COCO 1.0** or **CVAT for images 1.1**
-   - Download ZIP file
+    - Click task menu → **Actions**
+    - **Export task dataset**
+    - Format: **COCO 1.0** or **CVAT for images 1.1**
+    - Download ZIP file
 
 3. **Mark task complete** when review is done
 
@@ -321,17 +330,25 @@ docker logs bridge -f
 !!! success "Tutorial Complete!"
     You've successfully set up an automated coral annotation pipeline!
 
-**What's next**:
+**For End Users (Coral Researchers)**:
 
-1. **Scale Up**: Add more images to your corner detection project
-2. **Add Stages**: Implement the 3-stage pipeline (corner → grid → removal → segmentation)
-3. **Train Models**: Use your annotations to fine-tune models
-4. **Export Data**: Learn to [export annotations](../user-guide/how-to/export-annotations.md) for analysis
+1. **Scale Up**: Process your coral quadrat image datasets
+2. **Batch Processing**: Upload multiple images to process in parallel
+3. **Export Results**: Get annotations for statistical analysis
+4. **Refine Workflow**: Adjust confidence thresholds and model parameters
+
+**For Developers (AI Researchers)**:
+
+1. **Set Up Development Environment**: Follow [Developer Setup](developer-setup.md) to install Pixi
+2. **Collect Training Data**: Use your reviewed annotations to create training datasets
+3. **Train Custom Models**: Fine-tune models on your specific coral species
+4. **Implement Continuous Learning**: Set up the feedback loop (annotate → review → retrain → deploy)
 
 **Advanced Tutorials**:
 - [Complete 3-Stage Pipeline](../user-guide/tutorials/complete-pipeline.md)
-- [Model Training](../user-guide/tutorials/model-training.md)
-- [Data Preparation](../user-guide/tutorials/data-preparation.md)
+- [Data Preparation](../user-guide/tutorials/data-preparation.md) (for developers)
+- [Model Training](../user-guide/tutorials/model-training.md) (for developers)
+- [Model Evaluation](../user-guide/tutorials/model-evaluation.md) (for developers)
 
 ## Quick Reference
 

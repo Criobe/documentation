@@ -12,11 +12,11 @@ From a CVAT project, go to **Actions → Setup webhooks** and configure entries 
 
 ### Two-Stage Processing (Recommended)
 1. **Corner ➜ Grid Detection**
-   - Source: Corner annotation project
-   - URL: `http://bridge.gateway:8000/crop-quadrat-and-detect-grid-webhook?target_proj_id=<grid_project_id>`
+    - Source: Corner annotation project
+    - URL: `http://bridge.gateway:8000/crop-quadrat-and-detect-grid-webhook?target_proj_id=<grid_project_id>`
 2. **Grid ➜ Coral Segmentation**
-   - Source: Grid annotation project
-   - URL: `http://bridge.gateway:8000/remove-grid-and-detect-corals-webhook?target_proj_id=<coral_project_id>`
+    - Source: Grid annotation project
+    - URL: `http://bridge.gateway:8000/remove-grid-and-detect-corals-webhook?target_proj_id=<coral_project_id>`
 
 ### Direct Corner ➜ Coral
 - Source: Corner annotation project

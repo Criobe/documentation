@@ -152,10 +152,10 @@ Open browser to `http://localhost:8000/docs` to see FastAPI interactive document
 1. **Task Completion**: User marks CVAT task as "completed"
 2. **CVAT Sends Webhook**: CVAT POSTs JSON payload to bridge webhook URL
 3. **Bridge Processes**:
-   - Downloads task annotations from CVAT
-   - Downloads images from CVAT
-   - Processes images (crop, warp, or remove grid)
-   - Optionally runs ML model via Nuclio
+    - Downloads task annotations from CVAT
+    - Downloads images from CVAT
+    - Processes images (crop, warp, or remove grid)
+    - Optionally runs ML model via Nuclio
 4. **Bridge Creates Task**: Uploads processed images to new CVAT task
 5. **Webhook Response**: Returns HTTP 200 to CVAT
 

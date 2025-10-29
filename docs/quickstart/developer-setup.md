@@ -1,19 +1,40 @@
-# 5-Minute Demo
+# Developer Setup
 
-Get the QUADRATSEG platform—developed by CRIOBE—running in 5 minutes using pre-downloaded test data and pre-trained models.
+Set up the QUADRATSEG development environment for **AI researchers and developers** who want to train models, experiment with architectures, and iterate on the ML pipeline.
+
+!!! info "For AI Researchers & Developers"
+    This setup installs **Pixi** for managing Python environments across all modules. Use this path if you want to train models, run experiments, or develop new features.
+
+**Time Required**: 30-45 minutes
+**Target Users**: AI researchers, ML engineers, software developers
 
 !!! tip "What You'll Accomplish"
-    - Download test images representing each pipeline stage
-    - Download pre-trained ML models
-    - Run inference for each module independently
-    - See the complete pipeline output
+    - Install Pixi package manager for environment management
+    - Set up development environments for all pipeline modules
+    - Download test data and pre-trained models
+    - Run inference and training experiments locally
+    - Understand the codebase structure for development
 
-**Time Required**: 5-10 minutes
-**Prerequisites**: Git, Pixi installed
+**Prerequisites**: Git, Pixi installed, Python 3.9+, NVIDIA GPU recommended
 
-## Overview
+## Why Use Pixi for Development?
 
-This demo walks through each stage of the coral segmentation pipeline using sample data:
+Pixi is a fast, cross-platform package manager that handles all dependencies for each module:
+
+- **Isolated Environments**: Each module (grid detection, segmentation, etc.) has its own environment
+- **Reproducible Builds**: Exact versions specified in `pixi.toml` files
+- **Fast Installation**: Parallel downloads and caching
+- **CUDA Management**: Handles PyTorch + CUDA dependencies automatically
+- **Cross-Platform**: Works on Linux, macOS, and Windows
+
+!!! warning "Production vs Development"
+    **End users** (coral researchers) do NOT need Pixi. The production system uses Docker with pre-packaged models.
+
+    **Developers** need Pixi to train, evaluate, and experiment with models before packaging them for deployment.
+
+## Development Workflow Overview
+
+This setup enables the complete development workflow:
 
 ```mermaid
 graph LR
@@ -25,6 +46,54 @@ graph LR
 
     style A fill:#e1f5ff
     style F fill:#c8e6c9
+```
+
+## Prerequisites Check
+
+Before starting, ensure you have:
+
+### Required Software
+
+- [x] **Git**: For version control ([install](https://git-scm.com/downloads))
+- [x] **Pixi**: Package manager ([install guide](https://pixi.sh/latest/#installation))
+- [x] **Python 3.9+**: Managed by Pixi, but system Python helpful for Pixi itself
+- [x] **NVIDIA GPU**: Recommended for training and fast inference
+- [x] **NVIDIA Drivers**: CUDA 11.7+ or 12.x depending on module
+- [x] **Disk Space**: 50GB+ for datasets, models, and experiments
+
+### Install Pixi
+
+If you haven't installed Pixi yet:
+
+**Linux & macOS**:
+```bash
+# Install via curl
+curl -fsSL https://pixi.sh/install.sh | bash
+
+# Restart terminal or source the config
+source ~/.bashrc  # or ~/.zshrc for zsh
+
+# Verify installation
+pixi --version
+```
+
+**Windows**:
+```powershell
+# Install via PowerShell
+iwr -useb https://pixi.sh/install.ps1 | iex
+
+# Verify installation
+pixi --version
+```
+
+### Verify GPU (Optional but Recommended)
+
+```bash
+# Check NVIDIA driver
+nvidia-smi
+
+# Expected: GPU information with CUDA version
+# If error, install NVIDIA drivers from nvidia.com
 ```
 
 ## Step 1: Clone Repository
@@ -317,17 +386,73 @@ ls data/test_samples/
 ./download_test_samples.sh
 ```
 
-## Next Steps
+## Next Steps for Developers
 
-!!! success "Demo Complete!"
-    You've successfully run the QUADRATSEG platform workflow!
+!!! success "Development Environment Ready!"
+    You've successfully set up the QUADRATSEG development environment and run inference demos!
 
-**What to do next**:
+### Understand the Codebase
 
-1. **Understand the System**: Read [Pipeline Overview](../user-guide/concepts/pipeline-overview.md)
-2. **Full Installation**: Follow [complete setup guide](../setup/installation/index.md)
-3. **Create Your First Annotation**: [First Annotation Tutorial](first-annotation.md)
-4. **Train Custom Models**: [Model Training Tutorial](../user-guide/tutorials/model-training.md)
+Each module has its own `CLAUDE.md` file with detailed documentation:
+
+```bash
+# Read module-specific guides
+cat grid_pose_detection/CLAUDE.md
+cat coral_seg_yolo/CLAUDE.md
+cat DINOv2_mmseg/CLAUDE.md
+cat bridge/CLAUDE.md
+cat data_engineering/CLAUDE.md
+```
+
+### Development Workflows
+
+**1. Train Custom Models**:
+- Follow [Model Training Tutorial](../user-guide/tutorials/model-training.md)
+- Use [Data Preparation Guide](../user-guide/tutorials/data-preparation.md)
+- See module-specific training configs in `experiments/` or `configs/` directories
+
+**2. Experiment with Architectures**:
+- Modify training configs (YOLO: `experiments/`, DINOv2: `configs/`)
+- Run experiments with Pixi: `pixi run -e <env> python train.py --config <config>`
+- Track results with FiftyOne or TensorBoard
+
+**3. Continuous Learning Loop**:
+```mermaid
+graph LR
+    A[Upload Images<br/>to CVAT] --> B[Auto-Annotate<br/>with Models]
+    B --> C[Manual Review<br/>& Correction]
+    C --> D[Export to<br/>FiftyOne]
+    D --> E[Retrain Models<br/>with Pixi]
+    E --> F[Package as<br/>Nuclio Function]
+    F --> B
+
+    style A fill:#e1f5ff
+    style E fill:#FF9800
+    style F fill:#4CAF50
+```
+
+**4. Deploy to Production**:
+- Package trained models as Nuclio functions
+- Update `function.yaml` with new model URLs
+- Deploy with `nuctl deploy`
+- See [Bridge documentation](../user-guide/modules/bridge.md)
+
+### Advanced Tutorials
+
+- **[Complete Pipeline](../user-guide/tutorials/complete-pipeline.md)**: End-to-end workflow
+- **[Data Preparation](../user-guide/tutorials/data-preparation.md)**: FiftyOne + CVAT integration
+- **[Model Training](../user-guide/tutorials/model-training.md)**: Train custom models
+- **[Model Evaluation](../user-guide/tutorials/model-evaluation.md)**: Evaluate and compare models
+- **[Architecture Guide](../developer-guide/architecture.md)**: System design and modules
+
+### Set Up Production Environment
+
+If you also need the production CVAT+Nuclio+Bridge setup:
+
+1. Follow [Production Setup Guide](production-setup.md)
+2. Deploy your trained models as Nuclio functions
+3. Configure webhooks for automated processing
+4. Implement continuous learning workflow
 
 ## Quick Reference
 
