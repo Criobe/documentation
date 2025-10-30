@@ -10,8 +10,7 @@ This guide covers training **DINOv2-based semantic segmentation models** for cor
 
 **Best for:**
 
-- Scientific research and publications
-- Maximum pixel-level accuracy requirements
+- Low data regime - finetuning with foundation models gives good performance with low data
 - Semantic segmentation (class per pixel)
 - Two-stage workflows (semantic → instance refinement)
 - Applications where speed is secondary to accuracy
@@ -19,8 +18,7 @@ This guide covers training **DINOv2-based semantic segmentation models** for cor
 **Consider YOLO instead if:**
 
 - Need real-time inference (<10s per image)
-- Instance segmentation with bounding boxes required
-- Deploying on resource-constrained hardware
+- Enough data for fine-tuning
 - Faster iteration during development
 
 ### What You'll Learn
@@ -38,13 +36,6 @@ This guide covers training **DINOv2-based semantic segmentation models** for cor
 - Per-class IoU metrics for all coral genera
 - Instance-refined predictions via CoralSCoP + SAM
 - Deployment-ready model weights
-
-### Time Required
-
-- **Data preparation**: ~1 hour
-- **Training**: 24-36 hours (160 epochs, multi-scale)
-- **Evaluation**: ~2 hours
-- **Deployment**: ~1 hour
 
 ## Prerequisites
 
