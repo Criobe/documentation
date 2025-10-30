@@ -61,25 +61,29 @@ nuctl get projects --platform local | grep cvat
 
 All modules follow this pattern:
 
-### Step 1: Prepare Model Weights
+### Step 1: Locate Model Weights
 
-Navigate to your module:
+Navigate to your module and identify the trained model weights:
 
 ```bash
 cd PROJ_ROOT/criobe/{module}/
 ```
 
-Copy best checkpoint to deployment directory:
+**Find your best checkpoint:**
 
 ```bash
 # For YOLO models (coral_seg_yolo, grid_pose_detection):
-cp runs/{train_dir}/weights/best.pt deploy/{function_name}/nuclio/model_weights.pt
+ls runs/{train_dir}/weights/best.pt
 
-# For MMSeg:
-cp work_dirs/{experiment}/best_mIoU_epoch_X.pth deploy/{function_name}/nuclio/model_weights.pth
+# For MMSeg (DINOv2_mmseg):
+ls work_dirs/{experiment}/best_mIoU_epoch_X.pth
+ls work_dirs/{experiment}/*.py  # Also need config file
 
-# For grid_inpainting: No manual copy needed - model downloads automatically
+# For grid_inpainting: No weights needed - model downloads automatically
 ```
+
+!!! note "No manual copying needed"
+    The new parameterized deployment scripts handle copying automatically. You just need to know the paths to pass as arguments.
 
 ### Step 2: Review Function Configuration
 
@@ -162,39 +166,80 @@ def handler(context, event):
 
 ### Step 4: Package Function
 
-Package the function with dependencies:
+All modules now use **parameterized deployment scripts** that accept model weights and configuration files as arguments:
 
 ```bash
 # Run from module root directory
 cd PROJ_ROOT/criobe/{module}/
 
-# Run module-specific deployment script
-./deploy_as_zip.sh  # For most modules
+# Each module has its own argument structure:
 
-# Or for grid_pose_detection (has separate scripts):
-./deploy_gridcorners_as_zip.sh  # For GridCorners
-./deploy_gridpose_as_zip.sh     # For GridPose
+# For coral_seg_yolo (2 arguments):
+./deploy_as_zip.sh MODEL_NAME MODEL_WEIGHTS
+
+# For DINOv2_mmseg (4 arguments):
+./deploy_as_zip.sh MODEL_NAME SEGFORMER_WEIGHTS SEGFORMER_CONFIG SAM_WEIGHTS
+
+# For grid_pose_detection (3 arguments, unified script):
+./deploy_as_zip.sh MODEL_NAME MODEL_WEIGHTS TEMPLATE_PATH
 ```
 
-This creates `nuclio/` directory at the repo root with:
+This creates a `nuclio.zip` package containing:
 
 ```
 nuclio/
 ├── function.yaml        # Function configuration
 ├── main.py              # Handler code
-├── model_weights.pt     # Model checkpoint
-├── requirements.txt     # Python dependencies
-└── ...                  # Additional files
+├── best.pt / best_segformer.pth  # Model checkpoint (standardized name)
+├── best_segformer_config.py      # Config file (MMSeg only)
+├── kp_template.npy               # Template file (grid detection only)
+├── src/ or inferencer.py         # Source code modules
+└── ...                           # Additional dependencies
 ```
+
+**Key benefits of parameterized deployment:**
+
+- ✅ No manual copying of weights to deploy directories
+- ✅ Deploy different model versions easily
+- ✅ Input validation prevents errors
+- ✅ Standardized weight names across deployments
+- ✅ Clear help text with examples
 
 ### Step 5: Deploy to Nuclio
 
+After creating `nuclio.zip`, you have **two deployment options**:
+
+**Option 1: Deploy via CVAT's centralized serverless folder**
+
 ```bash
+# Extract to CVAT's serverless directory
+unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/{framework}/{function_name}/
+
+# Deploy from CVAT directory
+cd /path/to/cvat
 nuctl deploy --project-name cvat \
-    --path ./nuclio \
+    --path ./serverless/pytorch/{framework}/{function_name}/nuclio/ \
     --platform local \
     --verbose
 ```
+
+**Option 2: Deploy from local bundle directory** (recommended for development)
+
+```bash
+# Extract to local nuclio_bundles directory
+mkdir -p nuclio_bundles/{function_name}
+unzip nuclio.zip -d nuclio_bundles/{function_name}/
+
+# Deploy directly from local bundle
+nuctl deploy --project-name cvat \
+    --path ./nuclio_bundles/{function_name}/nuclio/ \
+    --platform local \
+    --verbose
+```
+
+!!! tip "Which option to choose?"
+    - **Option 1** is useful when CVAT manages all serverless functions centrally
+    - **Option 2** is more flexible for development and testing, keeping deployments separate from the CVAT source tree
 
 **Expected output:**
 
@@ -270,17 +315,47 @@ curl -X POST http://localhost:8010 \
 ```bash
 cd PROJ_ROOT/criobe/coral_seg_yolo
 
-# Copy trained weights to deployment directory
-cp runs/segment/criobe_finegrained_yolo11m/weights/best.pt deploy/coralsegv4/nuclio/model_weights.pt
+# Package function with trained weights (no manual copying needed)
+./deploy_as_zip.sh coralsegv4 \
+    runs/yolov11_criobe_finegrained_annotated/train/weights/best.pt
 
-# Package and deploy
-./deploy_as_zip.sh coralsegv4
+# For Banggai model
+./deploy_as_zip.sh coralsegbanggai \
+    runs/yolov11_banggai_extended_annotated/train/weights/best.pt
 
+# Deploy using Option 1 (CVAT centralized)
+unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/yolo/coralsegv4/
+cd /path/to/cvat
 nuctl deploy --project-name cvat \
-    --path ./nuclio \
+    --path ./serverless/pytorch/yolo/coralsegv4/nuclio/ \
+    --platform local \
+    --verbose
+
+# OR Deploy using Option 2 (local bundle)
+mkdir -p nuclio_bundles/coralsegv4
+unzip nuclio.zip -d nuclio_bundles/coralsegv4/
+nuctl deploy --project-name cvat \
+    --path ./nuclio_bundles/coralsegv4/nuclio/ \
     --platform local \
     --verbose
 ```
+
+**Deployment script arguments:**
+
+```bash
+./deploy_as_zip.sh MODEL_NAME MODEL_WEIGHTS_PATH
+
+# Arguments:
+#   MODEL_NAME          Model name (coralsegv4 or coralsegbanggai)
+#   MODEL_WEIGHTS_PATH  Path to model weights file (.pt file)
+```
+
+**What happens:**
+
+- Script validates inputs (model name and weights existence)
+- Copies weights as `best.pt` (standardized name)
+- Copies `src/` module for inference engine
+- Creates `nuclio.zip` ready for deployment
 
 **Key configuration (`function.yaml`):**
 
@@ -313,23 +388,49 @@ http://bridge:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask
 ```bash
 cd PROJ_ROOT/criobe/DINOv2_mmseg
 
-# Copy trained weights to deployment directory
-cp work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth deploy/coralscopsegformer/nuclio/segformer_weights.pth
+# Package function with all required files (no manual copying needed)
+./deploy_as_zip.sh coralscopsegformer \
+    work_dirs/dinov2_vitb14_coralsegv4_ms_config_segformer/best_mIoU_epoch_140.pth \
+    work_dirs/dinov2_vitb14_coralsegv4_ms_config_segformer/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
+    assets/pretrained_models/vit_b_coralscop.pth
 
-# Copy CoralSCoP SAM weights
-cp assets/pretrained_models/vit_b_coralscop.pth deploy/coralscopsegformer/nuclio/sam_weights.pth
-
-# Copy config
-cp configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py deploy/coralscopsegformer/nuclio/config.py
-
-# Package and deploy
-./deploy_as_zip.sh
-
+# Deploy using Option 1 (CVAT centralized)
+unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/mmseg/coralscopsegformer/
+cd /path/to/cvat
 nuctl deploy --project-name cvat \
-    --path ./nuclio \
+    --path ./serverless/pytorch/mmseg/coralscopsegformer/nuclio/ \
+    --platform local \
+    --verbose
+
+# OR Deploy using Option 2 (local bundle)
+mkdir -p nuclio_bundles/coralscopsegformer
+unzip nuclio.zip -d nuclio_bundles/coralscopsegformer/
+nuctl deploy --project-name cvat \
+    --path ./nuclio_bundles/coralscopsegformer/nuclio/ \
     --platform local \
     --verbose
 ```
+
+**Deployment script arguments:**
+
+```bash
+./deploy_as_zip.sh MODEL_NAME SEGFORMER_WEIGHTS SEGFORMER_CONFIG SAM_WEIGHTS
+
+# Arguments:
+#   MODEL_NAME          Model name (coralscopsegformer)
+#   SEGFORMER_WEIGHTS   Path to Segformer model weights (.pth file)
+#   SEGFORMER_CONFIG    Path to Segformer config file (.py file)
+#   SAM_WEIGHTS         Path to CoralSCoP/SAM weights (.pth file)
+```
+
+**What happens:**
+
+- Script validates all inputs (model name, weights, config existence)
+- Copies Segformer weights as `best_segformer.pth` (standardized name)
+- Copies Segformer config as `best_segformer_config.py` (standardized name)
+- Copies SAM weights as `vit_b_coralscop.pth` (standardized name)
+- Copies source modules: `inferencer.py`, `dataset/`, `models/`, `segment_anything/`
+- Creates `nuclio.zip` ready for deployment
 
 **Key configuration:**
 
@@ -364,41 +465,56 @@ http://bridge:8000/detect-model-webhook?model_name=pth-mmseg-coralscopsegformer&
 - `pth-yolo-gridcorners` (4-point corner detection)
 - `pth-yolo-gridpose` (117-point grid detection)
 
-**GridCorners deployment:**
+**Unified deployment (for both GridCorners and GridPose):**
 
 ```bash
 cd PROJ_ROOT/criobe/grid_pose_detection
 
-# Copy trained weights and template to deployment directory
-cp runs/gridcorners/detect/train14/weights/best.pt deploy/gridcorners/nuclio/model_weights.pt
-cp assets/kp_template_corners.npy deploy/gridcorners/nuclio/kp_template.npy
+# Package GridCorners function (4 points for quadrat cropping)
+./deploy_as_zip.sh gridcorners \
+    runs/gridcorners/detect/train14/weights/best.pt \
+    assets/kp_template_corners.npy
 
-# Package and deploy
-./deploy_gridcorners_as_zip.sh
+# Package GridPose function (117 points for grid removal)
+./deploy_as_zip.sh gridpose \
+    runs/gridpose/detect/train6/weights/best.pt \
+    assets/kp_template.npy
 
+# Deploy GridCorners using Option 1 (CVAT centralized)
+unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/yolo/gridcorners/
+cd /path/to/cvat
 nuctl deploy --project-name cvat \
-    --path ./nuclio \
+    --path ./serverless/pytorch/yolo/gridcorners/nuclio/ \
+    --platform local \
+    --verbose
+
+# OR Deploy GridPose using Option 2 (local bundle)
+mkdir -p nuclio_bundles/gridpose
+unzip nuclio.zip -d nuclio_bundles/gridpose/
+nuctl deploy --project-name cvat \
+    --path ./nuclio_bundles/gridpose/nuclio/ \
     --platform local \
     --verbose
 ```
 
-**GridPose deployment:**
+**Deployment script arguments:**
 
 ```bash
-cd PROJ_ROOT/criobe/grid_pose_detection
+./deploy_as_zip.sh MODEL_NAME MODEL_WEIGHTS TEMPLATE_PATH
 
-# Copy trained weights and template to deployment directory
-cp runs/gridpose/detect/train6/weights/best.pt deploy/gridpose/nuclio/model_weights.pt
-cp assets/kp_template.npy deploy/gridpose/nuclio/kp_template.npy
-
-# Package and deploy
-./deploy_gridpose_as_zip.sh
-
-nuctl deploy --project-name cvat \
-    --path ./nuclio \
-    --platform local \
-    --verbose
+# Arguments:
+#   MODEL_NAME      Model name (gridpose or gridcorners)
+#   MODEL_WEIGHTS   Path to model weights file (.pt file)
+#   TEMPLATE_PATH   Path to template file (.npy file)
 ```
+
+**What happens:**
+
+- Script validates inputs (model name, weights, template existence)
+- Copies weights as `best.pt` (standardized name)
+- Copies template as `kp_template.npy` or `kp_template_corners.npy` (based on model type)
+- Copies `src/` module for inference engine
+- Creates `nuclio.zip` ready for deployment
 
 **Key configuration:**
 

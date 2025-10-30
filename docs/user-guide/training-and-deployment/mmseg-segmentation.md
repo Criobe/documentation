@@ -592,119 +592,106 @@ MMSeg models are saved as PyTorch `.pth` files, which can be used directly for d
         --shape 1920 1920
     ```
 
-### 7.2 Prepare Nuclio Deployment
+### 7.2 Package Function with Trained Models
+
+Use the **parameterized deployment script** - no manual copying needed:
 
 ```bash
-cd PROJ_ROOT/criobe/DINOv2_mmseg/deploy
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 
-# Create deployment directory
-mkdir -p pth-mmseg-coralsegv4-coralscop
-cd pth-mmseg-coralsegv4-coralscop
-
-# Copy model weights
-cp ../../work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth segformer_weights.pth
-cp ../../assets/pretrained_models/vit_b_coralscop.pth sam_weights.pth
+# Package function with all required files
+./deploy_as_zip.sh coralscopsegformer \
+    work_dirs/dinov2_vitb14_coralsegv4_ms_config_segformer/best_mIoU_epoch_140.pth \
+    work_dirs/dinov2_vitb14_coralsegv4_ms_config_segformer/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
+    assets/pretrained_models/vit_b_coralscop.pth
 ```
 
-### 7.3 Create Deployment Function
-
-Create `main.py`:
-
-```python
-import json
-import base64
-import io
-import numpy as np
-from PIL import Image
-import torch
-from mmseg.apis import init_model, inference_model
-from coralscop import CoralSCoPSAM
-
-# Initialize models
-segformer_config = 'configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py'
-segformer_checkpoint = 'segformer_weights.pth'
-sam_checkpoint = 'sam_weights.pth'
-
-segformer_model = init_model(segformer_config, segformer_checkpoint, device='cuda:0')
-sam_model = CoralSCoPSAM(checkpoint=sam_checkpoint, device='cuda:0')
-
-def handler(context, event):
-    """Nuclio handler for two-stage inference"""
-    data = event.body
-
-    # Decode image
-    image_data = base64.b64decode(data['image'])
-    image = Image.open(io.BytesIO(image_data))
-    image_np = np.array(image)
-
-    # Stage 1: Semantic segmentation
-    result = inference_model(segformer_model, image_np)
-    semantic_mask = result.pred_sem_seg.data[0].cpu().numpy()
-
-    # Stage 2: Instance refinement with CoralSCoP
-    instances = sam_model.segment_instances(image_np, semantic_mask)
-
-    # Convert to CVAT format
-    annotations = []
-    for inst in instances:
-        annotations.append({
-            'label': inst['class_name'],
-            'points': inst['contour'].tolist(),
-            'type': 'polyline',
-            'confidence': float(inst['confidence'])
-        })
-
-    return context.Response(
-        body=json.dumps(annotations),
-        headers={},
-        content_type='application/json',
-        status_code=200
-    )
+**Script arguments:**
+```bash
+./deploy_as_zip.sh MODEL_NAME SEGFORMER_WEIGHTS SEGFORMER_CONFIG SAM_WEIGHTS
 ```
 
-Create `function.yaml`:
+- `MODEL_NAME`: `coralscopsegformer`
+- `SEGFORMER_WEIGHTS`: Path to Segformer model weights (.pth file)
+- `SEGFORMER_CONFIG`: Path to Segformer config file (.py file)
+- `SAM_WEIGHTS`: Path to CoralSCoP/SAM weights (.pth file)
 
-```yaml
-metadata:
-  name: pth-mmseg-coralsegv4-coralscop
-  labels:
-    nuclio.io/project-name: cvat
+**What happens:**
 
-spec:
-  handler: main:handler
-  runtime: python:3.9
+- Script validates all inputs (model name, weights, config existence)
+- Copies Segformer weights as `best_segformer.pth` (standardized name)
+- Copies Segformer config as `best_segformer_config.py` (standardized name)
+- Copies SAM weights as `vit_b_coralscop.pth` (standardized name)
+- Copies source modules: `inferencer.py`, `dataset/`, `models/`, `segment_anything/`
+- Creates `nuclio.zip` ready for deployment
 
-  build:
-    commands:
-      - pip install torch==2.0.0 torchvision==0.15.0 --index-url https://download.pytorch.org/whl/cu117
-      - pip install mmsegmentation==1.2.2
-      - pip install segment-anything coralscop
+### 7.3 Deploy Function to Nuclio
 
-  env:
-    - name: SEGFORMER_CONFIG
-      value: /opt/nuclio/configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py
-    - name: SEGFORMER_WEIGHTS
-      value: /opt/nuclio/segformer_weights.pth
-    - name: SAM_WEIGHTS
-      value: /opt/nuclio/sam_weights.pth
+After packaging, deploy using one of these options:
 
-  resources:
-    limits:
-      nvidia.com/gpu: "1"
-    requests:
-      memory: 8Gi
-```
+=== "Option 1: CVAT Centralized (Production)"
 
-### 7.4 Deploy to Nuclio
+    ```bash
+    # Extract to CVAT's serverless directory
+    unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/mmseg/coralscopsegformer/
+
+    # Deploy from CVAT directory
+    cd /path/to/cvat
+    nuctl deploy --project-name cvat \
+        --path ./serverless/pytorch/mmseg/coralscopsegformer/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+=== "Option 2: Local Bundle (Development)"
+
+    ```bash
+    # Extract to local nuclio_bundles directory
+    mkdir -p nuclio_bundles/coralscopsegformer
+    unzip nuclio.zip -d nuclio_bundles/coralscopsegformer/
+
+    # Deploy directly from local bundle
+    nuctl deploy --project-name cvat \
+        --path ./nuclio_bundles/coralscopsegformer/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+!!! tip "Deployment Options"
+    - **Option 1** is useful when CVAT manages all serverless functions centrally
+    - **Option 2** is more flexible for development and testing
+
+### 7.4 Verify Deployment
 
 ```bash
-./deploy_as_zip.sh
+# Check function status
+nuctl get functions --platform local | grep coralscopsegformer
 
-nuctl deploy --project-name cvat \
-    --path ./nuclio \
-    --platform local \
-    --verbose
+# View function logs
+nuctl get function pth-mmseg-coralscopsegformer --platform local
 ```
+
+### 7.5 Test Deployed Function
+
+```bash
+# Test with sample image
+curl -X POST http://localhost:8011 \
+    -H "Content-Type: application/json" \
+    -d @test_payload.json
+```
+
+**Expected response:** JSON array with detected coral polylines and species labels.
+
+### 7.6 Integrate with CVAT
+
+1. Navigate to your coral segmentation project in CVAT
+2. **Actions** → **Webhooks** → **Create webhook**
+3. Configure:
+    - **Target URL**: `http://bridge:8000/detect-model-webhook?model_name=pth-mmseg-coralscopsegformer&conv_mask_to_poly=true`
+    - **Events**: Check "When a job state is changed to 'in progress'"
+4. Click **Submit**
+
+Now when you open annotation jobs, the two-stage DINOv2 + CoralSCoP model will run automatically!
 
 For detailed deployment instructions, see [Model Deployment Guide](model-deployment.md).
 

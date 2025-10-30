@@ -354,19 +354,48 @@ def handler(context, event):
     return encode_image(result)
 ```
 
-### 6.3 Deploy Function
+### 6.3 Package and Deploy Function
 
 ```bash
 cd PROJ_ROOT/criobe/grid_inpainting
 
-# Package and deploy
+# Package function (model downloads automatically via function.yaml)
 ./deploy_as_zip.sh
-
-nuctl deploy --project-name cvat \
-    --path ./deploy/nuclio \
-    --platform local \
-    --verbose
 ```
+
+After packaging, deploy using one of these options:
+
+=== "Option 1: CVAT Centralized (Production)"
+
+    ```bash
+    # Extract to CVAT's serverless directory
+    unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/lama/
+
+    # Deploy from CVAT directory
+    cd /path/to/cvat
+    nuctl deploy --project-name cvat \
+        --path ./serverless/pytorch/lama/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+=== "Option 2: Local Bundle (Development)"
+
+    ```bash
+    # Extract to local nuclio_bundles directory
+    mkdir -p nuclio_bundles/lama
+    unzip nuclio.zip -d nuclio_bundles/lama/
+
+    # Deploy directly from local bundle
+    nuctl deploy --project-name cvat \
+        --path ./nuclio_bundles/lama/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+!!! tip "Deployment Options"
+    - **Option 1** is useful when CVAT manages all serverless functions centrally
+    - **Option 2** is more flexible for development and testing
 
 ### 6.4 Test Deployed Function
 

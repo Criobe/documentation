@@ -443,39 +443,81 @@ Creates `.txt` files compatible with YOLO format for downstream processing.
 
 ## Step 7: Deploy to Nuclio
 
-### 7.1 Deploy GridCorners Function
+### 7.1 Package Functions with Trained Models
+
+Both models use the **unified parameterized deployment script**:
 
 ```bash
 cd PROJ_ROOT/criobe/grid_pose_detection
 
-# Copy trained model to deployment directory
-cp runs/gridcorners/detect/train14/weights/best.pt deploy/gridcorners/nuclio/model_weights.pt
+# Package GridCorners function (4 points for quadrat cropping)
+./deploy_as_zip.sh gridcorners \
+    runs/gridcorners/detect/train14/weights/best.pt \
+    assets/kp_template_corners.npy
 
-# Package and deploy
-./deploy_gridcorners_as_zip.sh
+# This creates nuclio.zip - deploy it before packaging the next model
 
-nuctl deploy --project-name cvat \
-    --path ./deploy/gridcorners/nuclio \
-    --platform local \
-    --verbose
+# Package GridPose function (117 points for grid removal)
+./deploy_as_zip.sh gridpose \
+    runs/gridpose/detect/train6/weights/best.pt \
+    assets/kp_template.npy
 ```
 
-### 7.2 Deploy GridPose Function
-
+**Script arguments:**
 ```bash
-cd PROJ_ROOT/criobe/grid_pose_detection
-
-# Copy trained model to deployment directory
-cp runs/gridpose/detect/train6/weights/best.pt deploy/gridpose/nuclio/model_weights.pt
-
-# Package and deploy
-./deploy_gridpose_as_zip.sh
-
-nuctl deploy --project-name cvat \
-    --path ./deploy/gridpose/nuclio \
-    --platform local \
-    --verbose
+./deploy_as_zip.sh MODEL_NAME MODEL_WEIGHTS TEMPLATE_PATH
 ```
+
+- `MODEL_NAME`: `gridcorners` or `gridpose`
+- `MODEL_WEIGHTS`: Path to trained weights (.pt file)
+- `TEMPLATE_PATH`: Path to template file (.npy file)
+
+### 7.2 Deploy Functions to Nuclio
+
+After packaging each function, deploy using one of these options:
+
+=== "Option 1: CVAT Centralized (Production)"
+
+    ```bash
+    # Deploy GridCorners
+    unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/yolo/gridcorners/
+    cd /path/to/cvat
+    nuctl deploy --project-name cvat \
+        --path ./serverless/pytorch/yolo/gridcorners/nuclio/ \
+        --platform local \
+        --verbose
+
+    # Deploy GridPose (after packaging it)
+    unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/yolo/gridpose/
+    nuctl deploy --project-name cvat \
+        --path ./serverless/pytorch/yolo/gridpose/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+=== "Option 2: Local Bundle (Development)"
+
+    ```bash
+    # Deploy GridCorners
+    mkdir -p nuclio_bundles/gridcorners
+    unzip nuclio.zip -d nuclio_bundles/gridcorners/
+    nuctl deploy --project-name cvat \
+        --path ./nuclio_bundles/gridcorners/nuclio/ \
+        --platform local \
+        --verbose
+
+    # Deploy GridPose (after packaging it)
+    mkdir -p nuclio_bundles/gridpose
+    unzip nuclio.zip -d nuclio_bundles/gridpose/
+    nuctl deploy --project-name cvat \
+        --path ./nuclio_bundles/gridpose/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+!!! tip "Deployment Options"
+    - **Option 1** is useful when CVAT manages all serverless functions centrally
+    - **Option 2** is more flexible for development and testing
 
 ### 7.3 Test Deployed Functions
 

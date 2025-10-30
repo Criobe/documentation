@@ -590,84 +590,111 @@ pixi run -e coral-seg-yolo yolo export model=best.pt format=coreml
 
 ## Step 9: Deploy to Nuclio
 
-### 9.1 Prepare Deployment
+### 9.1 Package Function with Trained Model
 
-Copy your trained model to the deployment directory:
-
-```bash
-cd PROJ_ROOT/criobe/coral_seg_yolo/deploy
-
-# Create deployment for your model
-cp -r pth-yolo-coralsegv4 pth-yolo-my-model
-
-cd pth-yolo-my-model
-
-# Copy your trained weights
-cp ../../runs/segment/criobe_finegrained_yolo11m/weights/best.pt model_weights.pt
-```
-
-### 9.2 Edit Deployment Configuration
-
-Edit `function.yaml`:
-
-```yaml
-metadata:
-  name: pth-yolo-my-model
-  labels:
-    nuclio.io/project-name: cvat
-
-spec:
-  handler: main:handler
-  runtime: python:3.9
-
-  env:
-    - name: MODEL_PATH
-      value: /opt/nuclio/model_weights.pt
-    - name: CONF_THRESHOLD
-      value: "0.25"
-    - name: IOU_THRESHOLD
-      value: "0.5"
-
-  resources:
-    limits:
-      nvidia.com/gpu: "1"
-```
-
-### 9.3 Deploy Function
+Use the **parameterized deployment script** - no manual copying needed:
 
 ```bash
-# Package as zip
-./deploy_as_zip.sh
+cd PROJ_ROOT/criobe/coral_seg_yolo
 
-# Deploy to Nuclio
-nuctl deploy --project-name cvat \
-    --path ./nuclio \
-    --platform local \
-    --verbose
+# For CRIOBE finegrained model (coralsegv4)
+./deploy_as_zip.sh coralsegv4 \
+    runs/yolov11_criobe_finegrained_annotated/train/weights/best.pt
+
+# For Banggai model (coralsegbanggai)
+./deploy_as_zip.sh coralsegbanggai \
+    runs/yolov11_banggai_extended_annotated/train/weights/best.pt
+
+# Or use your custom training run path
+./deploy_as_zip.sh coralsegv4 \
+    runs/segment/my_experiment/weights/best.pt
+```
+
+**Script arguments:**
+```bash
+./deploy_as_zip.sh MODEL_NAME MODEL_WEIGHTS_PATH
+```
+
+- `MODEL_NAME`: `coralsegv4` or `coralsegbanggai`
+- `MODEL_WEIGHTS_PATH`: Path to trained weights (.pt file)
+
+**What happens:**
+
+- Script validates model name and weights existence
+- Copies weights as `best.pt` (standardized name)
+- Copies `src/` module for inference engine
+- Creates `nuclio.zip` ready for deployment
+
+### 9.2 Deploy Function to Nuclio
+
+After packaging, deploy using one of these options:
+
+=== "Option 1: CVAT Centralized (Production)"
+
+    ```bash
+    # Extract to CVAT's serverless directory
+    unzip nuclio.zip -d /path/to/cvat/serverless/pytorch/yolo/coralsegv4/
+
+    # Deploy from CVAT directory
+    cd /path/to/cvat
+    nuctl deploy --project-name cvat \
+        --path ./serverless/pytorch/yolo/coralsegv4/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+=== "Option 2: Local Bundle (Development)"
+
+    ```bash
+    # Extract to local nuclio_bundles directory
+    mkdir -p nuclio_bundles/coralsegv4
+    unzip nuclio.zip -d nuclio_bundles/coralsegv4/
+
+    # Deploy directly from local bundle
+    nuctl deploy --project-name cvat \
+        --path ./nuclio_bundles/coralsegv4/nuclio/ \
+        --platform local \
+        --verbose
+    ```
+
+!!! tip "Deployment Options"
+    - **Option 1** is useful when CVAT manages all serverless functions centrally
+    - **Option 2** is more flexible for development and testing
+
+### 9.3 Verify Deployment
+
+```bash
+# Check function status
+nuctl get functions --platform local | grep coralsegv4
+
+# View function logs
+nuctl get function pth-yolo-coralsegv4 --platform local
 ```
 
 ### 9.4 Test Deployed Function
 
 ```bash
-# Check function status
-nuctl get functions --platform local | grep my-model
-
-# Test with sample payload
+# Test with sample image
 curl -X POST http://localhost:8010 \
     -H "Content-Type: application/json" \
     -d @test_payload.json
 ```
+
+**Expected response:** JSON array with detected coral polylines and labels.
 
 ### 9.5 Integrate with CVAT
 
 1. Navigate to your coral segmentation project in CVAT
 2. **Actions** → **Webhooks** → **Create webhook**
 3. Configure:
-    - **Target URL**: `http://bridge:8000/detect-model-webhook?model_name=pth-yolo-my-model&conv_mask_to_poly=true`
+    - **Target URL**: `http://bridge:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask_to_poly=true`
     - **Events**: Check "When a job state is changed to 'in progress'"
 4. Click **Submit**
 
-Now when you open annotation jobs, your custom model will run automatically!
+!!! info "Model Name in Webhook"
+    Use `pth-yolo-coralsegv4` or `pth-yolo-coralsegbanggai` based on which model you deployed.
+
+Now when you open annotation jobs, your model will run automatically!
 
 For complete deployment instructions, see [Model Deployment Guide](model-deployment.md).
 
