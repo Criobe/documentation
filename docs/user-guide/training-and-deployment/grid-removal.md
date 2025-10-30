@@ -170,16 +170,23 @@ data/test_samples/
 
 ### 3.3 Verify Grid Annotations
 
-Check that keypoint annotations are correct:
+Check that keypoint annotations are correct using FiftyOne:
 
 ```bash
-python src/visualize_grid_keypoints.py \
-    --images-dir data/test_samples/3-image_warping/ \
-    --annotations data/test_samples/4-grid_pose_export/person_keypoints_default.json \
-    --output-dir results/grid_visualization
+pixi run -e grid-inpainting python -c "
+import fiftyone as fo
+dataset = fo.Dataset.from_dir(
+    dataset_type=fo.types.COCODetectionDataset,
+    label_types=['keypoints'],
+    data_path='data/test_samples/3-image_warping/',
+    labels_path='data/test_samples/4-grid_pose_export/person_keypoints_default.json'
+)
+session = fo.launch_app(dataset)
+session.wait()
+"
 ```
 
-Verify:
+Verify in the FiftyOne app:
 
 - All 117 keypoints are present per image
 - Keypoints align with grid intersections
@@ -193,24 +200,24 @@ Remove grids from a dataset using pre-trained SimpleLama:
 
 ```bash
 pixi run -e grid-inpainting python grid_rem_with_kp.py remove_grid_from_coco_dataset \
-    --data-path data/test_samples/3-image_warping/ \
-    --labels-path data/test_samples/4-grid_pose_export/person_keypoints_default.json \
-    --output-dir results/grid_removed/ \
-    --model-path assets/pretrained_models/big-lama.pt \
-    --device cuda:0 \
-    --grid-line-width 8 \
-    --save-masks
+    data/test_samples/3-image_warping/ \
+    data/test_samples/4-grid_pose_export/person_keypoints_default.json \
+    results/grid_removed/
 ```
 
 **Parameters:**
 
-- `--data-path`: Directory containing images with grids
-- `--labels-path`: COCO keypoint JSON file
-- `--output-dir`: Where to save clean images
-- `--model-path`: SimpleLama checkpoint
-- `--device`: CUDA device (cuda:0) or cpu
-- `--grid-line-width`: Width of grid lines in pixels (adjust to match your grid, default 8)
-- `--save-masks`: Also save generated grid masks for debugging
+- First argument: Directory containing images with grids (data path)
+- Second argument: COCO keypoint JSON file (labels path)
+- Third argument: Where to save clean images (output directory)
+
+!!! note "Configuration Note"
+    Model path, device, grid line width, and batch size are hardcoded in the script. To customize:
+
+    - Model: Hardcoded to `models/big-lama.pt`
+    - Grid line width: Hardcoded to 30px in `src/grid_remover.py:54`
+    - Batch size: Hardcoded to 50 in `grid_rem_with_kp.py:59`
+    - Device: Automatically uses CUDA if available
 
 **What this does:**
 
@@ -236,40 +243,18 @@ INFO: Processed 25 images in 142.5s (5.7s per image average)
 
 ### 4.2 Adjust Grid Line Width
 
-If grid lines are not fully removed or too much area is inpainted:
+If grid lines are not fully removed or too much area is inpainted, you'll need to modify the hardcoded grid line width in the source code:
 
-**Grid still visible:**
+!!! tip "Adjusting Grid Line Width"
+    Grid line width is hardcoded to 30px in `src/grid_remover.py:54`. To adjust:
 
-```bash
-# Increase line width
-python grid_rem_with_kp.py ... --grid-line-width 12
-```
+    **If grid is still visible** (under-inpainting):
+    - Edit `src/grid_remover.py` and increase the line width value (e.g., to 35 or 40)
 
-**Over-inpainting (coral texture lost):**
+    **If too much coral texture is removed** (over-inpainting):
+    - Edit `src/grid_remover.py` and decrease the line width value (e.g., to 25 or 20)
 
-```bash
-# Decrease line width
-python grid_rem_with_kp.py ... --grid-line-width 5
-```
-
-### 4.3 Batch Processing
-
-For large datasets:
-
-```bash
-pixi run -e grid-inpainting python grid_rem_with_kp.py remove_grid_batch \
-    --data-dirs data/moorea_2020/ data/moorea_2021/ data/tikehau_2023/ \
-    --output-dir results/all_sites_clean/ \
-    --model-path assets/pretrained_models/big-lama.pt \
-    --batch-size 4 \
-    --num-workers 2
-```
-
-**Batch processing benefits:**
-
-- Process multiple images in parallel
-- Progress tracking with tqdm
-- Automatic error handling and logging
+    After modifying the source, re-run the grid removal command.
 
 ## Step 5: Evaluate Grid Removal Quality
 
@@ -285,176 +270,55 @@ Open results in image viewer and check:
 
 ### 5.2 Compare Before/After
 
-Create side-by-side comparisons:
+Use an image viewer or photo editing software to create side-by-side comparisons of the original and grid-removed images. This helps visualize the quality of grid removal.
+
+Alternatively, use FiftyOne to compare results:
 
 ```bash
-python src/create_comparison.py \
-    --original-dir data/test_samples/3-image_warping/ \
-    --cleaned-dir results/grid_removed/ \
-    --output-dir results/comparisons/ \
-    --layout horizontal
+pixi run -e grid-inpainting python -c "
+import fiftyone as fo
+from pathlib import Path
+# Compare before/after by loading both as separate datasets
+# or use external tools like ImageMagick for montages
+"
 ```
 
-### 5.3 Quantitative Evaluation (If Ground Truth Available)
-
-If you have ground-truth clean images (without grids):
-
-```bash
-python src/evaluate_inpainting.py \
-    --ground-truth-dir data/ground_truth_clean/ \
-    --predicted-dir results/grid_removed/ \
-    --metrics psnr ssim lpips
-```
-
-**Metrics:**
-
-- **PSNR (Peak Signal-to-Noise Ratio)**: Higher is better (>30 dB is good)
-- **SSIM (Structural Similarity Index)**: Closer to 1.0 is better (>0.90 is good)
-- **LPIPS (Learned Perceptual Image Patch Similarity)**: Lower is better (<0.1 is good)
-
-### 5.4 Check for Common Artifacts
+### 5.3 Check for Common Artifacts
 
 **Common issues to watch for:**
 
 - **Blurring**: Inpainted regions appear softer than surrounding coral
-    - Solution: Use smaller grid-line-width
+    - Solution: Adjust grid line width in source code (see Step 4.2)
 - **Color shift**: Inpainted areas have different color tone
-    - Solution: Fine-tune model on your specific images
+    - Usually minor and acceptable for coral segmentation tasks
 - **Pattern repetition**: Inpainting creates unrealistic repeated patterns
-    - Solution: Usually minor, acceptable for most use cases
+    - Usually minor, acceptable for most use cases
 - **Edge effects**: Artifacts at grid-background boundaries
-    - Solution: Adjust mask dilation/erosion in preprocessing
+    - Typically minimal with SimpleLama model
 
-## Step 6: Optional - Fine-tune LaMa
+!!! note "Quantitative Evaluation"
+    If you have ground-truth clean images without grids, you can evaluate grid removal quality using standard image quality metrics (PSNR, SSIM, LPIPS) with external tools like scikit-image or PyTorch metrics.
 
-Fine-tuning is only needed if pre-trained model produces poor results on your specific grid type.
+!!! info "Fine-tuning Not Currently Supported"
+    This module is deployment-focused and does not include training infrastructure. The pre-trained SimpleLama model works well for most grid removal tasks. If you need custom training, you would need to set up a separate training environment using the original LaMa repository.
 
-### 6.1 Prepare Training Data
+## Step 6: Deploy to Nuclio
 
-For fine-tuning, you need image pairs:
-
-- **Input**: Images with grids
-- **Target**: Corresponding clean images (ground truth)
-
-**Creating synthetic training data:**
-
-If you don't have ground truth, you can:
-
-1. Manually inpaint a subset of images (20-50) using Photoshop/GIMP
-2. Use the pre-trained model's best outputs as pseudo-ground truth
-3. Acquire clean images from same sites without grids
-
-**Data structure:**
-
-```
-data/fine_tuning/
-├── train/
-│   ├── with_grid/
-│   │   ├── img_001.jpg
-│   │   └── ...
-│   └── clean/
-│       ├── img_001.jpg
-│       └── ...
-└── val/
-    ├── with_grid/
-    └── clean/
-```
-
-### 6.2 Generate Masks for Training
+### 6.1 Prepare Deployment
 
 ```bash
-python src/prepare_training_masks.py \
-    --images-with-grid data/fine_tuning/train/with_grid/ \
-    --keypoints-json data/fine_tuning/train/keypoints.json \
-    --output-dir data/fine_tuning/train/masks/ \
-    --grid-line-width 8
+cd PROJ_ROOT/criobe/grid_inpainting
+
+# Model is automatically downloaded by Nuclio function.yaml
+# No manual model copying needed
 ```
 
-### 6.3 Configure Fine-tuning
+!!! note "Automatic Model Download"
+    The grid inpainting Nuclio function automatically downloads the SimpleLama model from Google Cloud Storage during deployment. You don't need to manually copy model weights.
 
-Edit `configs/train_config.yaml`:
+### 6.2 Review Deployment Function
 
-```yaml
-data:
-    train_dir: data/fine_tuning/train
-    val_dir: data/fine_tuning/val
-    img_size: 1920
-
-model:
-    checkpoint: assets/pretrained_models/big-lama.pt  # Start from pre-trained
-    architecture: simple_lama
-
-training:
-    epochs: 50                    # Fewer epochs for fine-tuning
-    batch_size: 2                 # Small batch for large images
-    learning_rate: 0.0001         # Lower LR for fine-tuning
-    weight_decay: 0.0001
-
-    optimizer: AdamW
-    scheduler: CosineAnnealingLR
-
-losses:
-    l1_weight: 1.0               # Pixel-level loss
-    perceptual_weight: 0.1       # VGG perceptual loss
-    adversarial_weight: 0.01     # GAN loss
-
-augmentation:
-    random_crop: true
-    crop_size: 512               # Train on patches
-    random_flip: true
-    color_jitter: 0.1
-```
-
-### 6.4 Start Fine-tuning
-
-```bash
-pixi run -e grid-inpainting python tools/train_lama.py \
-    --config configs/train_config.yaml \
-    --work-dir work_dirs/fine_tuned_lama \
-    --gpu 0
-```
-
-**Monitor training:**
-
-```bash
-tensorboard --logdir work_dirs/fine_tuned_lama
-```
-
-### 6.5 Fine-tuning Duration
-
-- **50 epochs, 100 image pairs**: ~6-8 hours on RTX 4090
-- **Each epoch**: ~6-8 minutes
-
-### 6.6 Evaluate Fine-tuned Model
-
-```bash
-pixi run -e grid-inpainting python grid_rem_with_kp.py remove_grid_from_coco_dataset \
-    --data-path data/test_samples/3-image_warping/ \
-    --labels-path data/test_samples/4-grid_pose_export/person_keypoints_default.json \
-    --output-dir results/grid_removed_finetuned/ \
-    --model-path work_dirs/fine_tuned_lama/best_checkpoint.pt \
-    --device cuda:0
-```
-
-Compare outputs with pre-trained model to see if fine-tuning improved results.
-
-## Step 7: Deploy to Nuclio
-
-### 7.1 Prepare Deployment
-
-```bash
-cd PROJ_ROOT/criobe/grid_inpainting/deploy
-
-# Copy model weights
-cp ../assets/pretrained_models/big-lama.pt pth-lama-nuclio/model_weights.pt
-
-# Or if you fine-tuned:
-# cp ../work_dirs/fine_tuned_lama/best_checkpoint.pt pth-lama-nuclio/model_weights.pt
-```
-
-### 7.2 Review Deployment Function
-
-The Nuclio function (`deploy/pth-lama-nuclio/main.py`) should:
+The Nuclio function (`deploy/main.py`) should:
 
 1. Load SimpleLama model on startup
 2. Receive grid keypoints from webhook
@@ -490,20 +354,21 @@ def handler(context, event):
     return encode_image(result)
 ```
 
-### 7.3 Deploy Function
+### 6.3 Deploy Function
 
 ```bash
-cd PROJ_ROOT/criobe/grid_inpainting/deploy
+cd PROJ_ROOT/criobe/grid_inpainting
 
+# Package and deploy
 ./deploy_as_zip.sh
 
 nuctl deploy --project-name cvat \
-    --path ./pth-lama-nuclio \
+    --path ./deploy/nuclio \
     --platform local \
     --verbose
 ```
 
-### 7.4 Test Deployed Function
+### 6.4 Test Deployed Function
 
 ```bash
 # Prepare test payload
@@ -521,7 +386,7 @@ curl -X POST http://localhost:8003 \
     -o test_output.jpg
 ```
 
-### 7.5 Integrate with CVAT Pipeline
+### 6.5 Integrate with CVAT Pipeline
 
 The grid removal function is called automatically by the Bridge service when grid detection tasks are completed.
 
@@ -534,13 +399,10 @@ For complete pipeline integration, see [Three-Stage CRIOBE Setup](../data-prepar
 ??? question "Grid lines still visible after inpainting"
     **Solutions:**
 
-    1. Increase grid line width:
-       ```bash
-       --grid-line-width 12  # or 15
-       ```
+    1. Increase grid line width by editing `src/grid_remover.py` line 54 (default: 30px → try 35 or 40px)
     2. Check keypoint accuracy - if points are off by >5 pixels, mask won't cover grid
-    3. Grid may be thicker or higher contrast than expected - consider fine-tuning
-    4. Try dilating the mask:
+    3. Grid may be thicker or higher contrast than expected
+    4. Try dilating the mask by modifying `src/grid_remover.py`:
        ```python
        # In generate_grid_mask function
        import cv2
@@ -551,14 +413,12 @@ For complete pipeline integration, see [Three-Stage CRIOBE Setup](../data-prepar
     **Causes:**
 
     - Model filling too large regions
-    - Grid line width too large
-    - Model not optimized for your image characteristics
+    - Grid line width too large (edit `src/grid_remover.py` to reduce)
 
     **Solutions:**
 
-    1. Reduce grid line width to minimum needed
-    2. Fine-tune model on your specific dataset
-    3. Post-process with sharpening:
+    1. Reduce grid line width in source code to minimum needed
+    2. Post-process with sharpening:
        ```python
        from PIL import ImageFilter
        result_image = result_image.filter(ImageFilter.SHARPEN)
@@ -572,18 +432,14 @@ For complete pipeline integration, see [Three-Stage CRIOBE Setup](../data-prepar
 
     **Solutions:**
 
-    1. Fine-tune model on your specific images
-    2. Color-correct images before grid removal:
-       ```python
-       # Normalize underwater white balance
-       image = apply_underwater_color_correction(image)
-       ```
-    3. Accept minor color differences (often not noticeable in final annotations)
+    1. Color-correct images before grid removal using external tools
+    2. Accept minor color differences (often not noticeable in final annotations)
+    3. The pre-trained SimpleLama model generally handles underwater images well
 
 ??? question "Very slow inference (>15s per image)"
     **Check:**
 
-    1. Using GPU: `--device cuda:0` (not `cpu`)
+    1. GPU is being used (automatically selected if CUDA is available)
     2. CUDA is properly installed and accessible
     3. Image size - very large images (>3000px) are slower
 

@@ -123,20 +123,19 @@ python create_fiftyone_dataset.py \
 cd PROJ_ROOT/criobe/DINOv2_mmseg
 pixi shell -e dinov2-mmseg
 
-python prepare_data.py \
-    --dataset-name criobe_finegrained_fo \
-    --taxonomy finegrained \
-    --output-dir data/prepared_for_training/criobe_finegrained \
-    --img-size 1920
+python prepare_data.py criobe_finegrained_fo
 ```
 
 **What this script does:**
 
 1. Loads FiftyOne dataset with polyline annotations
 2. Converts polylines to semantic segmentation masks (PNG images)
-3. Creates train/val/test splits
-4. Generates MMSeg dataset configuration files
+3. Creates train/val/test splits based on FiftyOne tags
+4. Generates MMSeg-compatible directory structure
 5. Creates class mapping and color palette
+
+!!! note "Configuration"
+    Output directory, taxonomy, and image size are configured via environment variables in the `.env` file, not CLI arguments. The script uses Fire for CLI parsing with a single positional argument (dataset name).
 
 **Expected output:**
 
@@ -389,18 +388,16 @@ backbone=dict(
 ### 4.1 Start Training
 
 ```bash
-pixi run -e dinov2-mmseg python tools/train.py \
+pixi run -e dinov2-mmseg python train.py \
     configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
-    --work-dir work_dirs/criobe_finegrained_dinov2_segformer \
-    --seed 42 \
-    --deterministic
+    --work-dir work_dirs/criobe_finegrained_dinov2_segformer
 ```
 
 **Arguments:**
 
 - `--work-dir`: Output directory for checkpoints and logs
-- `--seed`: Random seed for reproducibility
-- `--deterministic`: Ensures deterministic training (slightly slower)
+- `--resume`: Resume training from checkpoint (optional)
+- `--amp`: Enable Automatic Mixed Precision for faster training (optional)
 
 ### 4.2 Monitor Training
 
@@ -453,13 +450,14 @@ Typical training times (160 epochs, 450 images, RTX 4090):
 ### 5.1 Validation Set Evaluation
 
 ```bash
-pixi run -e dinov2-mmseg python tools/test.py \
+pixi run -e dinov2-mmseg python test.py \
     configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
     work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
-    --eval mIoU \
-    --show-dir work_dirs/criobe_finegrained_dinov2_segformer/val_results \
-    --opacity 0.5
+    --show-dir work_dirs/criobe_finegrained_dinov2_segformer/val_results
 ```
+
+!!! note "Evaluation Metrics"
+    Evaluation metrics (mIoU, mAcc, etc.) are configured in the config file's `evaluation` section, not via CLI arguments. The test script automatically computes all metrics specified in the config.
 
 **Output:**
 
@@ -491,18 +489,21 @@ pixi run -e dinov2-mmseg python tools/test.py \
 ### 5.2 Test Set Evaluation
 
 ```bash
-pixi run -e dinov2-mmseg python tools/test.py \
+pixi run -e dinov2-mmseg python test.py \
     configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
     work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
-    --eval mIoU \
-    --eval-options efficient_test=True \
     --show-dir work_dirs/criobe_finegrained_dinov2_segformer/test_results
 ```
 
+!!! tip "Testing on Test Split"
+    By default, test.py evaluates on the validation split. To evaluate on the test split, modify the `data.test` section in your config file to point to your test dataset.
+
 ### 5.3 Confusion Matrix Analysis
 
+Generate confusion matrix using MMSegmentation's analysis tools:
+
 ```bash
-python tools/analysis_tools/confusion_matrix.py \
+pixi run -e dinov2-mmseg mim run mmseg confusion_matrix \
     configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
     work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
     --show \
@@ -541,10 +542,14 @@ pixi run -e dinov2-mmseg python inference_with_coralscop.py \
     --segformer-weights work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
     --sam-checkpoint assets/pretrained_models/vit_b_coralscop.pth \
     --device cuda:0 \
-    --conf-threshold 0.5 \
-    --save-masks \
-    --save-json
+    --min-threshold 0.05 \
+    --unsure-threshold 0.2
 ```
+
+!!! info "Classification Thresholds"
+    - `--min-threshold`: Minimum confidence for a pixel to be classified (default: 0.05)
+    - `--unsure-threshold`: Threshold for uncertain classifications passed to SAM (default: 0.2)
+    - Output format is controlled automatically - semantic masks are saved in folder mode
 
 **Pipeline stages:**
 
@@ -580,18 +585,21 @@ Typical inference times per 1920x1920 image (RTX 4090):
 
 ## Step 7: Export and Deploy
 
-### 7.1 Export Model Weights
+### 7.1 Model Export (Optional)
 
-MMSeg models are saved as PyTorch `.pth` files. For deployment, you may want to optimize:
+MMSeg models are saved as PyTorch `.pth` files, which can be used directly for deployment.
 
-```bash
-# Convert to TorchScript (optional, for faster inference)
-python tools/pytorch2torchscript.py \
-    configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
-    --checkpoint work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
-    --output work_dirs/criobe_finegrained_dinov2_segformer/model.pt \
-    --shape 1920 1920
-```
+!!! note "TorchScript Conversion"
+    TorchScript conversion is optional and not commonly needed for this deployment. The Nuclio function uses the `.pth` checkpoint directly with the inference_with_coralscop.py script.
+
+    If you need TorchScript for other deployments, you can use MMSegmentation's conversion tools:
+    ```bash
+    pixi run -e dinov2-mmseg mim run mmseg pytorch2torchscript \
+        configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
+        --checkpoint work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
+        --output-file work_dirs/criobe_finegrained_dinov2_segformer/model.pt \
+        --shape 1920 1920
+    ```
 
 ### 7.2 Prepare Nuclio Deployment
 
@@ -743,8 +751,8 @@ For detailed deployment instructions, see [Model Deployment Guide](model-deploym
 
     **Debug:**
     ```bash
-    # Visualize training samples
-    python tools/analysis_tools/browse_dataset.py \
+    # Visualize training samples using MMSeg tools
+    pixi run -e dinov2-mmseg mim run mmseg browse_dataset \
         configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
         --show-interval 1
     ```

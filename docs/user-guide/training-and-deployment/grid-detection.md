@@ -111,15 +111,14 @@ python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}, GPU: {torch.
 cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
-python create_fiftyone_dataset.py \
-    --cvat-project-name "criobe_corner_annotation" \
-    --dataset-name "criobe_corners_fo"
+python create_fiftyone_dataset.py "criobe_corner_annotation"
 
 # Or for Banggai
-python create_fiftyone_dataset.py \
-    --cvat-project-name "banggai_corner_detection" \
-    --dataset-name "banggai_corners_fo"
+python create_fiftyone_dataset.py "banggai_corner_detection"
 ```
+
+!!! note "FiftyOne Dataset Naming"
+    The script uses Fire CLI with a single positional argument (project name). The FiftyOne dataset will be created with the same name as the CVAT project.
 
 **Verify corner dataset:**
 
@@ -139,9 +138,7 @@ Check:
 cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
-python create_fiftyone_dataset.py \
-    --cvat-project-name "criobe_grid_annotation" \
-    --dataset-name "criobe_grid_fo"
+python create_fiftyone_dataset.py "criobe_grid_annotation"
 ```
 
 **Verify grid dataset:**
@@ -164,11 +161,11 @@ Check:
 cd PROJ_ROOT/criobe/grid_pose_detection
 pixi shell -e grid-pose-dev
 
-python src/prepare_data.py \
-    --task gridcorners \
-    --dataset criobe_corners_fo \
-    --output-dir data/prepared_for_training/gridcorners
+python src/prepare_data.py gridcorners
 ```
+
+!!! note "Hardcoded Configuration"
+    The `prepare_data.py` script uses Fire CLI with task name as the only argument (`gridcorners` or `gridpose`). Dataset names and output paths are hardcoded in the `config.py` file.
 
 **What this does:**
 
@@ -210,10 +207,7 @@ data/prepared_for_training/gridcorners/
 ### 3.2 Prepare GridPose Data
 
 ```bash
-python src/prepare_data.py \
-    --task gridpose \
-    --dataset criobe_grid_fo \
-    --output-dir data/prepared_for_training/gridpose
+python src/prepare_data.py gridpose
 ```
 
 **Output:**
@@ -275,124 +269,57 @@ print(template)
 # Spacing: ~0.1125 horizontal, ~0.075 vertical
 ```
 
-## Step 4: Configure Training
+## Step 4: Train Models
 
-### 4.1 GridCorners Training Config
+!!! info "Training Implementation"
+    The grid_pose_detection module uses a specialized training script (`reproduce_exp_pose_as_det_with_mapping.py`) that treats keypoint detection as a detection problem with template matching. Training parameters are hardcoded in the script rather than using external config files.
 
-Edit `experiments/train_cfg_gridcorners.yaml`:
-
-```yaml
-# Model
-model: yolo11n-pose.pt  # Nano model (fast, sufficient for 4 points)
-
-# Dataset
-data: data/prepared_for_training/gridcorners/dataset.yaml
-
-# Hyperparameters
-epochs: 100
-batch: 16              # Adjust for GPU
-imgsz: 1920            # Match quadrat image size
-kpt_shape: [4, 3]      # 4 keypoints, 3 values each (x, y, visibility)
-
-# Optimizer
-optimizer: AdamW
-lr0: 0.001
-lrf: 0.01
-momentum: 0.937
-weight_decay: 0.0005
-
-# Data augmentation (conservative for keypoints)
-degrees: 5.0           # Small rotation (corners should stay in frame)
-translate: 0.05        # Small translation
-scale: 0.2             # Modest scaling
-shear: 0.0             # No shear (distorts corners)
-perspective: 0.0001    # Minimal perspective
-flipud: 0.0            # Don't flip vertically (breaks corner order)
-fliplr: 0.0            # Don't flip horizontally (breaks corner order)
-mosaic: 0.0            # Don't use mosaic (confuses corner detection)
-
-# Keypoint-specific
-pose: 1.0              # Keypoint loss weight
-kobj: 2.0              # Keypoint objectness weight
-
-# Advanced
-amp: true              # Mixed precision
-patience: 20           # Early stopping patience
-save_period: 10        # Save checkpoint every 10 epochs
-```
-
-!!! warning "Augmentation for Keypoint Detection"
-    Keypoint detection requires **conservative augmentation**:
-
-    - No horizontal/vertical flips (breaks point ordering)
-    - Limited rotation/translation (points must stay visible)
-    - No mosaic (creates impossible geometries)
-
-### 4.2 GridPose Training Config
-
-Edit `experiments/train_cfg_gridpose.yaml`:
-
-```yaml
-model: yolo11n-pose.pt  # Can use yolo11s-pose for more accuracy
-
-data: data/prepared_for_training/gridpose/dataset.yaml
-
-epochs: 100
-batch: 8               # Larger model, reduce batch size
-imgsz: 1920
-kpt_shape: [117, 3]    # 117 keypoints!
-
-optimizer: AdamW
-lr0: 0.001
-lrf: 0.01
-
-# Very conservative augmentation (117 points must stay ordered)
-degrees: 2.0
-translate: 0.02
-scale: 0.1
-shear: 0.0
-perspective: 0.0
-flipud: 0.0
-fliplr: 0.0
-mosaic: 0.0
-
-pose: 1.0
-kobj: 2.0
-
-amp: true
-patience: 25
-```
-
-!!! tip "Model Size Selection"
-    - **GridCorners (4 points)**: yolo11n-pose is sufficient (~2M params)
-    - **GridPose (117 points)**: yolo11s-pose or yolo11m-pose recommended (~9-22M params)
-
-## Step 5: Train GridCorners Model
-
-### 5.1 Start Training
+### 4.1 Train GridCorners Model
 
 ```bash
-pixi run -e grid-pose yolo pose train \
-    cfg=experiments/train_cfg_gridcorners.yaml \
-    project=runs/pose \
-    name=gridcorners_yolo11n
+cd PROJ_ROOT/criobe/grid_pose_detection
+pixi shell -e grid-pose
+
+python src/reproduce_exp_pose_as_det_with_mapping.py gridcorners
 ```
 
-**Or with explicit parameters:**
+**What this does:**
+
+1. Trains YOLO11n detection model (not pose model) to detect grid corners
+2. Uses template matching to refine detected points to exact 4-corner configuration
+3. Outputs trained model to `runs/gridcorners/detect/train14/weights/best.pt`
+4. Creates corner template at `assets/kp_template_corners.npy`
+
+**Training parameters** (hardcoded in script):
+- Model: yolo11n.pt (detection, not pose)
+- Epochs: 70
+- Batch size: 16
+- Image size: 1920
+- Data augmentation: Conservative (no flips, limited rotation)
+
+### 4.2 Train GridPose Model
 
 ```bash
-pixi run -e grid-pose yolo pose train \
-    model=yolo11n-pose.pt \
-    data=data/prepared_for_training/gridcorners/dataset.yaml \
-    epochs=100 \
-    imgsz=1920 \
-    batch=16 \
-    kpt_shape="[4, 3]" \
-    project=runs/pose \
-    name=gridcorners_yolo11n
+python src/reproduce_exp_pose_as_det_with_mapping.py gridpose
 ```
 
-### 5.2 Monitor Training
+**What this does:**
+
+1. Trains YOLO11n detection model to detect all 117 grid intersection points
+2. Uses template matching to ensure correct point ordering
+3. Outputs trained model to `runs/gridpose/detect/train6/weights/best.pt`
+4. Creates grid template at `assets/kp_template_gridpose.npy`
+
+**Training parameters** (hardcoded in script):
+- Model: yolo11n.pt
+- Epochs: 70
+- Batch size: 8
+- Image size: 1920
+
+!!! tip "Customizing Training"
+    To modify training parameters (epochs, batch size, etc.), edit the `reproduce_exp_pose_as_det_with_mapping.py` script directly. Look for the `run_gridcorners_experiment()` and `run_gridpose_experiment()` functions.
+
+### 4.3 Monitor Training
 
 ```
 Epoch    GPU_mem   box_loss   pose_loss   kobj_loss   cls_loss  Instances       Size
@@ -408,153 +335,99 @@ Epoch    GPU_mem   box_loss   pose_loss   kobj_loss   cls_loss  Instances       
 - **kobj_loss**: Keypoint objectness loss
 - **Pose(mAP50)**: Mean Average Precision for keypoints (aim for >0.85)
 
-### 5.3 Training Duration
+### 4.4 Training Duration
 
-- **GridCorners (yolo11n-pose, 200 images)**: ~2-3 hours on RTX 4090
-- **Each epoch**: ~1-2 minutes
+**Expected training times:**
+- **GridCorners**: ~2-3 hours on RTX 4090 (70 epochs)
+- **GridPose**: ~4-6 hours on RTX 4090 (70 epochs)
 
-## Step 6: Train GridPose Model
+**Note:** Training completes automatically and includes evaluation on validation set.
 
-### 6.1 Start Training
+## Step 5: Evaluate Models
 
-```bash
-pixi run -e grid-pose yolo pose train \
-    cfg=experiments/train_cfg_gridpose.yaml \
-    project=runs/pose \
-    name=gridpose_yolo11n
-```
+!!! note "Automatic Evaluation"
+    The training script (`reproduce_exp_pose_as_det_with_mapping.py`) automatically evaluates models using FiftyOne integration. Results are stored in the FiftyOne dataset and can be viewed interactively.
 
-### 6.2 Monitor Training
-
-GridPose training is more challenging (117 points vs 4):
-
-```
-Epoch    GPU_mem   box_loss   pose_loss   kobj_loss   cls_loss  Instances       Size
-  1/100      6.8G      0.912      0.456       0.234      0.678          1       1920
-
-         Class     Images  Instances    Pose(P    R    mAP50    mAP50-95)
-           all         36         36    0.812    0.756    0.789    0.512
-```
-
-**Aim for:**
-
-- **Pose(mAP50)**: >0.75 (acceptable for grid detection)
-- **pose_loss**: <0.1 (indicates good localization)
-
-### 6.3 Training Duration
-
-- **GridPose (yolo11n-pose, 180 images, 117 keypoints)**: ~4-6 hours on RTX 4090
-- **Each epoch**: ~3-4 minutes
-
-## Step 7: Evaluate Models
-
-### 7.1 GridCorners Validation
+### 5.1 View Results in FiftyOne
 
 ```bash
-pixi run -e grid-pose yolo pose val \
-    model=runs/pose/gridcorners_yolo11n/weights/best.pt \
-    data=data/prepared_for_training/gridcorners/dataset.yaml \
-    split=test \
-    save_json=true
+pixi run -e grid-pose-dev fiftyone app launch criobe_corner_annotation
+# or
+pixi run -e grid-pose-dev fiftyone app launch criobe_grid_annotation
+```
+
+Use FiftyOne to:
+- Inspect prediction quality visually
+- Filter by confidence scores
+- Identify problem cases
+- Compare predictions vs ground truth
+
+### 5.2 Key Metrics
+
+The training script evaluates both detection accuracy and template matching success:
+
+**Detection Metrics:**
+- **box_loss**: Bounding box localization (should converge to <0.5)
+- **cls_loss**: Classification loss
+- **Detection mAP**: Detection accuracy before template matching
+
+**Template Matching Metrics:**
+- **Matching success rate**: Percentage of images where all points matched to template (aim for >95%)
+- **Mean point error**: Average pixel distance from ground truth (aim for <3 pixels)
+- **Max point error**: Worst-case pixel error (should be <10 pixels)
+
+These metrics are computed automatically during training and stored in FiftyOne for interactive exploration.
+
+## Step 6: Inference on New Images
+
+### 6.1 GridCorners Inference
+
+```bash
+pixi run -e grid-pose python src/gridpose_inference.py predict_as_yolo_txt \
+    --test_dir=data/test_samples/1-raw_jpg/ \
+    --model_path=runs/gridcorners/detect/train14/weights/best.pt \
+    --template_path=assets/kp_template_corners.npy \
+    --output_dir=results/corner_predictions \
+    --label_name=quadrat_corner \
+    --max_cost=0.3
 ```
 
 **Output:**
 
-```
-                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)     Pose(P          R      mAP50  mAP50-95)
-                   all         20         20      0.945      0.900      0.935      0.756      0.923      0.875      0.912      0.698
-```
+- YOLO TXT format keypoint files
+- Template-matched corner coordinates (4 ordered points)
+- Optional debug visualizations
 
-### 7.2 GridPose Validation
-
-```bash
-pixi run -e grid-pose yolo pose val \
-    model=runs/pose/gridpose_yolo11n/weights/best.pt \
-    data=data/prepared_for_training/gridpose/dataset.yaml \
-    split=test \
-    save_json=true
-```
-
-### 7.3 Template Matching Evaluation
-
-The critical test is whether detected points can be correctly ordered using template matching:
+### 6.2 GridPose Inference
 
 ```bash
-pixi run -e grid-pose-dev python src/evaluate_with_template.py \
-    --model runs/pose/gridpose_yolo11n/weights/best.pt \
-    --test-dir data/prepared_for_training/gridpose/test/images \
-    --template assets/kp_template_gridpose.npy \
-    --output-dir results/gridpose_eval
-```
-
-**Metrics:**
-
-- **Matching success rate**: Percentage of images where all points matched correctly (aim for >95%)
-- **Mean Euclidean distance**: Average pixel error per keypoint (aim for <3 pixels)
-- **Max point error**: Worst-case error (should be <10 pixels)
-
-**Example output:**
-
-```
-Template Matching Evaluation Results:
-======================================
-Total images: 18
-Successful matches: 18 (100.0%)
-Failed matches: 0 (0.0%)
-
-Distance Metrics:
------------------
-Mean Euclidean distance: 2.34 pixels
-Median Euclidean distance: 2.12 pixels
-Std Euclidean distance: 0.87 pixels
-Max point error: 6.78 pixels
-Min point error: 0.45 pixels
-
-Per-Point Statistics:
----------------------
-Point 0 (top-left corner): mean=1.89px, max=4.23px
-Point 1: mean=2.12px, max=5.67px
-...
-Point 116 (bottom-right corner): mean=2.45px, max=6.78px
-```
-
-## Step 8: Inference and Testing
-
-### 8.1 Single Image Prediction (GridCorners)
-
-```bash
-pixi run -e grid-pose python src/gridpose_inference.py predict_corners \
-    --test-dir data/test_samples/1-raw_jpg/ \
-    --model-path runs/pose/gridcorners_yolo11n/weights/best.pt \
-    --template-path assets/kp_template_corners.npy \
-    --output-dir results/corner_predictions \
-    --visualize
+pixi run -e grid-pose python src/gridpose_inference.py predict_as_yolo_txt \
+    --test_dir=data/test_samples/3-image_warping/ \
+    --model_path=runs/gridpose/detect/train6/weights/best.pt \
+    --template_path=assets/kp_template_gridpose.npy \
+    --output_dir=results/grid_predictions \
+    --label_name=grid \
+    --max_cost=0.12
 ```
 
 **Output:**
 
-- Detected corner coordinates
-- Corner visualization overlaid on images
-- Ordered points (TL, TR, BR, BL)
+- YOLO TXT format keypoint files (117 ordered points)
+- Template-matched grid coordinates
+- Optional debug visualizations
 
-### 8.2 Batch Prediction (GridPose)
+### 6.3 Parameters
 
-```bash
-pixi run -e grid-pose python src/gridpose_inference.py predict_grid \
-    --test-dir data/test_samples/3-image_warping/ \
-    --model-path runs/pose/gridpose_yolo11n/weights/best.pt \
-    --template-path assets/kp_template_gridpose.npy \
-    --output-dir results/grid_predictions \
-    --save-coco-json
-```
+- `--test_dir`: Input directory with images
+- `--model_path`: Trained detection model
+- `--template_path`: Keypoint template for matching
+- `--output_dir`: Where to save predictions
+- `--label_name`: Label for COCO export (`quadrat_corner` or `grid`)
+- `--max_cost`: Maximum matching cost threshold (lower = stricter matching)
+- `--debug`: Optional debug output directory for visualizations
+- `--conf`: Detection confidence threshold (default: 0.1)
 
-**Output:**
-
-- 117 grid points per image
-- COCO keypoint format JSON
-- Visualizations with grid overlay
-
-### 8.3 Export to YOLO TXT Format
+### 6.4 Export to COCO Format
 
 For integration with warping and grid removal:
 
@@ -568,43 +441,43 @@ pixi run -e grid-pose python src/gridpose_inference.py predict_as_yolo_txt \
 
 Creates `.txt` files compatible with YOLO format for downstream processing.
 
-## Step 9: Deploy to Nuclio
+## Step 7: Deploy to Nuclio
 
-### 9.1 Deploy GridCorners Function
+### 7.1 Deploy GridCorners Function
 
 ```bash
-cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
+cd PROJ_ROOT/criobe/grid_pose_detection
 
-# Copy trained model
-cp ../../runs/pose/gridcorners_yolo11n/weights/best.pt model_weights.pt
+# Copy trained model to deployment directory
+cp runs/gridcorners/detect/train14/weights/best.pt deploy/gridcorners/nuclio/model_weights.pt
 
 # Package and deploy
-./deploy_as_zip.sh
+./deploy_gridcorners_as_zip.sh
 
 nuctl deploy --project-name cvat \
-    --path ./nuclio \
+    --path ./deploy/gridcorners/nuclio \
     --platform local \
     --verbose
 ```
 
-### 9.2 Deploy GridPose Function
+### 7.2 Deploy GridPose Function
 
 ```bash
-cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
+cd PROJ_ROOT/criobe/grid_pose_detection
 
-# Copy trained model
-cp ../../runs/pose/gridpose_yolo11n/weights/best.pt model_weights.pt
+# Copy trained model to deployment directory
+cp runs/gridpose/detect/train6/weights/best.pt deploy/gridpose/nuclio/model_weights.pt
 
 # Package and deploy
-./deploy_as_zip.sh
+./deploy_gridpose_as_zip.sh
 
 nuctl deploy --project-name cvat \
-    --path ./nuclio \
+    --path ./deploy/gridpose/nuclio \
     --platform local \
     --verbose
 ```
 
-### 9.3 Test Deployed Functions
+### 7.3 Test Deployed Functions
 
 **Test GridCorners:**
 
@@ -622,7 +495,7 @@ curl -X POST http://localhost:8002 \
     -d @test_payload_grid.json
 ```
 
-### 9.4 Integrate with CVAT
+### 7.4 Integrate with CVAT
 
 **Configure GridCorners webhook:**
 

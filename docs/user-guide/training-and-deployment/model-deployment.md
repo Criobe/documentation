@@ -63,7 +63,7 @@ All modules follow this pattern:
 
 ### Step 1: Prepare Model Weights
 
-Navigate to your trained model:
+Navigate to your module:
 
 ```bash
 cd PROJ_ROOT/criobe/{module}/
@@ -72,10 +72,13 @@ cd PROJ_ROOT/criobe/{module}/
 Copy best checkpoint to deployment directory:
 
 ```bash
-cp runs/{train_dir}/weights/best.pt deploy/{function_name}/model_weights.pt
+# For YOLO models (coral_seg_yolo, grid_pose_detection):
+cp runs/{train_dir}/weights/best.pt deploy/{function_name}/nuclio/model_weights.pt
 
-# Or for MMSeg:
-cp work_dirs/{experiment}/best_mIoU_epoch_X.pth deploy/{function_name}/model_weights.pth
+# For MMSeg:
+cp work_dirs/{experiment}/best_mIoU_epoch_X.pth deploy/{function_name}/nuclio/model_weights.pth
+
+# For grid_inpainting: No manual copy needed - model downloads automatically
 ```
 
 ### Step 2: Review Function Configuration
@@ -162,13 +165,18 @@ def handler(context, event):
 Package the function with dependencies:
 
 ```bash
-cd deploy/{function_name}
+# Run from module root directory
+cd PROJ_ROOT/criobe/{module}/
 
-# Run deployment script (creates zip with all dependencies)
-./deploy_as_zip.sh
+# Run module-specific deployment script
+./deploy_as_zip.sh  # For most modules
+
+# Or for grid_pose_detection (has separate scripts):
+./deploy_gridcorners_as_zip.sh  # For GridCorners
+./deploy_gridpose_as_zip.sh     # For GridPose
 ```
 
-This creates `nuclio/` directory with:
+This creates `nuclio/` directory at the repo root with:
 
 ```
 nuclio/
@@ -260,13 +268,13 @@ curl -X POST http://localhost:8010 \
 **Deployment:**
 
 ```bash
-cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegv4
+cd PROJ_ROOT/criobe/coral_seg_yolo
 
-# Copy trained weights
-cp ../../runs/segment/criobe_finegrained_yolo11m/weights/best.pt model_weights.pt
+# Copy trained weights to deployment directory
+cp runs/segment/criobe_finegrained_yolo11m/weights/best.pt deploy/coralsegv4/nuclio/model_weights.pt
 
-# Deploy
-./deploy_as_zip.sh
+# Package and deploy
+./deploy_as_zip.sh coralsegv4
 
 nuctl deploy --project-name cvat \
     --path ./nuclio \
@@ -303,18 +311,18 @@ http://bridge:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask
 **Deployment:**
 
 ```bash
-cd PROJ_ROOT/criobe/DINOv2_mmseg/deploy/pth-mmseg-coralscopsegformer
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 
-# Copy trained weights
-cp ../../work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth segformer_weights.pth
+# Copy trained weights to deployment directory
+cp work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth deploy/coralscopsegformer/nuclio/segformer_weights.pth
 
 # Copy CoralSCoP SAM weights
-cp ../../assets/pretrained_models/vit_b_coralscop.pth sam_weights.pth
+cp assets/pretrained_models/vit_b_coralscop.pth deploy/coralscopsegformer/nuclio/sam_weights.pth
 
 # Copy config
-cp ../../configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py config.py
+cp configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py deploy/coralscopsegformer/nuclio/config.py
 
-# Deploy
+# Package and deploy
 ./deploy_as_zip.sh
 
 nuctl deploy --project-name cvat \
@@ -359,12 +367,14 @@ http://bridge:8000/detect-model-webhook?model_name=pth-mmseg-coralscopsegformer&
 **GridCorners deployment:**
 
 ```bash
-cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
+cd PROJ_ROOT/criobe/grid_pose_detection
 
-cp ../../runs/pose/gridcorners_yolo11n/weights/best.pt model_weights.pt
-cp ../../assets/kp_template_corners.npy kp_template.npy
+# Copy trained weights and template to deployment directory
+cp runs/gridcorners/detect/train14/weights/best.pt deploy/gridcorners/nuclio/model_weights.pt
+cp assets/kp_template_corners.npy deploy/gridcorners/nuclio/kp_template.npy
 
-./deploy_as_zip.sh
+# Package and deploy
+./deploy_gridcorners_as_zip.sh
 
 nuctl deploy --project-name cvat \
     --path ./nuclio \
@@ -375,12 +385,14 @@ nuctl deploy --project-name cvat \
 **GridPose deployment:**
 
 ```bash
-cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
+cd PROJ_ROOT/criobe/grid_pose_detection
 
-cp ../../runs/pose/gridpose_yolo11n/weights/best.pt model_weights.pt
-cp ../../assets/kp_template_gridpose.npy kp_template.npy
+# Copy trained weights and template to deployment directory
+cp runs/gridpose/detect/train6/weights/best.pt deploy/gridpose/nuclio/model_weights.pt
+cp assets/kp_template.npy deploy/gridpose/nuclio/kp_template.npy
 
-./deploy_as_zip.sh
+# Package and deploy
+./deploy_gridpose_as_zip.sh
 
 nuctl deploy --project-name cvat \
     --path ./nuclio \
@@ -419,10 +431,11 @@ http://bridge:8000/detect-model-webhook?model_name=pth-yolo-gridpose&conv_mask_t
 **Deployment:**
 
 ```bash
-cd PROJ_ROOT/criobe/grid_inpainting/deploy/pth-lama-nuclio
+cd PROJ_ROOT/criobe/grid_inpainting
 
-cp ../../assets/pretrained_models/big-lama.pt model_weights.pt
+# No need to copy model weights - automatically downloaded by Nuclio function.yaml
 
+# Package and deploy
 ./deploy_as_zip.sh
 
 nuctl deploy --project-name cvat \
@@ -430,6 +443,9 @@ nuctl deploy --project-name cvat \
     --platform local \
     --verbose
 ```
+
+!!! info "Automatic Model Download"
+    The grid inpainting function automatically downloads the SimpleLama model (`big-lama.pt`) from Google Cloud Storage during deployment via the `function.yaml` configuration. You don't need to manually copy model weights.
 
 **Key configuration:**
 

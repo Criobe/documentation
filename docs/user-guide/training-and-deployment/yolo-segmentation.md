@@ -12,15 +12,13 @@ This guide walks you through training YOLOv11 segmentation models on your annota
 
 - Production coral monitoring systems
 - Real-time or near-real-time processing requirements
-- Deployment on edge devices or limited hardware
-- Applications requiring both bounding boxes and segmentation masks
 - Fast iteration during model development
+- Enough data to finetune a model | Fixed location with low variability in coral genus distibution
 
 **Consider MMSeg instead if:**
 
-- Maximum accuracy is critical (scientific publications)
+- Low annotated data regime : generalization to new sites is crucial
 - Speed is not a primary concern
-- You need pixel-perfect semantic segmentation
 - Two-stage workflow is acceptable
 
 ### What You'll Learn
@@ -149,9 +147,7 @@ Check:
 cd PROJ_ROOT/criobe/coral_seg_yolo
 pixi shell -e coral-seg-yolo-dev
 
-python src/prepare_data.py \
-    --dataset-name criobe_finegrained_fo \
-    --output-dir data/prepared_for_training/criobe_finegrained
+python src/prepare_data.py criobe_finegrained_fo
 ```
 
 **What this script does:**
@@ -172,19 +168,19 @@ INFO: Processing train split: 315 samples
 INFO: Processing val split: 90 samples
 INFO: Processing test split: 45 samples
 INFO: Created dataset.yaml with 16 classes
-INFO: Dataset prepared at: data/prepared_for_training/criobe_finegrained
+INFO: Dataset prepared at: data/coral_annotation_yolo_seg/criobe_finegrained_fo
 ```
 
 ### 3.2 Verify Output Structure
 
 ```bash
-tree data/prepared_for_training/criobe_finegrained -L 2
+tree data/coral_annotation_yolo_seg/criobe_finegrained_fo -L 2
 ```
 
 Expected structure:
 
 ```
-data/prepared_for_training/criobe_finegrained/
+data/coral_annotation_yolo_seg/criobe_finegrained_fo/
 ├── dataset.yaml          # YOLO dataset configuration
 ├── train/
 │   ├── images/           # Training images
@@ -200,13 +196,13 @@ data/prepared_for_training/criobe_finegrained/
 ### 3.3 Inspect dataset.yaml
 
 ```bash
-cat data/prepared_for_training/criobe_finegrained/dataset.yaml
+cat data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml
 ```
 
 Should contain:
 
 ```yaml
-path: PROJ_ROOT/criobe/coral_seg_yolo/data/prepared_for_training/criobe_finegrained
+path: PROJ_ROOT/criobe/coral_seg_yolo/data/coral_annotation_yolo_seg/criobe_finegrained_fo
 train: train/images
 val: val/images
 test: test/images
@@ -238,7 +234,7 @@ names:
 
 ```bash
 # Check a sample label file
-head -3 data/prepared_for_training/criobe_finegrained/train/labels/sample_001.txt
+head -3 data/coral_annotation_yolo_seg/criobe_finegrained_fo/train/labels/sample_001.txt
 ```
 
 YOLO segmentation format:
@@ -282,7 +278,7 @@ nano experiments/my_training.yaml
 model: yolo11m-seg.pt  # Change to desired size
 
 # Dataset
-data: data/prepared_for_training/criobe_finegrained/dataset.yaml
+data: data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml
 
 # Training hyperparameters
 epochs: 100            # Number of training epochs
@@ -360,7 +356,7 @@ pixi run -e coral-seg-yolo yolo task=segment mode=train \
 ```bash
 pixi run -e coral-seg-yolo yolo segment train \
     model=yolo11m-seg.pt \
-    data=data/prepared_for_training/criobe_finegrained/dataset.yaml \
+    data=data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml \
     epochs=100 \
     imgsz=1920 \
     batch=16 \
@@ -442,7 +438,7 @@ Evaluate the best model on the test set:
 ```bash
 pixi run -e coral-seg-yolo yolo segment val \
     model=runs/segment/criobe_finegrained_yolo11m/weights/best.pt \
-    data=data/prepared_for_training/criobe_finegrained/dataset.yaml \
+    data=data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml \
     split=test \
     imgsz=1920 \
     save_json=true
@@ -467,8 +463,7 @@ For detailed error analysis, use FiftyOne integration:
 pixi run -e coral-seg-yolo-dev python src/fiftyone_evals.py \
     --dataset-name criobe_finegrained_fo \
     --model-path runs/segment/criobe_finegrained_yolo11m/weights/best.pt \
-    --pred-field-name "predictions_yolo11m" \
-    --confidence-threshold 0.25
+    --pred-field-name "predictions_yolo11m"
 ```
 
 **What this does:**
@@ -762,27 +757,45 @@ For complete deployment instructions, see [Model Deployment Guide](model-deploym
 
 ### Multi-Taxonomy Training
 
-Train models on different taxonomic hierarchies:
+Train models on different taxonomic hierarchies by creating transformed datasets at the FiftyOne level first, then exporting them for training.
 
-**Extended taxonomy (10 classes):**
+!!! note "Taxonomy Transformation Workflow"
+    Taxonomy transformations must be applied when creating the FiftyOne dataset, not during YOLO export. The workflow is:
 
-```bash
-python src/prepare_data.py \
-    --dataset-name criobe_finegrained_fo \
-    --taxonomy extended \
-    --output-dir data/prepared_for_training/criobe_extended
-```
+    1. Create a new FiftyOne dataset with simplified taxonomy using `data_engineering/create_cvat_annotation_tasks.py`
+    2. Export the transformed dataset to YOLO format using `prepare_data.py`
 
-**Main families (7 classes):**
+**Example: Extended taxonomy (10 classes):**
 
 ```bash
-python src/prepare_data.py \
-    --dataset-name criobe_finegrained_fo \
-    --taxonomy main_families \
-    --output-dir data/prepared_for_training/criobe_main_families
+# Step 1: Create FiftyOne dataset with extended taxonomy (in data_engineering/)
+cd PROJ_ROOT/criobe/data_engineering
+python create_cvat_annotation_tasks.py \
+    --source-dataset criobe_finegrained_fo \
+    --target-dataset criobe_extended_fo \
+    --taxonomy extended
+
+# Step 2: Export to YOLO format (in coral_seg_yolo/)
+cd PROJ_ROOT/criobe/coral_seg_yolo
+python src/prepare_data.py criobe_extended_fo
 ```
 
-See `data_engineering/tools.py` for taxonomy definitions.
+**Example: Main families (7 classes):**
+
+```bash
+# Step 1: Create FiftyOne dataset with main families taxonomy
+cd PROJ_ROOT/criobe/data_engineering
+python create_cvat_annotation_tasks.py \
+    --source-dataset criobe_finegrained_fo \
+    --target-dataset criobe_main_families_fo \
+    --taxonomy main_families
+
+# Step 2: Export to YOLO format
+cd PROJ_ROOT/criobe/coral_seg_yolo
+python src/prepare_data.py criobe_main_families_fo
+```
+
+See `data_engineering/tools.py` for available taxonomy definitions (finegrained, extended, main_families, agnostic).
 
 ### Transfer Learning from Pretrained Coral Models
 
@@ -791,22 +804,9 @@ Use existing coral models as initialization:
 ```bash
 yolo segment train \
     model=assets/coralsegv4_yolo11m_best.pt \  # Start from coral model
-    data=data/prepared_for_training/my_new_site/dataset.yaml \
+    data=data/coral_annotation_yolo_seg/my_new_site/dataset.yaml \
     epochs=50 \  # Fewer epochs needed
     freeze=10    # Freeze first 10 layers
-```
-
-### Ensemble Predictions
-
-Combine multiple models for better accuracy:
-
-```bash
-python src/ensemble_predict.py \
-    --models runs/segment/model1/weights/best.pt \
-              runs/segment/model2/weights/best.pt \
-              runs/segment/model3/weights/best.pt \
-    --source data/test_images/ \
-    --method weighted_boxes_fusion
 ```
 
 ## Next Steps
