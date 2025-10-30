@@ -66,7 +66,7 @@ All modules follow this pattern:
 Navigate to your trained model:
 
 ```bash
-cd /home/taiamiti/Projects/criobe/{module}/
+cd PROJ_ROOT/criobe/{module}/
 ```
 
 Copy best checkpoint to deployment directory:
@@ -260,7 +260,7 @@ curl -X POST http://localhost:8010 \
 **Deployment:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegv4
+cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegv4
 
 # Copy trained weights
 cp ../../runs/segment/criobe_finegrained_yolo11m/weights/best.pt model_weights.pt
@@ -303,7 +303,7 @@ http://bridge:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask
 **Deployment:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg/deploy/pth-mmseg-coralscopsegformer
+cd PROJ_ROOT/criobe/DINOv2_mmseg/deploy/pth-mmseg-coralscopsegformer
 
 # Copy trained weights
 cp ../../work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth segformer_weights.pth
@@ -359,7 +359,7 @@ http://bridge:8000/detect-model-webhook?model_name=pth-mmseg-coralscopsegformer&
 **GridCorners deployment:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
 
 cp ../../runs/pose/gridcorners_yolo11n/weights/best.pt model_weights.pt
 cp ../../assets/kp_template_corners.npy kp_template.npy
@@ -375,7 +375,7 @@ nuctl deploy --project-name cvat \
 **GridPose deployment:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
 
 cp ../../runs/pose/gridpose_yolo11n/weights/best.pt model_weights.pt
 cp ../../assets/kp_template_gridpose.npy kp_template.npy
@@ -419,7 +419,7 @@ http://bridge:8000/detect-model-webhook?model_name=pth-yolo-gridpose&conv_mask_t
 **Deployment:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_inpainting/deploy/pth-lama-nuclio
+cd PROJ_ROOT/criobe/grid_inpainting/deploy/pth-lama-nuclio
 
 cp ../../assets/pretrained_models/big-lama.pt model_weights.pt
 

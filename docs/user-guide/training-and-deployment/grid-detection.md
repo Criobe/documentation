@@ -72,7 +72,7 @@ Ensure you have:
 ### 1.1 Navigate to Module
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection
+cd PROJ_ROOT/criobe/grid_pose_detection
 ```
 
 ### 1.2 Activate Pixi Environment
@@ -104,7 +104,7 @@ python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}, GPU: {torch.
 ### 2.1 Pull Corner Detection Dataset
 
 ```bash
-cd /home/taiamiti/Projects/criobe/data_engineering
+cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 python create_fiftyone_dataset.py \
@@ -132,7 +132,7 @@ Check:
 ### 2.2 Pull Grid Detection Dataset
 
 ```bash
-cd /home/taiamiti/Projects/criobe/data_engineering
+cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 python create_fiftyone_dataset.py \
@@ -157,7 +157,7 @@ Check:
 ### 3.1 Prepare GridCorners Data
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection
+cd PROJ_ROOT/criobe/grid_pose_detection
 pixi shell -e grid-pose-dev
 
 python src/prepare_data.py \
@@ -569,7 +569,7 @@ Creates `.txt` files compatible with YOLO format for downstream processing.
 ### 9.1 Deploy GridCorners Function
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
 
 # Copy trained model
 cp ../../runs/pose/gridcorners_yolo11n/weights/best.pt model_weights.pt
@@ -586,7 +586,7 @@ nuctl deploy --project-name cvat \
 ### 9.2 Deploy GridPose Function
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
 
 # Copy trained model
 cp ../../runs/pose/gridpose_yolo11n/weights/best.pt model_weights.pt

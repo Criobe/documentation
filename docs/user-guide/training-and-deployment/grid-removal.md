@@ -61,7 +61,7 @@ Ensure you have:
 ### 1.1 Navigate to Module
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_inpainting
+cd PROJ_ROOT/criobe/grid_inpainting
 ```
 
 ### 1.2 Activate Pixi Environment
@@ -443,7 +443,7 @@ Compare outputs with pre-trained model to see if fine-tuning improved results.
 ### 7.1 Prepare Deployment
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_inpainting/deploy
+cd PROJ_ROOT/criobe/grid_inpainting/deploy
 
 # Copy model weights
 cp ../assets/pretrained_models/big-lama.pt pth-lama-nuclio/model_weights.pt
@@ -493,7 +493,7 @@ def handler(context, event):
 ### 7.3 Deploy Function
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_inpainting/deploy
+cd PROJ_ROOT/criobe/grid_inpainting/deploy
 
 ./deploy_as_zip.sh
 

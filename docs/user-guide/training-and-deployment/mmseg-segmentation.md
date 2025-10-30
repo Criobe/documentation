@@ -68,7 +68,7 @@ Ensure you have:
 ### 1.1 Navigate to Module
 
 ```bash
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 ```
 
 ### 1.2 Activate Pixi Environment
@@ -109,7 +109,7 @@ MMSeg: 1.2.2
 If you haven't already created the FiftyOne dataset:
 
 ```bash
-cd /home/taiamiti/Projects/criobe/data_engineering
+cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 python create_fiftyone_dataset.py \
@@ -120,7 +120,7 @@ python create_fiftyone_dataset.py \
 ### 2.2 Convert to MMSegmentation Format
 
 ```bash
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 pixi shell -e dinov2-mmseg
 
 python prepare_data.py \
@@ -518,7 +518,7 @@ DINOv2 produces semantic masks (pixel-level classification). For instance segmen
 ### 6.1 Download CoralSCoP SAM Weights
 
 ```bash
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 
 # Create assets directory if needed
 mkdir -p assets/pretrained_models
@@ -596,7 +596,7 @@ python tools/pytorch2torchscript.py \
 ### 7.2 Prepare Nuclio Deployment
 
 ```bash
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg/deploy
+cd PROJ_ROOT/criobe/DINOv2_mmseg/deploy
 
 # Create deployment directory
 mkdir -p pth-mmseg-coralsegv4-coralscop

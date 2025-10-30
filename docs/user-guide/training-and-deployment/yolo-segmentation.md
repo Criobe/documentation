@@ -70,7 +70,7 @@ Ensure you have:
 ### 1.1 Navigate to Module
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo
+cd PROJ_ROOT/criobe/coral_seg_yolo
 ```
 
 ### 1.2 Activate Pixi Environment
@@ -108,7 +108,7 @@ GPU: NVIDIA GeForce RTX 4090
 If you haven't already pulled your annotated dataset from CVAT, do so now:
 
 ```bash
-cd /home/taiamiti/Projects/criobe/data_engineering
+cd PROJ_ROOT/criobe/data_engineering
 
 # Activate data engineering environment
 pixi shell
@@ -142,7 +142,7 @@ Check:
 ### 3.1 Convert FiftyOne Dataset to YOLO Format
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo
+cd PROJ_ROOT/criobe/coral_seg_yolo
 pixi shell -e coral-seg-yolo-dev
 
 python src/prepare_data.py \
@@ -202,7 +202,7 @@ cat data/prepared_for_training/criobe_finegrained/dataset.yaml
 Should contain:
 
 ```yaml
-path: /home/taiamiti/Projects/criobe/coral_seg_yolo/data/prepared_for_training/criobe_finegrained
+path: PROJ_ROOT/criobe/coral_seg_yolo/data/prepared_for_training/criobe_finegrained
 train: train/images
 val: val/images
 test: test/images
@@ -604,7 +604,7 @@ pixi run -e coral-seg-yolo yolo export model=best.pt format=coreml
 Copy your trained model to the deployment directory:
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo/deploy
+cd PROJ_ROOT/criobe/coral_seg_yolo/deploy
 
 # Create deployment for your model
 cp -r pth-yolo-coralsegv4 pth-yolo-my-model

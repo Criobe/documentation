@@ -161,7 +161,7 @@ Click **Continue** to create the project.
 
 ```bash
 # Navigate to grid pose detection module
-cd /home/taiamiti/Projects/criobe/grid_pose_detection
+cd PROJ_ROOT/criobe/grid_pose_detection
 
 # Activate environment
 pixi shell -e grid-pose
@@ -189,7 +189,7 @@ nuctl get functions --platform local | grep gridcorners
 # pth-yolo-gridcorners  ready  http://:8001  ...
 
 # Test function
-cd /home/taiamiti/Projects/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
 curl -X POST http://localhost:8001 \
     -H "Content-Type: application/json" \
     -d @test_payload.json
@@ -328,7 +328,7 @@ INFO: Task created successfully with ID: 46
 ### Step 2.5: Deploy GridPose Model
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
 
 ./deploy_as_zip.sh
 
@@ -399,7 +399,7 @@ nuctl get functions --platform local | grep gridpose
 ### Step 3.2: Deploy LaMa Inpainting Model
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_inpainting/deploy
+cd PROJ_ROOT/criobe/grid_inpainting/deploy
 
 ./deploy_as_zip.sh
 
@@ -624,7 +624,7 @@ If not created automatically:
 ### Step 4.4: Deploy Coral Segmentation Model
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegv4
+cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegv4
 
 ./deploy_as_zip.sh
 
@@ -810,7 +810,7 @@ Implement QA at each stage:
 ### Pull All Projects from CVAT
 
 ```bash
-cd /home/taiamiti/Projects/criobe/data_engineering
+cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 # Pull corner annotations (optional, for records)
@@ -852,7 +852,7 @@ fiftyone app launch criobe_corners_fo criobe_grid_fo criobe_finegrained_fo
 **For YOLO segmentation training:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo
+cd PROJ_ROOT/criobe/coral_seg_yolo
 pixi shell -e coral-seg-yolo-dev
 
 python src/prepare_data.py \
@@ -863,7 +863,7 @@ python src/prepare_data.py \
 **For MMSeg segmentation training:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 pixi shell -e dinov2-mmseg
 
 python prepare_data.py \
@@ -874,7 +874,7 @@ python prepare_data.py \
 **For grid detection training (if retraining models):**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/grid_pose_detection
+cd PROJ_ROOT/criobe/grid_pose_detection
 pixi shell -e grid-pose-dev
 
 # Prepare corner detection data
@@ -934,7 +934,7 @@ python src/prepare_data.py \
 
     3. Consider fine-tuning LaMa on your specific grid pattern:
        ```bash
-       cd /home/taiamiti/Projects/criobe/grid_inpainting
+       cd PROJ_ROOT/criobe/grid_inpainting
        # See README.md for fine-tuning instructions
        ```
 
@@ -990,7 +990,7 @@ python src/prepare_data.py \
     1. All tasks marked as "completed"
     2. CVAT credentials correct in `.env`:
        ```bash
-       cat /home/taiamiti/Projects/criobe/data_engineering/.env
+       cat PROJ_ROOT/criobe/data_engineering/.env
        ```
 
     3. Project name exactly matches:

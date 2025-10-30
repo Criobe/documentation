@@ -135,7 +135,7 @@ Deploy the pre-trained YOLOv11 corner detection model:
 
 ```bash
 # Navigate to grid pose detection module
-cd /home/taiamiti/Projects/criobe/grid_pose_detection
+cd PROJ_ROOT/criobe/grid_pose_detection
 
 # Activate environment
 pixi shell -e grid-pose
@@ -405,7 +405,7 @@ Now test the automation:
 For semi-automatic coral annotation, deploy the Banggai segmentation model:
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegbanggai
+cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegbanggai
 
 ./deploy_as_zip.sh
 
@@ -476,7 +476,7 @@ Once both stages are complete, export the annotated dataset.
 ### Pull Both Projects with FiftyOne
 
 ```bash
-cd /home/taiamiti/Projects/criobe/data_engineering
+cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 # Pull corner detection annotations (optional, for records)
@@ -508,7 +508,7 @@ Verify:
 **For YOLO training:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo
+cd PROJ_ROOT/criobe/coral_seg_yolo
 pixi shell -e coral-seg-yolo-dev
 
 python src/prepare_data.py \
@@ -519,7 +519,7 @@ python src/prepare_data.py \
 **For MMSeg training:**
 
 ```bash
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 pixi shell -e dinov2-mmseg
 
 python prepare_data.py \

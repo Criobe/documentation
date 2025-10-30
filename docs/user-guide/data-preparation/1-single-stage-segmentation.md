@@ -319,7 +319,7 @@ The YOLO coral segmentation model must be deployed as a Nuclio serverless functi
 
 ```bash
 # Navigate to the YOLO segmentation module
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo
+cd PROJ_ROOT/criobe/coral_seg_yolo
 
 # Deploy the model (see deployment guide for details)
 cd deploy
@@ -458,7 +458,7 @@ Use the `data_engineering` module to pull annotations from CVAT:
 
 ```bash
 # Navigate to data engineering module
-cd /home/taiamiti/Projects/criobe/data_engineering
+cd PROJ_ROOT/criobe/data_engineering
 
 # Activate the Pixi environment
 pixi shell
@@ -484,7 +484,7 @@ INFO: Found project 'my_coral_segmentation' (ID: 5)
 INFO: Downloading 120 images...
 INFO: Processing annotations...
 INFO: Created FiftyOne dataset 'my_coral_segmentation_fo' with 120 samples
-INFO: Dataset stored in /home/taiamiti/Projects/criobe/data_engineering/data/media/my_coral_segmentation
+INFO: Dataset stored in PROJ_ROOT/criobe/data_engineering/data/media/my_coral_segmentation
 ```
 
 ### 5.3 Verify Dataset in FiftyOne
@@ -515,7 +515,7 @@ To train a YOLO model, convert the FiftyOne dataset:
 
 ```bash
 # Navigate to YOLO module
-cd /home/taiamiti/Projects/criobe/coral_seg_yolo
+cd PROJ_ROOT/criobe/coral_seg_yolo
 
 # Activate environment
 pixi shell -e coral-seg-yolo-dev
@@ -548,7 +548,7 @@ To train a DINOv2/MMSeg model:
 
 ```bash
 # Navigate to DINOv2 module
-cd /home/taiamiti/Projects/criobe/DINOv2_mmseg
+cd PROJ_ROOT/criobe/DINOv2_mmseg
 
 # Activate environment
 pixi shell -e dinov2-mmseg
@@ -649,7 +649,7 @@ python -c "import cv2; import numpy as np; mask = cv2.imread('data/prepared_for_
 
     1. Check `.env` file:
         ```bash
-        cat /home/taiamiti/Projects/criobe/data_engineering/.env
+        cat PROJ_ROOT/criobe/data_engineering/.env
         # Verify FIFTYONE_CVAT_URL, USERNAME, PASSWORD
         ```
     2. Test CVAT API manually:
