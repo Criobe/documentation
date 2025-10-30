@@ -658,7 +658,7 @@ coral-segmentation/
 
 **What's next**:
 
-1. **[Prepare Datasets](3-data-preparation.md)** - Download and configure training datasets
+1. **[Prepare Datasets](3-data-preparation.md)** - Download demo datasets and ML datasets for training
 2. **[Configure GPU](4-gpu-configuration.md)** - Verify CUDA and optimize GPU settings
 3. **[Configure CVAT Integration](../../configuration/for-developers/2-cvat-integration.md)** - Connect to CVAT for dataset management
 

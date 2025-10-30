@@ -185,7 +185,7 @@ ls -l ~/Projects/coral_seg_yolo/data
 ```
 
 !!! success "Data Access"
-    All modules can now access shared data through their `data` symlink! Download test data once, use everywhere.
+    All modules can now access shared data through their `data` symlink! Download demo datasets once, use everywhere.
 
 ## Step 5: Understand Repository Structure
 
@@ -590,7 +590,7 @@ If you're familiar with conda, here's how Pixi compares:
 **What's next**:
 
 1. **[Install Module Environments](2-module-environments.md)** - Set up environments for all modules
-2. **[Prepare Datasets](3-data-preparation.md)** - Download and configure training data
+2. **[Prepare Datasets](3-data-preparation.md)** - Download demo datasets and ML datasets for training
 3. **[Configure GPU](4-gpu-configuration.md)** - Set up CUDA for GPU training
 
 ## Quick Reference

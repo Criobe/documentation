@@ -33,9 +33,10 @@ The platform currently targets a single high-end desktop with ample VRAM (16 GB 
 | Docker images | 15-20 GB |
 | CVAT data & database | 10-50 GB (grows with annotations) |
 | ML models (all modules) | 5-10 GB |
-| Test samples | 500 MB |
+| Demo datasets (5-sample test sets) | 500 MB |
+| ML datasets (full training sets) | 20-25 GB |
 | Working datasets | Variable (10-100+ GB) |
-| **Total Minimum** | **30-80 GB** |
+| **Total Minimum** | **50-100 GB** |
 | **Recommended** | **200+ GB** |
 
 ## Software Requirements

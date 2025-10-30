@@ -1,9 +1,13 @@
 # Data Preparation
 
-Download and prepare datasets for training, evaluation, and experimentation with QUADRATSEG models.
+Download and prepare datasets for training, evaluation, and functional testing with QUADRATSEG models.
 
 !!! info "For Developers"
-    This guide sets up **training datasets** for model development. If you only want to process images with pre-trained models, you don't need this—see the [End User Guide](../for-end-users/1-docker-deployment.md) instead.
+    This guide covers both **ML datasets** (for model development) and **demo datasets** (for functional testing). If you only want to process images with pre-trained models, you don't need this—see the [End User Guide](../for-end-users/1-docker-deployment.md) instead.
+
+!!! warning "Understanding Dataset Types"
+    - **ML Datasets**: Large annotated datasets used for machine learning training and evaluation (includes train/val splits). These are production datasets pulled from CVAT projects.
+    - **Demo Datasets**: Small sample datasets (5 images per pipeline stage) used for functional testing and demos during development. Not for training.
 
 **Time Required**: 30-45 minutes (depending on dataset size and download speed)
 **Prerequisites**: [Module environments installed](2-module-environments.md)
@@ -30,21 +34,38 @@ graph LR
 
 ## Available Datasets
 
-### Training Datasets
+### ML Datasets (Training and Evaluation)
 
-| Dataset | Purpose | Size | Annotations | Module |
-|---------|---------|------|-------------|--------|
-| **CRIOBE Finegrained** | Coral segmentation | ~500 images | 16 genera, polygons | coral_seg_yolo, DINOv2_mmseg |
-| **Banggai Extended** | Coral segmentation | ~300 images | 10 genera, polygons | coral_seg_yolo, DINOv2_mmseg |
-| **Grid Corners** | Corner detection | ~800 images | 4 keypoints | grid_pose_detection |
-| **Grid Pose** | Grid detection | ~800 images | 117 keypoints | grid_pose_detection |
+QUADRATSEG uses annotated datasets from CVAT projects. Each dataset corresponds to a specific annotation task in the pipeline.
 
-### Test Datasets
+#### CRIOBE Datasets
 
-Small sample datasets for quick testing:
+Three separate CVAT projects covering different pipeline stages:
+
+| Project Name | Pipeline Stage | Size | Annotations | Purpose |
+|--------------|----------------|------|-------------|---------|
+| **criobe_corner_annotation** | Stage 1: Corner Detection | Handpicked subset | 4 corner keypoints (skeleton) | Raw images with corrected corner annotations |
+| **criobe_grid_annotation** | Stage 2: Grid Detection | 19 images (15 train, 4 val) | 117 grid intersection keypoints (skeleton) | Warped images with grid annotation |
+| **criobe_finegrained_annotated** | Stage 3: Coral Segmentation | 345 images (242 train, 103 val) | 14,327 coral colonies, 16 genera (polygons) | Clean gridless images from French Polynesia (2006-2023) |
+
+!!! note "Dataset Alignment"
+    These 3 CRIOBE datasets are **NOT aligned** (different image subsets). Corner and grid datasets use handpicked images because annotations are expensive and fewer samples are needed for training good models.
+
+#### Banggai Datasets
+
+Two separate CVAT projects for the Banggai survey (2024):
+
+| Project Name | Pipeline Stage | Size | Annotations | Purpose |
+|--------------|----------------|------|-------------|---------|
+| **banggai_corner_annotation** | Stage 1: Corner Detection | 735 images (8 sites, 2 transects each) | 4 corner keypoints (skeleton) | Raw images with validated corner annotations |
+| **banggai_extended_annotated** | Stage 3: Coral Segmentation | 126 images (88 train, 38 val) | 2,943 coral colonies, 10 genera (polygons) | Clean warped images from 5 monitoring stations (ST03-ST08) |
+
+### Demo Datasets (Functional Testing)
+
+Small sample datasets for functional testing and development demos:
 
 ```bash
-# Download test samples (all modules)
+# Download demo samples (5 images covering all pipeline stages)
 cd ~/Projects/coral-segmentation
 ./download_test_samples.sh
 
@@ -55,6 +76,9 @@ cd ~/Projects/coral-segmentation
 # - 4-grid_pose_export/ (grid annotations)
 # - 5-grid_removal/ (clean images)
 ```
+
+!!! info "Demo vs ML Datasets"
+    Demo datasets contain only **5 images** for quick functional testing. Use ML datasets for actual model training and evaluation.
 
 ## Data Storage Structure
 
@@ -103,11 +127,11 @@ QUADRATSEG uses a **centralized data directory** accessed via symlinks:
 - No duplication of large datasets (~20-30GB savings)
 - Consistent paths across all modules
 
-## Step 1: Download Test Samples
+## Step 1: Download Demo Samples
 
-Start with small test datasets to verify everything works. Test data is downloaded **once** to the centralized data directory:
+Start with small demo datasets to verify everything works. Demo data is downloaded **once** to the centralized data directory:
 
-### Download All Test Samples
+### Download All Demo Samples
 
 ```bash
 # Navigate to centralized data directory
@@ -131,35 +155,40 @@ ls -la
 # Example: ~/Projects/coral_seg_yolo/data/test_samples/
 ```
 
-### Test Sample Contents
+### Demo Sample Contents
+
+Demo datasets contain **5 sample images** that progress through each pipeline stage:
 
 ```bash
-# Navigate to test samples (accessible from any module)
+# Navigate to demo samples (accessible from any module)
 cd $DATA_ROOT/test_samples
 
-# Raw images (5 samples)
+# Stage 1: Raw images (5 samples)
 ls 1-raw_jpg/
 # MooreaE2B_2020_05.jpg, MooreaE2B_2020_12.jpg, etc.
 
-# Corner annotations (COCO format)
+# Stage 1 Output: Corner annotations (COCO format)
 ls 2-quadrat_corner_export/
 # instances_default.json (4 corner keypoints per image)
 
-# Warped images (perspective corrected)
+# Stage 2: Warped images (perspective corrected)
 ls 3-image_warping/
 # Cropped and warped versions of raw images
 
-# Grid pose annotations (COCO format)
+# Stage 2 Output: Grid pose annotations (COCO format)
 ls 4-grid_pose_export/
 # person_keypoints_default.json (117 grid points per image)
 
-# Grid-removed images (clean coral)
+# Stage 3: Grid-removed images (clean coral)
 ls 5-grid_removal/
 # Images with grid overlay removed via inpainting
 ```
 
+!!! tip "Demo Dataset Purpose"
+    These 5 images are for **functional testing only**—to verify your environment setup and test inference pipelines. For model training, use the ML datasets described below.
+
 **Access from Modules**:
-All modules can access test data through their symlink:
+All modules can access demo data through their symlink:
 ```bash
 # From coral_seg_yolo
 ls ~/Projects/coral_seg_yolo/data/test_samples/
@@ -170,9 +199,80 @@ ls ~/Projects/grid_pose_detection/data/test_samples/
 # Both point to the same centralized data!
 ```
 
-## Step 2: Prepare Coral Segmentation Data
+## Step 2: Access ML Datasets from CVAT Backups
 
-### Option A: Use Public Datasets (Recommended for Testing)
+ML datasets are distributed as password-protected 7z archives containing CVAT project backups.
+
+### Understanding CVAT Project Backups
+
+Each dataset is exported from CVAT as a project backup (`.zip` file), then multiple related projects are bundled into a single encrypted 7z archive for distribution.
+
+**Available Archives**:
+
+- **CRIOBE Archive**: `criobe.7z` (3 projects)
+    - `criobe_corner_annotation.zip`
+    - `criobe_grid_annotation.zip`
+    - `criobe_finegrained_annotated.zip`
+    - Download: https://storage.googleapis.com/data_criobe/cvat_project_backups/criobe.7z
+
+- **Banggai Archive**: `banggai.7z` (2 projects)
+    - `banggai_corner_annotation.zip`
+    - `banggai_extended_annotated.zip`
+    - Download: https://storage.googleapis.com/data_criobe/cvat_project_backups/banggai.7z
+
+!!! warning "Password Protected Archives"
+    Archives use AES-256 encryption. To obtain the password, email **gilles.siu@criobe.pf** with:
+
+    - Your name and institution
+    - Research purpose (academic research only)
+    - Which datasets you need
+
+### Download and Extract ML Datasets
+
+```bash
+# Navigate to centralized data directory
+cd $DATA_ROOT
+mkdir -p cvat_backups
+cd cvat_backups
+
+# Download archives (password required for extraction)
+wget https://storage.googleapis.com/data_criobe/cvat_project_backups/criobe.7z
+wget https://storage.googleapis.com/data_criobe/cvat_project_backups/banggai.7z
+
+# Install 7z if not available
+sudo apt install p7zip-full  # Ubuntu/Debian
+# or brew install p7zip on macOS
+
+# Extract archives (enter password when prompted)
+7z x criobe.7z
+7z x banggai.7z
+
+# Verify extracted project backups
+ls -la
+# Should show:
+# criobe_corner_annotation.zip
+# criobe_grid_annotation.zip
+# criobe_finegrained_annotated.zip
+# banggai_corner_annotation.zip
+# banggai_extended_annotated.zip
+```
+
+### Restore Projects to CVAT
+
+Import the project backups into your CVAT instance:
+
+1. **Access CVAT**: Navigate to http://localhost:8080/projects
+2. **Create from Backup**: Click "Create" → "Import from backup"
+3. **Select Backup File**: Choose a project backup (e.g., `criobe_finegrained_annotated.zip`)
+4. **Wait for Import**: CVAT will restore the project with all tasks, images, and annotations
+
+Repeat for each project backup you need.
+
+## Step 3: Pull ML Datasets from CVAT to FiftyOne
+
+Once projects are restored in CVAT, pull them to create local FiftyOne datasets for training:
+
+### Option A: Use Pre-Prepared Datasets (Recommended for Testing)
 
 Download pre-prepared coral segmentation datasets to the centralized data directory:
 
@@ -301,11 +401,11 @@ pixi run python create_fiftyone_dataset.py \
 # Data is now in $DATA_ROOT/pulled_from_cvat/
 ```
 
-## Step 4: Verify Dataset Preparation
+## Step 4: Verify ML Dataset Preparation
 
-Check that datasets are correctly formatted:
+Check that ML datasets are correctly formatted:
 
-### Verify Coral Segmentation Datasets
+### Verify Coral Segmentation ML Datasets
 
 ```bash
 cd ~/Projects/coral-segmentation/coral_seg_yolo
@@ -344,7 +444,7 @@ Val images: 100
 Train labels: 350
 ```
 
-### Verify Grid Detection Datasets
+### Verify Grid Detection ML Datasets
 
 ```bash
 cd ~/Projects/coral-segmentation/grid_pose_detection
@@ -643,20 +743,45 @@ print(f'Unpaired: {imgs - lbls}')
 **Solutions**:
 ```bash
 # Check available space
-df -h ~/Projects/coral-segmentation
+df -h $DATA_ROOT
 
-# Datasets are large:
-# - CRIOBE Finegrained: ~5GB
-# - Banggai Extended: ~3GB
-# - Grid datasets: ~8GB
-# Total: ~20-25GB
+# ML datasets are large:
+# - Demo samples: ~50MB (5 images)
+# - CRIOBE ML datasets: ~5-8GB
+# - Banggai ML datasets: ~3-5GB
+# - Grid ML datasets: ~8GB
+# Total ML datasets: ~20-25GB
 
 # Clean up old datasets
-rm -rf data/old_datasets/
+rm -rf $DATA_ROOT/old_datasets/
 
-# Use external storage
-mkdir /mnt/external/quadratseg_data
-ln -s /mnt/external/quadratseg_data ~/Projects/coral-segmentation/data
+# Use external storage for ML datasets
+mkdir /mnt/external/criobe_ml_data
+export DATA_ROOT=/mnt/external/criobe_ml_data
+# Update symlinks in each module
+```
+
+### 7z Archive Extraction Issues
+
+**Symptoms**: Cannot extract 7z archive or "Wrong password" error
+
+**Solutions**:
+```bash
+# Install 7z
+sudo apt install p7zip-full  # Ubuntu/Debian
+brew install p7zip           # macOS
+
+# Test 7z installation
+7z --help
+
+# Extract with verbose output
+7z x -v criobe.7z
+
+# If password rejected, verify you have the correct password
+# Email gilles.siu@criobe.pf to request access
+
+# Check archive integrity
+7z t criobe.7z
 ```
 
 ### FiftyOne Database Errors
@@ -680,29 +805,31 @@ pixi run python -c "import fiftyone as fo; fo.delete_datasets('*')"
 
 ### Version Control
 
-1. **Don't commit datasets to git**: Use `.gitignore`
+1. **Don't commit datasets to git**: Use `.gitignore` for data directories
 2. **Version control metadata**: Commit `dataset.yaml` and preparation scripts
 3. **Document dataset versions**: Tag datasets with version numbers
 4. **Use dataset checksums**: Verify data integrity with MD5/SHA256
+5. **Track CVAT backups**: Keep records of which backup versions you're using
 
 ### Storage Organization
 
-1. **Separate by module**: Each module has its own `data/` directory
-2. **Use symbolic links**: Link to shared data instead of duplicating
-3. **External storage**: Store large datasets on external drives
-4. **Backup regularly**: Keep backups of annotated datasets
+1. **Centralized data directory**: Use `DATA_ROOT` with symlinks (as described above)
+2. **Separate ML and demo datasets**: Keep functional test data separate from training data
+3. **External storage**: Store large ML datasets on external drives if needed
+4. **Backup CVAT projects**: Regularly export CVAT project backups
 
 ### Dataset Hygiene
 
 1. **Validate annotations**: Check for errors before training
 2. **Remove duplicates**: Use FiftyOne to find duplicate images
-3. **Balance classes**: Monitor class distribution
+3. **Balance classes**: Monitor class distribution across train/val splits
 4. **Document processing**: Keep notes on dataset preparation steps
+5. **Understand dataset purpose**: Use demo datasets for testing, ML datasets for training
 
 ## Next Steps
 
 !!! success "Datasets Prepared!"
-    Training datasets are ready for model development!
+    ML datasets are ready for model development!
 
 **What's next**:
 
@@ -715,19 +842,21 @@ pixi run python -c "import fiftyone as fo; fo.delete_datasets('*')"
 ### Download Commands
 
 ```bash
-# Test samples
+# Demo samples (5 images for functional testing)
 cd ~/Projects/coral-segmentation
 ./download_test_samples.sh
 
-# Coral segmentation datasets
-cd coral_seg_yolo/data
+# ML datasets - Download CVAT backups (password required)
+cd $DATA_ROOT/cvat_backups
+wget https://storage.googleapis.com/data_criobe/cvat_project_backups/criobe.7z
+wget https://storage.googleapis.com/data_criobe/cvat_project_backups/banggai.7z
+7z x criobe.7z
+7z x banggai.7z
+
+# Pre-prepared ML datasets (alternative to CVAT workflow)
+cd $DATA_ROOT/prepared_yolo
 wget https://storage.googleapis.com/criobe_public/datasets/criobe_finegrained.tar.gz
 tar -xzf criobe_finegrained.tar.gz
-
-# Grid detection datasets
-cd grid_pose_detection/data
-wget https://storage.googleapis.com/criobe_public/datasets/grid_corners.tar.gz
-tar -xzf grid_corners.tar.gz
 ```
 
 ### FiftyOne Commands
@@ -745,13 +874,15 @@ session = fo.launch_app(dataset)
 
 ### Verification Checklist
 
-- [ ] Test samples downloaded
-- [ ] Coral segmentation datasets prepared
-- [ ] Grid detection datasets prepared
+- [ ] Demo samples downloaded (5 images)
+- [ ] ML datasets downloaded from CVAT backups
+- [ ] CVAT projects restored (if using CVAT workflow)
+- [ ] Coral segmentation ML datasets prepared
+- [ ] Grid detection ML datasets prepared
 - [ ] YOLO dataset.yaml files exist
 - [ ] Images and labels are paired
 - [ ] FiftyOne app accessible
-- [ ] Dataset statistics generated
+- [ ] ML dataset statistics generated
 
 ---
 

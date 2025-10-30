@@ -181,7 +181,7 @@ Download shared test data once to the centralized directory:
 ```bash
 cd $DATA_ROOT
 
-# Download test samples (contains all pipeline stages)
+# Download demo datasets (contains 5 sample images for all pipeline stages)
 wget https://storage.googleapis.com/criobe_public/test_samples/test_samples.tar.gz
 tar -xzf test_samples.tar.gz
 
@@ -190,9 +190,9 @@ ls -la test_samples/
 # Should show: 1-raw_jpg/, 2-quadrat_corner_export/, etc.
 ```
 
-**All modules now have access to test data via their `data` symlinks!**
+**All modules now have access to demo datasets via their `data` symlinks!**
 
-The test data includes subdirectories for each pipeline stage:
+The demo datasets include subdirectories for each pipeline stage (5 sample images each):
 
 | Directory | Stage | Content |
 |-----------|-------|---------|

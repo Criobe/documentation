@@ -41,10 +41,14 @@ This guide walks you through training YOLOv11 segmentation models on your annota
 
 ### Time Required
 
-- **Data preparation**: ~30 minutes
+- **Demo dataset testing**: ~5 minutes (test with 5 samples first to verify setup)
+- **Data preparation**: ~30 minutes (ML datasets for training)
 - **Training**: 4-12 hours (depending on model size and dataset)
 - **Evaluation**: ~1 hour
 - **Deployment**: ~30 minutes
+
+!!! tip "Start with Demo Datasets"
+    Before training on full ML datasets, test your setup with demo datasets (5 samples) to verify your environment is correctly configured. This saves time if there are setup issues.
 
 ## Prerequisites
 

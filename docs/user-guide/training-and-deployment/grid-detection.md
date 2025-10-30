@@ -42,11 +42,15 @@ This guide covers training **YOLOv11-pose** models for detecting keypoints in un
 
 ### Time Required
 
-- **Data preparation**: ~1 hour
+- **Demo dataset testing**: ~5 minutes (test with 5 samples first to verify setup)
+- **Data preparation**: ~1 hour (ML datasets for training)
 - **GridCorners training**: 4-6 hours
 - **GridPose training**: 4-6 hours
 - **Evaluation**: ~1 hour
 - **Deployment**: ~30 minutes
+
+!!! tip "Start with Demo Datasets"
+    Before training on full ML datasets, test your setup with demo datasets (5 samples) to verify your environment is correctly configured. This saves time if there are setup issues.
 
 ## Prerequisites
 
