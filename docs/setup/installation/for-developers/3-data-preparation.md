@@ -66,7 +66,8 @@ Small sample datasets for functional testing and development demos:
 
 ```bash
 # Download demo samples (5 images covering all pipeline stages)
-cd ~/Projects/coral-segmentation
+# The download_test_samples.sh script is available in all ML module repositories
+cd ~/Projects/coral_seg_yolo  # or grid_pose_detection, grid_inpainting, DINOv2_mmseg
 ./download_test_samples.sh
 
 # Creates data/test_samples/ with:
@@ -79,6 +80,9 @@ cd ~/Projects/coral-segmentation
 
 !!! info "Demo vs ML Datasets"
     Demo datasets contain only **5 images** for quick functional testing. Use ML datasets for actual model training and evaluation.
+
+!!! info "No Password Required"
+    Test samples are publicly accessible and do not require a password. They are distributed as a simple ZIP archive. Only the ML datasets (CVAT backups) require password access for extraction.
 
 ## Data Storage Structure
 
@@ -134,18 +138,21 @@ Start with small demo datasets to verify everything works. Demo data is download
 ### Download All Demo Samples
 
 ```bash
-# Navigate to centralized data directory
-cd $DATA_ROOT  # or cd ~/Projects/criobe_data
+# Option 1: Use the automated script (recommended)
+# Navigate to any ML module and run:
+cd ~/Projects/coral_seg_yolo  # or grid_pose_detection, grid_inpainting, DINOv2_mmseg
+./download_test_samples.sh
 
-# Create test_samples directory
+# Option 2: Manual download and extraction
+cd $DATA_ROOT  # or cd ~/Projects/criobe_data
 mkdir -p test_samples
 cd test_samples
 
-# Download from Google Cloud Storage
-wget https://storage.googleapis.com/criobe_public/test_samples/test_samples.tar.gz
+# Download from Google Cloud Storage (no password required)
+wget https://storage.googleapis.com/data_criobe/test_samples.zip
 
-# Extract
-tar -xzf test_samples.tar.gz
+# Extract (requires unzip utility)
+unzip test_samples.zip
 
 # Verify structure
 ls -la
@@ -270,54 +277,10 @@ Repeat for each project backup you need.
 
 ## Step 3: Pull ML Datasets from CVAT to FiftyOne
 
-Once projects are restored in CVAT, pull them to create local FiftyOne datasets for training:
+Once projects are restored in CVAT, pull them to create local FiftyOne datasets for training.
 
-### Option A: Use Pre-Prepared Datasets (Recommended for Testing)
-
-Download pre-prepared coral segmentation datasets to the centralized data directory:
-
-```bash
-# Navigate to centralized data directory
-cd $DATA_ROOT
-
-# Create prepared_yolo directory
-mkdir -p prepared_yolo
-cd prepared_yolo
-
-# Download CRIOBE Finegrained dataset
-wget https://storage.googleapis.com/criobe_public/datasets/criobe_finegrained.tar.gz
-tar -xzf criobe_finegrained.tar.gz
-
-# Download Banggai Extended dataset
-wget https://storage.googleapis.com/criobe_public/datasets/banggai_extended.tar.gz
-tar -xzf banggai_extended.tar.gz
-
-# Verify structure
-ls -la
-# criobe_finegrained/ (YOLO format)
-# banggai_extended/ (YOLO format)
-
-# All modules can now access via symlink!
-# Example: ~/Projects/coral_seg_yolo/data/prepared_yolo/
-```
-
-**Dataset Structure** (YOLO format):
-```
-prepared_yolo/criobe_finegrained/
-├── images/
-│   ├── train/           # Training images
-│   ├── val/             # Validation images
-│   └── test/            # Test images (optional)
-├── labels/
-│   ├── train/           # YOLO txt annotations
-│   ├── val/
-│   └── test/
-└── dataset.yaml         # YOLO dataset configuration
-```
-
-### Option B: Pull from CVAT (Requires CVAT Access)
-
-If you have access to CVAT with annotated projects:
+!!! warning "Password-Protected Archives Required"
+    ML datasets are only available through password-protected CVAT project backups (`.7z` archives from Step 2). There are no publicly available pre-prepared datasets. You must restore the CVAT projects from the password-protected archives before proceeding.
 
 ```bash
 cd ~/Projects/coral-segmentation/data_engineering
@@ -353,36 +316,25 @@ pixi run python src/data_preparation/prepare_yolo_dataset.py \
 # Dataset is now in $DATA_ROOT/prepared_yolo/criobe_finegrained/
 ```
 
-## Step 3: Prepare Grid Detection Data
-
-### Download Grid Detection Datasets
-
-```bash
-# Navigate to centralized data directory
-cd $DATA_ROOT
-
-# Create prepared_yolo directory if not exists
-mkdir -p prepared_yolo
-cd prepared_yolo
-
-# Download corner detection dataset
-wget https://storage.googleapis.com/criobe_public/datasets/grid_corners.tar.gz
-tar -xzf grid_corners.tar.gz
-
-# Download grid pose detection dataset
-wget https://storage.googleapis.com/criobe_public/datasets/grid_pose.tar.gz
-tar -xzf grid_pose.tar.gz
-
-# Verify structure
-ls -la
-# grid_corners/ (4 keypoints per image)
-# grid_pose/ (117 keypoints per image)
-
-# Grid detection module can access via symlink:
-# ~/Projects/grid_pose_detection/data/prepared_yolo/
+**Expected Dataset Structure** (YOLO format):
+```
+prepared_yolo/criobe_finegrained/
+├── images/
+│   ├── train/           # Training images
+│   ├── val/             # Validation images
+│   └── test/            # Test images (optional)
+├── labels/
+│   ├── train/           # YOLO txt annotations
+│   ├── val/
+│   └── test/
+└── dataset.yaml         # YOLO dataset configuration
 ```
 
-### Prepare from CVAT (Alternative)
+## Step 4: Prepare Grid Detection Data
+
+Grid detection datasets (corner detection and grid pose) are also only available through the password-protected CVAT project backups from Step 2.
+
+### Pull Grid Detection Datasets from CVAT
 
 ```bash
 # Navigate to data_engineering module
@@ -401,7 +353,7 @@ pixi run python create_fiftyone_dataset.py \
 # Data is now in $DATA_ROOT/pulled_from_cvat/
 ```
 
-## Step 4: Verify ML Dataset Preparation
+## Step 5: Verify ML Dataset Preparation
 
 Check that ML datasets are correctly formatted:
 
@@ -469,7 +421,7 @@ with open(sample_label) as f:
 "
 ```
 
-## Step 5: Explore Datasets with FiftyOne
+## Step 6: Explore Datasets with FiftyOne
 
 FiftyOne provides visual exploration of datasets:
 
@@ -843,20 +795,23 @@ pixi run python -c "import fiftyone as fo; fo.delete_datasets('*')"
 
 ```bash
 # Demo samples (5 images for functional testing)
-cd ~/Projects/coral-segmentation
+# Use automated script from any ML module
+cd ~/Projects/coral_seg_yolo  # or grid_pose_detection, grid_inpainting, DINOv2_mmseg
 ./download_test_samples.sh
+
+# Or download manually (no password required)
+cd $DATA_ROOT
+wget https://storage.googleapis.com/data_criobe/test_samples.zip
+unzip test_samples.zip
 
 # ML datasets - Download CVAT backups (password required)
 cd $DATA_ROOT/cvat_backups
 wget https://storage.googleapis.com/data_criobe/cvat_project_backups/criobe.7z
 wget https://storage.googleapis.com/data_criobe/cvat_project_backups/banggai.7z
+
+# Extract with password (enter password when prompted)
 7z x criobe.7z
 7z x banggai.7z
-
-# Pre-prepared ML datasets (alternative to CVAT workflow)
-cd $DATA_ROOT/prepared_yolo
-wget https://storage.googleapis.com/criobe_public/datasets/criobe_finegrained.tar.gz
-tar -xzf criobe_finegrained.tar.gz
 ```
 
 ### FiftyOne Commands
