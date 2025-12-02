@@ -92,54 +92,53 @@ git branch
 !!! warning "Important: Use criobe Branch"
     The CRIOBE platform **must** use the `criobe` branch of the CVAT repository, **not** the `main` branch. The criobe branch includes custom integrations for the bridge service and serverless components.
 
-## Step 2: Configure Environment Variables
+## Step 2: Deploy Basic CVAT
 
-Create environment configuration for CVAT:
-
-```bash
-# Copy example environment file
-cp .env.example .env
-
-# Edit .env file
-nano .env
-```
-
-**Minimal Required Configuration**:
+Deploy CVAT using the official pre-built images for version 2.29.0:
 
 ```bash
-# Admin credentials (CHANGE THESE!)
-CVAT_ADMIN_USERNAME=admin
-CVAT_ADMIN_PASSWORD=your_secure_password_here
-CVAT_ADMIN_EMAIL=admin@example.com
+# Deploy CVAT 2.29.0
+CVAT_VERSION=v2.29.0 docker compose up -d
 
-# Server configuration
-CVAT_HOST=localhost
-CVAT_PORT=8080
-
-# Nuclio configuration
-NUCLIO_HOST=localhost
-NUCLIO_PORT=8070
-
-# Bridge configuration
-BRIDGE_HOST=bridge.gateway
-BRIDGE_PORT=8000
-
-# Database (defaults usually fine)
-POSTGRES_USER=root
-POSTGRES_PASSWORD=your_db_password
-POSTGRES_DB=cvat
-
-# Redis (defaults usually fine)
-REDIS_HOST=cvat_redis
-REDIS_PORT=6379
+# Check deployment status
+docker compose ps
 ```
 
-!!! warning "Change Default Passwords"
-    Make sure to change `CVAT_ADMIN_PASSWORD` and `POSTGRES_PASSWORD` to secure values!
+**Expected Output**:
+```
+[+] Running 10/10
+ ✔ Network cvat_cvat                  Created
+ ✔ Volume cvat_cvat_data              Created
+ ✔ Container cvat_redis               Started
+ ✔ Container cvat_db                  Started
+ ✔ Container cvat_server              Started
+ ✔ Container cvat_worker_webhooks     Started
+ ...
+```
 
-## Step 3: Configure Bridge Service
+**Deployment Time**: 3-5 minutes
 
-The Bridge service connects CVAT with Nuclio functions via webhooks.
+## Step 3: Create Superuser
+
+Create the admin user for CVAT. These credentials will be used to configure the Bridge service in the next step.
+
+```bash
+# Create superuser (interactive)
+docker exec -it cvat_server bash -ic 'python3 ~/manage.py createsuperuser'
+```
+
+You'll be prompted to enter:
+- **Username**: Choose a username (e.g., `admin`)
+- **Email address**: Your email address
+- **Password**: Choose a secure password
+- **Password (again)**: Confirm password
+
+!!! important "Remember These Credentials"
+    Save the username and password you just created. You'll need them in the next step to configure the Bridge service.
+
+## Step 4: Configure Bridge
+
+Configure the Bridge service to connect to CVAT using the superuser credentials from Step 3:
 
 ```bash
 # Navigate to bridge directory
@@ -152,71 +151,64 @@ cp .env.example .env
 nano .env
 ```
 
-**Bridge Configuration**:
+**Bridge Configuration** (in `bridge/.env`):
 
 ```bash
-# CVAT connection
+# CVAT Connection
 CVAT_URL=http://cvat_server:8080
-CVAT_USERNAME=admin
-CVAT_PASSWORD=your_secure_password_here  # Same as CVAT_ADMIN_PASSWORD
+CVAT_USERNAME=admin  # Use the username from Step 3
+CVAT_PASSWORD=your_password_here  # Use the password from Step 3
 
-# Nuclio connection
+# Nuclio Connection
 NUCLIO_HOST=nuclio
 NUCLIO_PORT=8070
 
-# Bridge server
+# Bridge Server
 BRIDGE_PORT=8000
 
-# Optional: Logging level
+# Logging
 LOG_LEVEL=INFO
 ```
 
-## Step 4: Deploy the Complete Stack
-
-Deploy CVAT, Nuclio, and Bridge together. Ensure you're in the CVAT repository on the criobe branch:
+**Return to CVAT root directory:**
 
 ```bash
-# Verify you're in the CVAT directory on criobe branch
+cd ..
 pwd
 # Should show: /path/to/cvat
+```
 
-git branch
-# Should show: * criobe
+## Step 5: Deploy Bridge and Nuclio
 
-# Deploy the complete stack
-docker compose \
-  -f docker-compose.yml \
-  -f components/serverless/docker-compose.serverless.yml \
+Deploy the Bridge automation service and Nuclio serverless platform:
+
+```bash
+# Build bridge and rebuild CVAT components
+docker compose -f docker-compose.yml \
   -f bridge/docker-compose.bridge.yml \
-  up -d
+  -f components/serverless/docker-compose.serverless.yml \
+  up -d --build bridge cvat_server cvat_worker_webhooks
 
-# This will:
-# 1. Build and start CVAT services (web, workers, database, redis)
-# 2. Start Nuclio dashboard and platform
-# 3. Build and start Bridge service
-# 4. Create Docker networks and volumes
+# Start all remaining services
+docker compose -f docker-compose.yml \
+  -f bridge/docker-compose.bridge.yml \
+  -f components/serverless/docker-compose.serverless.yml \
+  up -d
 ```
 
 **Expected Output**:
 ```
-[+] Running 15/15
- ✔ Network cvat_cvat                  Created
- ✔ Volume cvat_cvat_data              Created
- ✔ Volume cvat_cvat_keys              Created
- ✔ Container cvat_redis               Started
- ✔ Container cvat_db                  Started
- ✔ Container cvat_opa                 Started
+[+] Running 12/12
  ✔ Container nuclio_dashboard         Started
- ✔ Container cvat_server              Started
- ✔ Container cvat_worker_annotation   Started
- ✔ Container cvat_worker_webhooks     Started
  ✔ Container bridge                   Started
+ ✔ Container cvat_server              Started
+ ✔ Container cvat_worker_webhooks     Started
  ...
 ```
 
-**Deployment Time**: 5-10 minutes (includes pulling Docker images)
+**Deployment Time**: 3-5 minutes
 
-## Step 5: Verify Services
+## Step 6: Verify Services
 
 Check that all services are running:
 
@@ -262,11 +254,11 @@ docker compose logs nuclio_dashboard
 docker compose logs -f cvat_server
 ```
 
-## Step 6: Deploy ML Models (Nuclio Functions)
+## Step 7: Deploy ML Models (Nuclio Functions)
 
 Deploy the pre-trained models as Nuclio serverless functions. Models are automatically downloaded during deployment.
 
-### 6.1: Install Nuclio CLI
+### 7.1: Install Nuclio CLI
 
 ```bash
 # Download nuctl CLI
@@ -278,7 +270,7 @@ sudo mv nuctl-1.13.0-linux-amd64 /usr/local/bin/nuctl
 nuctl version
 ```
 
-### 6.2: Deploy Core Processing Functions
+### 7.2: Deploy Core Processing Functions
 
 Each Nuclio function is packaged in `components/serverless/pytorch/` with:
 - Inference code
@@ -335,7 +327,7 @@ nuctl deploy --project-name cvat --path . --file function.yaml --platform local 
 
 **Total Deployment Time**: 30-60 minutes (models download in parallel during builds)
 
-### 6.3: Verify Deployed Functions
+### 7.3: Verify Deployed Functions
 
 ```bash
 # List all deployed functions
@@ -363,20 +355,20 @@ echo '{"image": "'$(base64 -w0 sample.jpg)'"}' | \
   -d @- http://localhost:49152  # Use port from function URL
 ```
 
-## Step 7: Access CVAT
+## Step 8: Access CVAT
 
 Your CVAT instance is now ready!
 
 1. **Open Browser**: Navigate to http://localhost:8080
-2. **Login**: Use credentials from Step 2:
-    - Username: `admin`
-    - Password: `your_secure_password_here`
+2. **Login**: Use the superuser credentials from Step 3
+    - Username: (your chosen username)
+    - Password: (your chosen password)
 3. **Explore Interface**:
     - **Projects**: Create and manage annotation projects
     - **Tasks**: Upload images and create annotation tasks
     - **Jobs**: Annotate images and review results
 
-## Step 8: Configure CVAT Projects
+## Step 9: Configure CVAT Projects
 
 Set up the recommended 3-stage pipeline with separate projects:
 
@@ -408,7 +400,7 @@ Set up the recommended 3-stage pipeline with separate projects:
 4. **Label Type**: Polygon or mask
 5. **Save Project** → Note the Project ID (e.g., ID: 3)
 
-## Step 9: Configure Webhooks
+## Step 10: Configure Webhooks
 
 Connect projects to automation via webhooks:
 
@@ -460,7 +452,7 @@ Add model inference webhooks to each project:
 !!! tip "Webhook Testing"
     Use the **Ping** button to verify each webhook connects successfully before proceeding.
 
-## Step 10: Test the Pipeline
+## Step 11: Test the Pipeline
 
 Create a test task to verify the complete pipeline:
 

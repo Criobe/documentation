@@ -148,54 +148,65 @@ cvat/  (criobe branch)
 └── ...                          # CVAT core files
 ```
 
-## Step 2: Configure Environment Variables
+## Step 2: Deploy Basic CVAT
 
-Create environment configuration files for CVAT and Bridge:
-
-### 2.1 Configure CVAT
+Deploy CVAT using the official pre-built images for version 2.29.0:
 
 ```bash
-# Copy example environment file
-cp .env.example .env
+# Deploy CVAT 2.29.0
+CVAT_VERSION=v2.29.0 docker compose up -d
 
-# Edit CVAT configuration
-nano .env
+# Check deployment status
+docker compose ps
 ```
 
-**Minimal Required Configuration** (in `.env`):
+**Expected Output**:
+```
+[+] Running 10/10
+ ✔ Network cvat_cvat                  Created
+ ✔ Volume cvat_cvat_data              Created
+ ✔ Volume cvat_cvat_keys              Created
+ ✔ Container cvat_redis               Started
+ ✔ Container cvat_db                  Started
+ ✔ Container cvat_opa                 Started
+ ✔ Container cvat_server              Started
+ ✔ Container cvat_worker_annotation   Started
+ ✔ Container cvat_worker_webhooks     Started
+ ...
+```
+
+**Deployment Time**: 3-5 minutes (pulling images and starting services)
+
+## Step 3: Create Superuser
+
+Create the admin user for CVAT. These credentials will be used to configure the Bridge service in the next step.
 
 ```bash
-# Admin Credentials (CHANGE THESE!)
-CVAT_ADMIN_USERNAME=admin
-CVAT_ADMIN_PASSWORD=your_secure_password_here
-CVAT_ADMIN_EMAIL=admin@example.com
-
-# Server Configuration
-CVAT_HOST=localhost
-CVAT_PORT=8080
-
-# Database Configuration (defaults usually fine)
-POSTGRES_USER=root
-POSTGRES_PASSWORD=your_db_password_here
-POSTGRES_DB=cvat
-
-# Redis Configuration (defaults usually fine)
-REDIS_HOST=cvat_redis
-REDIS_PORT=6379
-
-# Nuclio Configuration
-NUCLIO_HOST=localhost
-NUCLIO_PORT=8070
-
-# Smokescreen Configuration (for webhook security)
-# Allow gateway IP for bridge webhooks
-SMOKESCREEN_OPTS=--allow-address=172.17.0.1
+# Create superuser (interactive)
+docker exec -it cvat_server bash -ic 'python3 ~/manage.py createsuperuser'
 ```
 
-!!! danger "Security: Change Default Passwords"
-    **Never use default passwords in production!** Change `CVAT_ADMIN_PASSWORD` and `POSTGRES_PASSWORD` to secure values.
+You'll be prompted to enter:
+- **Username**: Choose a username (e.g., `admin`)
+- **Email address**: Your email address
+- **Password**: Choose a secure password
+- **Password (again)**: Confirm password
 
-### 2.2 Configure Bridge
+**Expected Output**:
+```
+Username: admin
+Email address: admin@example.com
+Password:
+Password (again):
+Superuser created successfully.
+```
+
+!!! important "Remember These Credentials"
+    Save the username and password you just created. You'll need them in the next step to configure the Bridge service.
+
+## Step 4: Configure Bridge
+
+Configure the Bridge service to connect to CVAT using the superuser credentials from Step 3:
 
 ```bash
 # Navigate to bridge directory
@@ -213,8 +224,8 @@ nano .env
 ```bash
 # CVAT Connection
 CVAT_URL=http://cvat_server:8080
-CVAT_USERNAME=admin
-CVAT_PASSWORD=your_secure_password_here  # Same as CVAT_ADMIN_PASSWORD
+CVAT_USERNAME=admin  # Use the username from Step 3
+CVAT_PASSWORD=your_password_here  # Use the password from Step 3
 
 # Nuclio Connection
 NUCLIO_HOST=nuclio
@@ -231,61 +242,55 @@ AUTO_ANN_TIMEOUT=900  # Timeout for auto-annotation in seconds
 LOG_LEVEL=INFO
 ```
 
-!!! tip "Credential Sync"
-    Ensure `CVAT_PASSWORD` in `bridge/.env` matches `CVAT_ADMIN_PASSWORD` in `cvat/.env`
+!!! tip "Use Superuser Credentials"
+    Ensure `CVAT_USERNAME` and `CVAT_PASSWORD` match the superuser credentials you created in Step 3.
 
-### 2.3 Return to CVAT Root
+**Return to CVAT root directory:**
 
 ```bash
-# Return to cvat root directory
 cd ..
 pwd
 # Should show: ~/quadratseg-platform/cvat
 ```
 
-## Step 3: Deploy the Stack
+## Step 5: Deploy Bridge and Nuclio
 
-### 3.1 First-Time Deployment (Build Bridge)
+Now deploy the Bridge automation service and Nuclio serverless platform to work with your running CVAT instance:
 
-On first deployment, the Bridge image must be built locally while CVAT and Nuclio use pre-built images:
+### 5.1 Build and Deploy Bridge
+
+The Bridge service must be built locally on first deployment. We also rebuild cvat_server and cvat_worker_webhooks to ensure proper integration:
 
 ```bash
-# First-time deployment: build bridge image
-docker compose \
-  -f docker-compose.yml \
+# Build bridge and rebuild CVAT components
+docker compose -f docker-compose.yml \
   -f bridge/docker-compose.bridge.yml \
   -f components/serverless/docker-compose.serverless.yml \
   up -d --build bridge cvat_server cvat_worker_webhooks
-```
 
-**Explanation**:
-- `-f docker-compose.yml`: Main CVAT services
-- `-f bridge/docker-compose.bridge.yml`: Bridge service
-- `-f components/serverless/docker-compose.serverless.yml`: Nuclio platform
-- `up -d`: Start services in detached mode
-- `--build bridge`: Build only the bridge image (CVAT/Nuclio use pre-built images)
-- `bridge cvat_server cvat_worker_webhooks`: Target specific services for building
+# Start all remaining services
+docker compose -f docker-compose.yml \
+  -f bridge/docker-compose.bridge.yml \
+  -f components/serverless/docker-compose.serverless.yml \
+  up -d
+
+# Check all services are running
+docker compose ps
+```
 
 **Expected Output**:
 ```
-[+] Running 15/15
- ✔ Network cvat_cvat                  Created
- ✔ Volume cvat_cvat_data              Created
- ✔ Volume cvat_cvat_keys              Created
- ✔ Container cvat_redis               Started
- ✔ Container cvat_db                  Started
- ✔ Container cvat_opa                 Started
+[+] Running 12/12
  ✔ Container nuclio_dashboard         Started
- ✔ Container cvat_server              Started
- ✔ Container cvat_worker_annotation   Started
- ✔ Container cvat_worker_webhooks     Started
  ✔ Container bridge                   Started
+ ✔ Container cvat_server              Started
+ ✔ Container cvat_worker_webhooks     Started
  ...
 ```
 
-**Deployment Time**: 5-10 minutes (includes pulling pre-built images and building bridge)
+**Deployment Time**: 3-5 minutes (building bridge image and restarting CVAT components)
 
-### 3.2 Subsequent Deployments
+### 5.2 Subsequent Deployments
 
 After the first deployment, use this command (no build needed):
 
@@ -303,7 +308,7 @@ docker compose \
     - **Nuclio**: Uses official pre-built images (pulled from Docker Hub)
     - **Bridge**: Built locally from source (only needs building once)
 
-## Step 4: Verify Services
+## Step 6: Verify Services
 
 Check that all services are running correctly:
 
@@ -342,42 +347,14 @@ curl http://localhost:8000/health
 !!! tip "All Services Healthy"
     If all three commands return successful responses, your platform is deployed correctly!
 
-## Step 5: Create Admin User
-
-Create the admin user for CVAT access:
-
-```bash
-# Create superuser (interactive)
-docker exec -it cvat_server \
-  bash -ic 'python3 ~/manage.py createsuperuser'
-
-# You'll be prompted to enter:
-# - Username: (use the one from CVAT_ADMIN_USERNAME)
-# - Email address: (use the one from CVAT_ADMIN_EMAIL)
-# - Password: (use the one from CVAT_ADMIN_PASSWORD)
-# - Password (again): (confirm)
-```
-
-**Expected Output**:
-```
-Username: admin
-Email address: admin@example.com
-Password:
-Password (again):
-Superuser created successfully.
-```
-
-!!! warning "Use Configured Credentials"
-    Use the same username and password you configured in `.env` to avoid confusion.
-
-## Step 6: Access CVAT
+## Step 7: Access CVAT
 
 Your CVAT instance is now ready!
 
 1. **Open Browser**: Navigate to http://localhost:8080
-2. **Login**: Use the credentials you just created
-    - Username: `admin`
-    - Password: `your_secure_password_here`
+2. **Login**: Use the superuser credentials from Step 3
+    - Username: (your chosen username)
+    - Password: (your chosen password)
 3. **Explore Interface**:
     - **Projects**: Create and manage annotation projects
     - **Tasks**: Upload images and create annotation tasks
@@ -575,7 +552,7 @@ docker compose up -d
 !!! warning "Production Deployment"
     If deploying for production use beyond localhost:
 
-    1. **Change all default passwords** in `.env` files
+    1. **Use strong passwords** for superuser and bridge configuration
     2. **Configure SSL/TLS** for HTTPS access
     3. **Set up firewall rules** to restrict access
     4. **Use secrets management** for sensitive credentials
@@ -595,16 +572,35 @@ docker compose up -d
 
 ## Quick Reference
 
-### Deploy Command (First Time)
+### Deploy CVAT (Step 2)
 
 ```bash
+CVAT_VERSION=v2.29.0 docker compose up -d
+```
+
+### Create Superuser (Step 3)
+
+```bash
+docker exec -it cvat_server bash -ic 'python3 ~/manage.py createsuperuser'
+```
+
+### Deploy Bridge and Nuclio (First Time - Step 5)
+
+```bash
+# Build bridge and rebuild CVAT components
 docker compose -f docker-compose.yml \
   -f bridge/docker-compose.bridge.yml \
   -f components/serverless/docker-compose.serverless.yml \
   up -d --build bridge cvat_server cvat_worker_webhooks
+
+# Start all remaining services
+docker compose -f docker-compose.yml \
+  -f bridge/docker-compose.bridge.yml \
+  -f components/serverless/docker-compose.serverless.yml \
+  up -d
 ```
 
-### Deploy Command (Subsequent)
+### Deploy Bridge and Nuclio (Subsequent)
 
 ```bash
 docker compose -f docker-compose.yml \
