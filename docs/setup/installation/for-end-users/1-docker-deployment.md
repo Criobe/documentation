@@ -41,7 +41,7 @@ Before starting, ensure you have:
 - [x] **Docker**: Version 20.10+ ([install guide](https://docs.docker.com/engine/install/))
 - [x] **Docker Compose**: Version 2.0+ (included with Docker Desktop)
 - [x] **NVIDIA GPU**: 8GB+ VRAM recommended (GTX 1070 or better)
-- [x] **NVIDIA Docker Runtime**: For GPU acceleration ([install guide](https://github.com/NVIDIA/nvidia-docker))
+- [x] **NVIDIA Docker Runtime**: For GPU acceleration (see [GPU Support in ML deployment](2-ml-models-deployment.md#gpu-support-nvidia-container-toolkit))
 - [x] **Disk Space**: 20GB+ free space for Docker images and data
 - [x] **Memory**: 16GB+ RAM recommended
 - [x] **Git**: For cloning repository

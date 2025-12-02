@@ -6,7 +6,9 @@ Deploy pre-trained ML models as Nuclio serverless functions for automated coral 
     This guide deploys **pre-trained models** as serverless functions. Models are automatically downloaded during Docker build—no manual download needed.
 
 **Time Required**: 40-60 minutes (models download during deployment)
-**Prerequisites**: [Docker deployment](1-docker-deployment.md) completed successfully
+**Prerequisites**:
+- [Docker deployment](1-docker-deployment.md) completed successfully
+- GPU with NVIDIA Container Toolkit configured (see [GPU Support](#gpu-support-nvidia-container-toolkit) below)
 
 ## What You'll Deploy
 
@@ -60,6 +62,166 @@ docker compose ps
 curl -I http://localhost:8070
 # Expected: "OK"
 ```
+
+### GPU Support (NVIDIA Container Toolkit)
+
+All Nuclio ML functions require GPU acceleration for production use. To use an NVIDIA GPU from inside Docker containers, you need three components:
+
+1. **NVIDIA drivers** installed on the host
+2. **NVIDIA Container Toolkit** to expose GPU to Docker containers
+3. **Proper Docker configuration** (--gpus flag support)
+
+!!! info "GPU Requirement"
+    While functions can technically run on CPU, inference will be 10-50x slower. GPU with 8GB+ VRAM is **required for production** use.
+
+#### Step 1: Verify Host GPU & Drivers
+
+First, check that your GPU and drivers work on the host system.
+
+=== "Linux / Windows (WSL2)"
+
+    ```bash
+    # Check NVIDIA driver and GPU
+    nvidia-smi
+    ```
+
+    **Expected output**: A table showing driver version, CUDA version, and GPU information.
+
+    If this fails, you need to install/update NVIDIA drivers before proceeding:
+
+    ```bash
+    # Ubuntu - install drivers
+    sudo ubuntu-drivers autoinstall
+    sudo reboot
+    ```
+
+    After reboot, verify `nvidia-smi` works before continuing.
+
+=== "macOS"
+
+    !!! warning "NVIDIA GPUs Not Supported on macOS"
+        macOS does not support NVIDIA GPUs in Docker containers:
+
+        - **Apple Silicon** (M1/M2/M3): Uses Metal, not NVIDIA CUDA
+        - **Intel Macs**: Cannot expose NVIDIA GPUs to Docker containers
+
+        **Recommendation**: Deploy on Linux for GPU-accelerated ML workloads.
+
+#### Step 2: Install NVIDIA Container Toolkit
+
+This toolkit allows Docker to access the GPU.
+
+=== "Linux (Ubuntu/Debian)"
+
+    **a) Add NVIDIA's package repository:**
+
+    ```bash
+    # Set up repository
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+      sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit.gpg
+    curl -fsSL https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+      sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit.gpg] https://#g' | \
+      sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    sudo apt-get update
+    ```
+
+    **b) Install the toolkit:**
+
+    ```bash
+    sudo apt-get install -y nvidia-container-toolkit
+    ```
+
+    **c) Configure Docker runtime:**
+
+    ```bash
+    # Configure Docker to use NVIDIA runtime
+    sudo nvidia-ctk runtime configure --runtime=docker
+
+    # Restart Docker
+    sudo systemctl restart docker
+    ```
+
+    **Installation complete!** Proceed to Step 3 to verify.
+
+=== "Windows (WSL2 + Docker Desktop)"
+
+    **Prerequisites:**
+    - Windows 10/11 with WSL2 enabled
+    - Docker Desktop for Windows installed
+    - NVIDIA GPU drivers installed on Windows (not in WSL2)
+
+    **Steps:**
+
+    1. **Install NVIDIA drivers on Windows** (not WSL2):
+       - Download from [NVIDIA Driver Downloads](https://www.nvidia.com/download/index.aspx)
+       - Install and reboot if needed
+
+    2. **Enable GPU support in Docker Desktop**:
+       - Open Docker Desktop
+       - Go to **Settings** → **Resources** → **WSL Integration**
+       - Enable integration with your WSL2 distro
+       - Apply & Restart
+
+    3. **Verify from WSL2 terminal**:
+       ```bash
+       # From WSL2 Ubuntu/Debian terminal
+       nvidia-smi
+       # Should show GPU info
+       ```
+
+    4. **Install NVIDIA Container Toolkit in WSL2** (same as Linux):
+       ```bash
+       # Run in WSL2 terminal
+       distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+       curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+         sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit.gpg
+       curl -fsSL https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+         sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit.gpg] https://#g' | \
+         sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+       sudo apt-get update
+       sudo apt-get install -y nvidia-container-toolkit
+       ```
+
+    **Additional Resources:**
+    - [Docker Desktop GPU support](https://docs.docker.com/desktop/gpu/)
+    - [NVIDIA CUDA on WSL2](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
+
+=== "macOS"
+
+    !!! danger "Not Supported"
+        NVIDIA Container Toolkit is not available for macOS. NVIDIA GPUs cannot be used in Docker containers on macOS.
+
+        **Alternatives:**
+        - Deploy on a Linux machine or cloud instance (recommended)
+        - Use CPU inference (50x slower, not recommended for production)
+        - Use cloud GPU services (AWS, GCP, Azure)
+
+#### Step 3: Test GPU Access in Docker
+
+Verify that Docker containers can access the GPU:
+
+```bash
+# Run test container with GPU access
+docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
+```
+
+**Expected output**: Same `nvidia-smi` table as on the host, showing your GPU.
+
+!!! success "GPU Access Working"
+    If you see GPU information, Docker can successfully access your GPU. You're ready to deploy Nuclio functions!
+
+**Common Issues:**
+
+| Error | Solution |
+|-------|----------|
+| `docker: Error response from daemon: could not select device driver "" with capabilities: [[gpu]]` | NVIDIA Container Toolkit not installed or Docker not restarted. Run Step 2 again and ensure `sudo systemctl restart docker`. |
+| `docker: unknown flag: --gpus` | Docker version too old. Upgrade to Docker 19.03+ with `sudo apt-get update && sudo apt-get install docker-ce`. |
+| `Failed to initialize NVML: Driver/library version mismatch` | Host driver updated but not rebooted, or container driver mismatch. Reboot host system. |
+| No GPU shown in container | Check `nvidia-smi` works on host first. Ensure `--gpus all` flag is used in docker run command. |
+
+!!! tip "Skip if Already Configured"
+    If the test container successfully shows your GPU, you already have NVIDIA Container Toolkit properly configured. You can skip the installation steps above.
 
 ### Install Nuclio CLI (nuctl)
 
