@@ -10,31 +10,177 @@ Configure CVAT webhooks to automate the coral processing pipeline with the Bridg
 
 ## Webhook Architecture
 
-Understanding how webhooks automate the pipeline:
+Understanding how webhooks automate the pipeline through a repeatable cycle:
+
+### Generic Pipeline Flow
+
+The webhook system creates a repeatable automation cycle that can chain multiple annotation stages:
 
 ```mermaid
 graph TB
-    A[CVAT Project 1<br/>Corner Detection] -->|Task Complete| B[CVAT Webhook]
-    B --> C[Bridge Service<br/>Receives Event]
-    C --> D[Bridge Downloads<br/>Annotations & Images]
-    D --> E[Bridge Processes<br/>Crop & Warp]
-    E --> F[Bridge Creates Task<br/>in Project 2]
-    F --> G[CVAT Project 2<br/>Grid Detection]
+    A[Create Task in<br/>Project A] --> B[Status: new → in progress]
+    B --> C[Model Detection<br/>Webhook Triggered]
+    C --> D[Auto-annotations<br/>Generated]
+    D --> E[User Reviews &<br/>Corrects Annotations]
+    E --> F[Status: in progress → completed]
+    F --> G[Task Completion<br/>Webhook Triggered]
+    G --> H[Bridge Processes Images<br/>& Creates Task in Project B]
+    H --> I[Status: new → in progress]
+    I --> J{More Stages?}
+    J -->|Yes| C
+    J -->|No| K[Pipeline Complete]
 
-    style B fill:#FF9800
+    style A fill:#4CAF50
+    style B fill:#4CAF50
+    style E fill:#4CAF50
+    style F fill:#4CAF50
     style C fill:#FF9800
-    style E fill:#2196F3
+    style G fill:#FF9800
+    style H fill:#2196F3
 ```
 
-**Two Types of Webhooks**:
+**Key Stages in Each Cycle**:
 
-1. **Task Completion Webhooks**: Triggered when task status = "completed"
-    - Processes images and creates task in next project
-    - Links projects in the pipeline
+1. **Task Creation**: New task created in CVAT project
+2. **Model Detection**: Status changes to "in progress" → triggers ML inference webhook
+3. **User Validation**: User reviews and corrects auto-generated annotations
+4. **Task Completion**: User marks task as "completed" → triggers processing webhook
+5. **Next Stage**: Bridge processes images and creates task in next project
+6. **Repeat**: Cycle continues until all pipeline stages complete
 
-2. **Model Detection Webhooks**: Triggered when job state = "in progress"
-    - Runs ML model inference
-    - Auto-annotates images
+**Legend**:
+
+- 🟢 **Green** = Manual user actions
+- 🟠 **Orange** = Model detection webhook (automated ML inference)
+- 🔵 **Blue** = Task completion webhook (automated processing)
+- ⚪ **Light Blue** = Automatic system actions
+
+### Two Types of Webhooks
+
+**1. Model Detection Webhooks**: Triggered when job state = "in progress"
+   - Runs ML model inference
+   - Auto-annotates images for user review
+
+**2. Task Completion Webhooks**: Triggered when task status = "completed"
+   - Processes images (crop, warp, grid removal)
+   - Creates task in next project
+   - Links projects in the pipeline
+
+### Example: 2-Stage Pipeline (Corner → Coral)
+
+Skip grid detection for faster processing:
+
+```mermaid
+flowchart LR
+    subgraph Stage1[" Stage 1: Corner Detection "]
+        direction TB
+        A1[Create Task]
+        B1[Open Job<br/>Status: in progress]
+        C1[Model Webhook:<br/>Detect Corners]
+        D1[Review & Correct<br/>Corner Annotations]
+        E1[Mark Complete<br/>Status: completed]
+
+        A1 --> B1 --> C1 --> D1 --> E1
+    end
+
+    subgraph Bridge1[" Processing "]
+        direction TB
+        F1[Task Webhook:<br/>Crop & Warp Images]
+    end
+
+    subgraph Stage2[" Stage 2: Coral Segmentation "]
+        direction TB
+        A2[Create Task in<br/>Coral Project]
+        B2[Open Job<br/>Status: in progress]
+        C2[Model Webhook:<br/>Segment Corals]
+        D2[Review & Correct<br/>Coral Annotations]
+        E2[Mark Complete<br/>Pipeline Done]
+
+        A2 --> B2 --> C2 --> D2 --> E2
+    end
+
+    Stage1 --> Bridge1 --> Stage2
+
+    style A1 fill:#4CAF50
+    style B1 fill:#4CAF50
+    style D1 fill:#4CAF50
+    style E1 fill:#4CAF50
+    style D2 fill:#4CAF50
+    style E2 fill:#4CAF50
+    style C1 fill:#FF9800
+    style F1 fill:#2196F3
+    style C2 fill:#FF9800
+```
+
+**Pipeline**: Corner Detection → Crop/Warp → Coral Segmentation
+
+### Example: 3-Stage Pipeline (Corner → Grid → Coral)
+
+Full processing with grid removal for cleaner images:
+
+```mermaid
+flowchart LR
+    subgraph Stage1[" Stage 1: Corner Detection "]
+        direction TB
+        A1[Create Task]
+        B1[Open Job<br/>Status: in progress]
+        C1[Model Webhook:<br/>Detect Corners]
+        D1[Review & Correct<br/>Corner Annotations]
+        E1[Mark Complete<br/>Status: completed]
+
+        A1 --> B1 --> C1 --> D1 --> E1
+    end
+
+    subgraph Bridge1[" Processing "]
+        direction TB
+        F1[Task Webhook:<br/>Crop & Warp Images]
+    end
+
+    subgraph Stage2[" Stage 2: Grid Detection "]
+        direction TB
+        A2[Create Task in<br/>Grid Project]
+        B2[Open Job<br/>Status: in progress]
+        C2[Model Webhook:<br/>Detect Grid]
+        D2[Review & Correct<br/>Grid Annotations]
+        E2[Mark Complete<br/>Status: completed]
+
+        A2 --> B2 --> C2 --> D2 --> E2
+    end
+
+    subgraph Bridge2[" Processing "]
+        direction TB
+        F2[Task Webhook:<br/>Remove Grid Lines]
+    end
+
+    subgraph Stage3[" Stage 3: Coral Segmentation "]
+        direction TB
+        A3[Create Task in<br/>Coral Project]
+        B3[Open Job<br/>Status: in progress]
+        C3[Model Webhook:<br/>Segment Corals]
+        D3[Review & Correct<br/>Coral Annotations]
+        E3[Mark Complete<br/>Pipeline Done]
+
+        A3 --> B3 --> C3 --> D3 --> E3
+    end
+
+    Stage1 --> Bridge1 --> Stage2 --> Bridge2 --> Stage3
+
+    style A1 fill:#4CAF50
+    style B1 fill:#4CAF50
+    style D1 fill:#4CAF50
+    style E1 fill:#4CAF50
+    style D2 fill:#4CAF50
+    style E2 fill:#4CAF50
+    style D3 fill:#4CAF50
+    style E3 fill:#4CAF50
+    style C1 fill:#FF9800
+    style F1 fill:#2196F3
+    style C2 fill:#FF9800
+    style F2 fill:#2196F3
+    style C3 fill:#FF9800
+```
+
+**Pipeline**: Corner Detection → Crop/Warp → Grid Detection → Grid Removal → Coral Segmentation
 
 ## Webhook URLs Reference
 
