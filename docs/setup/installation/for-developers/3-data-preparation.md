@@ -236,6 +236,9 @@ Each dataset is exported from CVAT as a project backup (`.zip` file), then multi
 
 ### Download and Extract ML Datasets
 
+!!! warning "Password-Protected Archives Required"
+    ML datasets are only available through password-protected CVAT project backups (`.7z` archives from Step 2). There are no publicly available pre-prepared datasets. You must restore the CVAT projects from the password-protected archives before proceeding.
+
 ```bash
 # Navigate to centralized data directory
 cd $DATA_ROOT
@@ -278,10 +281,6 @@ Repeat for each project backup you need.
 ## Step 3: Pull ML Datasets from CVAT to FiftyOne
 
 Once projects are restored in CVAT, pull them to create local FiftyOne datasets for training.
-
-!!! warning "Password-Protected Archives Required"
-    ML datasets are only available through password-protected CVAT project backups (`.7z` archives from Step 2). There are no publicly available pre-prepared datasets. You must restore the CVAT projects from the password-protected archives before proceeding.
-
 ```bash
 cd ~/Projects/coral-segmentation/data_engineering
 
