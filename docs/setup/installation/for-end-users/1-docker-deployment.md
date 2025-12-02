@@ -142,8 +142,10 @@ cvat/  (criobe branch)
 │   ├── docker-compose.bridge.yml
 │   └── .env.example
 ├── components/
-│   └── serverless/              # Nuclio serverless functions
+│   └── serverless/              # Nuclio docker-compose configuration
 │       └── docker-compose.serverless.yml
+├── serverless/                  # Nuclio function implementations
+│   └── pytorch/                 # PyTorch-based functions (yolo/, lama/, mmseg/)
 ├── docker-compose.yml           # Main CVAT deployment
 └── ...                          # CVAT core files
 ```

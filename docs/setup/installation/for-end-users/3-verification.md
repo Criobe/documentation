@@ -413,7 +413,7 @@ nuctl get logs <function-name> --platform local
 
 # Delete and redeploy
 nuctl delete function <function-name> --platform local
-cd ~/quadratseg-platform/cvat/components/serverless/pytorch/<function-name>
+cd ~/quadratseg-platform/cvat/serverless/pytorch/<framework>/<function-name>/nuclio
 nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
 ```
 

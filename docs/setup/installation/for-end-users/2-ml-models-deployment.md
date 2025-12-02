@@ -87,9 +87,34 @@ chmod +x nuctl-1.13.0-darwin-amd64
 sudo mv nuctl-1.13.0-darwin-amd64 /usr/local/bin/nuctl
 ```
 
+## Create Nuclio Project
+
+Before deploying any functions, create the `cvat` project in Nuclio:
+
+```bash
+# Create the Nuclio project
+nuctl create project cvat --platform local
+
+# Verify project was created
+nuctl get projects --platform local
+# Expected: cvat project listed
+```
+
+**Expected Output**:
+```
+Project 'cvat' created successfully
+```
+
+!!! warning "Required Before Deployment"
+    The `cvat` project must exist in Nuclio before deploying any functions. Without it, `nuctl deploy --project-name cvat` commands will fail with:
+    ```
+    Error - Project does not exist
+        ...//nuclio/pkg/platform/abstract/platform.go:459
+    ```
+
 ## Nuclio Function Structure
 
-Each function is packaged in `components/serverless/pytorch/<function-name>/`:
+Each function is packaged in `serverless/pytorch/<framework>/<function-name>/nuclio/` with nested organization (e.g., `yolo/`, `mmseg/`, `lama/`):
 
 ```
 pth-yolo-gridcorners/
@@ -114,7 +139,7 @@ Deploy the corner detection function (detects 4 quadrat corners):
 
 ```bash
 # Navigate to function directory
-cd ~/quadratseg-platform/cvat/components/serverless/pytorch/pth-yolo-gridcorners
+cd ~/quadratseg-platform/cvat/serverless/pytorch/yolo/gridcorners/nuclio
 
 # Deploy function
 nuctl deploy \
@@ -151,7 +176,7 @@ nuctl (I) Function URL: http://localhost:49152
 Deploy the grid pose detection function (detects 117 grid intersections):
 
 ```bash
-cd ../pth-yolo-gridpose
+cd ../gridpose/nuclio
 
 nuctl deploy \
   --project-name cvat \
@@ -168,7 +193,7 @@ nuctl deploy \
 Deploy the grid removal function using SimpleLama inpainting:
 
 ```bash
-cd ../pth-lama
+cd ../../lama/nuclio
 
 nuctl deploy \
   --project-name cvat \
@@ -185,7 +210,7 @@ nuctl deploy \
 Deploy the YOLO coral segmentation function trained on CRIOBE finegrained dataset:
 
 ```bash
-cd ../pth-yolo-coralsegv4
+cd ../coralsegv4/nuclio
 
 nuctl deploy \
   --project-name cvat \
@@ -202,7 +227,7 @@ nuctl deploy \
 Deploy the YOLO coral segmentation function trained on Banggai extended dataset:
 
 ```bash
-cd ../pth-yolo-coralsegbanggai
+cd ../coralsegbanggai/nuclio
 
 nuctl deploy \
   --project-name cvat \
@@ -219,7 +244,7 @@ nuctl deploy \
 Deploy the two-stage segmentation function (highest accuracy):
 
 ```bash
-cd ../pth-mmseg-coralscopsegformer
+cd ../../mmseg/coralscopsegformer/nuclio
 
 nuctl deploy \
   --project-name cvat \
@@ -350,7 +375,7 @@ If you need to update a function (e.g., new model version):
 
 ```bash
 # Navigate to function directory
-cd ~/quadratseg-platform/cvat/components/serverless/pytorch/<function-name>
+cd ~/quadratseg-platform/cvat/serverless/pytorch/<framework>/<function-name>/nuclio
 
 # Delete old function
 nuctl delete function <function-name> --platform local
@@ -547,7 +572,57 @@ spec:
 ### Deploy All Functions (Sequential)
 
 ```bash
-cd ~/quadratseg-platform/cvat/components/serverless/pytorch
+cd ~/quadratseg-platform/cvat/serverless/pytorch
+
+# Deploy YOLO functions
+for func in gridcorners gridpose coralsegv4 coralsegbanggai; do
+  cd yolo/$func/nuclio
+  nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+  cd ../../..
+done
+
+# Deploy LAMA function
+cd lama/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+cd ../..
+
+# Deploy MMSeg function
+cd mmseg/coralscopsegformer/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+```
+
+**Alternative (individual deployment)**:
+```bash
+cd ~/quadratseg-platform/cvat/serverless/pytorch
+
+# Grid corner detection
+cd yolo/gridcorners/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+
+# Grid pose detection
+cd ../gridpose/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+
+# LAMA (grid removal)
+cd ../../lama/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+
+# Coral segmentation (CRIOBE)
+cd ../yolo/coralsegv4/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+
+# Coral segmentation (Banggai)
+cd ../coralsegbanggai/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+
+# Two-stage segmentation
+cd ../../mmseg/coralscopsegformer/nuclio
+nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
+```
+
+**Legacy loop approach** (deprecated):
+```bash
+cd ~/quadratseg-platform/cvat/serverless/pytorch
 
 for func in pth-yolo-gridcorners pth-yolo-gridpose pth-lama pth-yolo-coralsegv4 pth-yolo-coralsegbanggai pth-mmseg-coralscopsegformer; do
   cd $func

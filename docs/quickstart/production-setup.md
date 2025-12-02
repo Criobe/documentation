@@ -85,7 +85,7 @@ git branch
 
 # The repository includes:
 # - cvat/ - CVAT core platform
-# - components/serverless/ - Nuclio serverless functions
+# - serverless/ - Nuclio serverless functions
 # - bridge/ - Automation service
 ```
 
@@ -270,9 +270,34 @@ sudo mv nuctl-1.13.0-linux-amd64 /usr/local/bin/nuctl
 nuctl version
 ```
 
-### 7.2: Deploy Core Processing Functions
+### 7.2: Create Nuclio Project
 
-Each Nuclio function is packaged in `components/serverless/pytorch/` with:
+Before deploying functions, create the `cvat` project in Nuclio:
+
+```bash
+# Create the Nuclio project
+nuctl create project cvat --platform local
+
+# Verify project was created
+nuctl get projects --platform local
+# Expected output: cvat project listed
+```
+
+**Expected Output**:
+```
+Project 'cvat' created successfully
+```
+
+!!! warning "Required Prerequisite"
+    All Nuclio functions must be deployed to a project. The `cvat` project must exist before running any `nuctl deploy --project-name cvat` commands. Without it, deployment will fail with:
+    ```
+    Error - Project does not exist
+        ...//nuclio/pkg/platform/abstract/platform.go:459
+    ```
+
+### 7.3: Deploy Core Processing Functions
+
+Each Nuclio function is packaged in `serverless/pytorch/<framework>/<function-name>/nuclio/` with nested organization (e.g., `yolo/`, `mmseg/`, `lama/`):
 - Inference code
 - `function.yaml` describing the Docker build
 - Model download URLs (models downloaded during build)
@@ -280,7 +305,7 @@ Each Nuclio function is packaged in `components/serverless/pytorch/` with:
 **Deploy Grid Corner Detection**:
 
 ```bash
-cd components/serverless/pytorch/pth-yolo-gridcorners
+cd serverless/pytorch/yolo/gridcorners/nuclio
 
 # Deploy function (model downloads during build)
 nuctl deploy --project-name cvat \
@@ -305,29 +330,29 @@ Function URL: http://localhost:49152
 
 ```bash
 # Grid Pose Detection (117 keypoints)
-cd ../pth-yolo-gridpose
+cd ../gridpose/nuclio
 nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
 
 # Grid Removal (Inpainting)
-cd ../pth-lama
+cd ../../lama/nuclio
 nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
 
 # Coral Segmentation (CRIOBE Finegrained)
-cd ../pth-yolo-coralsegv4
+cd ../yolo/coralsegv4/nuclio
 nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
 
 # Coral Segmentation (Banggai Extended)
-cd ../pth-yolo-coralsegbanggai
+cd ../coralsegbanggai/nuclio
 nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
 
 # Two-Stage Segmentation (Highest Accuracy)
-cd ../pth-mmseg-coralscopsegformer
+cd ../../mmseg/coralscopsegformer/nuclio
 nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
 ```
 
 **Total Deployment Time**: 30-60 minutes (models download in parallel during builds)
 
-### 7.3: Verify Deployed Functions
+### 7.4: Verify Deployed Functions
 
 ```bash
 # List all deployed functions
@@ -630,7 +655,7 @@ docker compose restart bridge
 nuctl get functions --platform local
 
 # Redeploy Nuclio function
-cd components/serverless/pytorch/<function-name>
+cd serverless/pytorch/<framework>/<function-name>/nuclio
 nuctl deploy --project-name cvat --path . --file function.yaml --platform local -v
 ```
 
