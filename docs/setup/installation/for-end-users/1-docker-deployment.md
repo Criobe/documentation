@@ -69,6 +69,47 @@ df -h
 !!! warning "GPU Required"
     While the platform can run without GPU, inference will be extremely slow. A GPU with 8GB+ VRAM is **strongly recommended** for production use.
 
+!!! danger "IMPORTANT: Docker 29+ Users"
+    If you're using Docker version 29.0.1 or higher, you **must** apply a compatibility workaround before deployment, otherwise Traefik and Nuclio will fail to start.
+
+    **Quick Check**:
+    ```bash
+    docker --version
+    # If version is 29.0.0 or higher, apply the workaround below
+    # Docker 27.x and earlier work without workaround
+    ```
+
+    **Workaround** (required for Docker 29+):
+
+    1. Create or edit `/etc/docker/daemon.json`:
+       ```bash
+       sudo nano /etc/docker/daemon.json
+       ```
+
+    2. Add the following content:
+       ```json
+       {
+         "min-api-version": "1.24"
+       }
+       ```
+
+    3. Restart Docker:
+       ```bash
+       sudo systemctl restart docker
+       ```
+
+    4. Verify Docker is running:
+       ```bash
+       docker ps
+       ```
+
+    **Why is this needed?** CVAT 2.29.0 includes Traefik with Docker client API v1.24. Docker 29+ requires API v1.44+ by default, causing the error: "client version 1.24 is too old".
+
+    **Tested Configurations**:
+
+    - ✅ Ubuntu 22.04, CVAT 2.29.0, Docker 27.3.1 (no workaround needed)
+    - ✅ Ubuntu 22.04, CVAT 2.29.0, Docker 29.0.1 (with workaround)
+
 ## Step 1: Clone Repository
 
 Clone CRIOBE's CVAT fork which includes the bridge service and serverless components. **Use the criobe branch**:
@@ -407,6 +448,23 @@ docker compose restart cvat_worker_webhooks
 ```
 
 ## Troubleshooting
+
+### Traefik/Nuclio "client version too old" Error
+
+**Symptoms**: Container logs show errors like:
+```
+traefik | {"level":"error","msg":"Failed to retrieve information of the docker client and server host: Error response from daemon: client version 1.24 is too old. Minimum supported API version is 1.44..."}
+```
+
+or
+
+```
+nuclio | Error response from daemon: client version 1.42 is too old
+```
+
+**Cause**: Docker 29+ requires minimum API version 1.44, but CVAT 2.29.0 uses older clients.
+
+**Solution**: Apply the Docker daemon configuration workaround (see warning box at top of this guide).
 
 ### Services Not Starting
 

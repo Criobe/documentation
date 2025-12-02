@@ -51,6 +51,27 @@ docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu20.04 nvidia-smi
 # If error, install nvidia-docker2 package
 ```
 
+### Docker Version Compatibility
+
+!!! warning "Docker 29+ Users Required Action"
+    If using Docker 29.0.1+, you must relax Docker's minimum API version **before** deployment.
+
+    **Quick Fix**:
+    ```bash
+    # 1. Edit daemon config
+    sudo nano /etc/docker/daemon.json
+    # Add: {"min-api-version": "1.24"}
+
+    # 2. Restart Docker
+    sudo systemctl restart docker
+    ```
+
+    **Why?** CVAT 2.29.0 uses older Docker clients that are incompatible with Docker 29+ defaults.
+
+    **Note**: Docker 27.x and earlier work without this workaround.
+
+    See [detailed instructions](../setup/installation/for-end-users/1-docker-deployment.md) for more information.
+
 ## Step 1: Clone the Repository
 
 ```bash

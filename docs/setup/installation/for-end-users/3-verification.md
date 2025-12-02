@@ -346,6 +346,38 @@ docker compose down
 docker compose up -d
 ```
 
+### Traefik or Nuclio: "Client Version Too Old" Error
+
+**Symptoms**: Traefik or Nuclio containers fail to start with error:
+```
+Error response from daemon: client version 1.24 is too old. Minimum supported API version is 1.44
+```
+
+**Cause**: Using Docker 29.0.1+ without compatibility workaround.
+
+**Solution**:
+```bash
+# 1. Edit Docker daemon configuration
+sudo nano /etc/docker/daemon.json
+
+# 2. Add this content:
+# {
+#   "min-api-version": "1.24"
+# }
+
+# 3. Restart Docker
+sudo systemctl restart docker
+
+# 4. Restart the platform
+docker compose down
+docker compose -f docker-compose.yml \
+  -f bridge/docker-compose.bridge.yml \
+  -f components/serverless/docker-compose.serverless.yml \
+  up -d
+```
+
+See [Docker Deployment Guide](1-docker-deployment.md) for detailed explanation.
+
 ### Service Not Responding
 
 **Symptoms**: curl commands timeout or return "Connection refused"

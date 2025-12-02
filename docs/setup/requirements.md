@@ -68,6 +68,30 @@ sudo usermod -aG docker $USER
 
 See [Docker installation guide](https://docs.docker.com/engine/install/).
 
+!!! warning "Docker 29+ Compatibility Issue"
+    **Known Issue**: CVAT 2.29.0 uses Traefik with Docker client API v1.24. Docker version 29.0.1+ requires minimum API version 1.44 by default, causing deployment failures.
+
+    **Tested Configurations**:
+
+    - ✅ Ubuntu 22.04, CVAT 2.29.0, Docker 27.3.1 (works without workaround)
+    - ⚠️ Ubuntu 22.04, CVAT 2.29.0, Docker 29.0.1+ (requires workaround below)
+
+    **Required Workaround for Docker 29+**:
+
+    Create or edit `/etc/docker/daemon.json`:
+    ```json
+    {
+      "min-api-version": "1.24"
+    }
+    ```
+
+    Then restart Docker:
+    ```bash
+    sudo systemctl restart docker
+    ```
+
+    This allows older clients (Traefik, Nuclio) to communicate with newer Docker daemons.
+
 #### Pixi Package Manager
 
 - **Pixi**: Latest version
