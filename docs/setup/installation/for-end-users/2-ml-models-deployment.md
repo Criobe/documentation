@@ -57,7 +57,7 @@ docker compose ps
 # All services should show "Up" status
 
 # Verify Nuclio dashboard accessible
-curl http://localhost:8070/api/healthz
+curl -I http://localhost:8070
 # Expected: "OK"
 ```
 

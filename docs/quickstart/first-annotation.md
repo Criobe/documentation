@@ -48,7 +48,7 @@ Before starting, verify these services are running:
 curl http://localhost:8080/api/server/about
 
 # Check Nuclio dashboard
-curl http://localhost:8070/api/healthz
+curl -I http://localhost:8070
 
 # Check Bridge service
 curl http://localhost:8000/health
@@ -407,7 +407,7 @@ http://bridge.gateway:8000/detect-model-webhook?model_name=<MODEL_NAME>
 curl http://localhost:8080/api/server/about
 
 # Nuclio
-curl http://localhost:8070/api/healthz
+curl -I http://localhost:8070
 
 # Bridge
 curl http://localhost:8000/health

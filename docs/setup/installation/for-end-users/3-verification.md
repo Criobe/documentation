@@ -92,7 +92,7 @@ curl http://localhost:8080/api/server/about
 
 ```bash
 # Test Nuclio health endpoint
-curl http://localhost:8070/api/healthz
+curl -I http://localhost:8070
 
 # Expected output:
 # OK
@@ -510,7 +510,7 @@ Expected performance on typical hardware (NVIDIA GTX 1070, 16GB RAM):
 curl http://localhost:8080/api/server/about
 
 # Nuclio
-curl http://localhost:8070/api/healthz
+curl -I http://localhost:8070
 
 # Bridge
 curl http://localhost:8000/health

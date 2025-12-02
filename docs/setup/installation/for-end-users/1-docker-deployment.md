@@ -336,7 +336,7 @@ curl http://localhost:8080/api/server/about
 # Expected: JSON response with CVAT version
 
 # Test Nuclio Dashboard
-curl http://localhost:8070/api/healthz
+curl -I http://localhost:8070
 # Expected: "OK"
 
 # Test Bridge
