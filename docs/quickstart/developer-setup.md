@@ -316,11 +316,11 @@ Processing 10 images...
 # Navigate to grid inpainting module
 cd ~/Projects/grid_inpainting
 
-pixi install
+pixi install -e grid-inpainting
 ./download_model.sh
 
 # Remove grid lines using detected keypoints
-pixi run python grid_rem_with_kp.py remove_grid_from_coco_dataset \
+pixi run -e grid-inpainting python grid_rem_with_kp.py remove_grid_from_coco_dataset \
     --data_path data/test_samples/3-image_warping/ \
     --labels_path data/test_samples/4-grid_pose_export/person_keypoints_default.json \
     --output_dir results/demo_grid_removal
