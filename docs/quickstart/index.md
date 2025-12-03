@@ -20,6 +20,14 @@ QUADRATSEG serves two distinct user types with different needs and setup paths:
 
     [:octicons-arrow-right-24: Production Setup](production-setup.md)
 
+    [:octicons-arrow-right-24: First Annotation Tutorial](first-annotation.md)
+
+    [:octicons-arrow-right-24: Guide A: Single-Stage Segmentation](../user-guide/data-preparation/1-single-stage-segmentation.md)
+
+    [:octicons-arrow-right-24: Guide B: Two-Stage Banggai](../user-guide/data-preparation/2-two-stage-banggai.md)
+
+    [:octicons-arrow-right-24: Guide C: Three-Stage CRIOBE](../user-guide/data-preparation/3-three-stage-criobe.md)
+
 -   :material-code-braces:{ .lg .middle } **AI Researcher / Developer**
 
     ---
@@ -31,6 +39,10 @@ QUADRATSEG serves two distinct user types with different needs and setup paths:
     **Setup Time**: 30-45 minutes
 
     [:octicons-arrow-right-24: Developer Setup](developer-setup.md)
+
+    [:octicons-arrow-right-24: First Annotation Tutorial](first-annotation.md)
+
+    [:octicons-arrow-right-24: Training & Deployment](../user-guide/training-and-deployment/index.md)
 
 </div>
 
