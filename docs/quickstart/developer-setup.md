@@ -179,11 +179,16 @@ ls -l ~/Projects/coral_seg_yolo/data
 Download shared test data once to the centralized directory:
 
 ```bash
+# Option 1: Use the automated script (recommended)
+cd ~/Projects/coral_seg_yolo  # or grid_pose_detection, grid_inpainting, DINOv2_mmseg
+./download_test_samples.sh
+
+# Option 2: Manual download
 cd $DATA_ROOT
 
 # Download demo datasets (contains 5 sample images for all pipeline stages)
-wget https://storage.googleapis.com/criobe_public/test_samples/test_samples.tar.gz
-tar -xzf test_samples.tar.gz
+wget https://storage.googleapis.com/data_criobe/test_samples.zip
+unzip test_samples.zip
 
 # Verify structure
 ls -la test_samples/
