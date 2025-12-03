@@ -126,6 +126,7 @@ QUADRATSEG uses a **centralized data directory** accessed via symlinks:
 ```
 
 **Benefits of Centralized Data**:
+
 - Download test data once, accessible by all modules
 - Share CVAT images and annotations across modules
 - No duplication of large datasets (~20-30GB savings)
