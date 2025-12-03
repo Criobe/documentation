@@ -31,40 +31,167 @@ If the user requests code generation or scripting:
 
 ## Markdown Formatting Rules
 
-### List Items with Trailing Spaces
+### List Formatting for MkDocs
 
-When writing or editing Markdown lists, **always add two trailing spaces** at the end of each list item that continues with sub-content on the next line. This ensures proper rendering in MkDocs Material theme.
+MkDocs uses Python Markdown, which has specific requirements for list formatting. Follow these rules to ensure proper rendering:
+
+#### 1. Four-Space Indentation Rule
+
+**CRITICAL: All nested content within list items MUST be indented with 4 spaces (or one tab).**
+
+This includes:
+- Continuation paragraphs
+- Code blocks
+- Nested lists
+- Admonitions
+- Any other block-level content
 
 **Example - Correct formatting:**
 ```markdown
 1. **Step 1: Enable GitHub Pages with GitHub Actions**
 
-   Go to your repository settings and configure GitHub Pages.
+    Go to your repository settings and configure GitHub Pages.
+
+    This is a second paragraph, also indented 4 spaces.
 
 2. **Step 2: Verify Workflow Permissions**
 
-   Ensure proper permissions are set for the workflow.
+    Ensure proper permissions are set for the workflow.
+
+    - Nested bullet point (4 spaces from list margin)
+    - Another nested item
+```
+
+**Example - Incorrect formatting (2 or 3 spaces will break rendering):**
+```markdown
+1. **Step 1: Enable GitHub Pages with GitHub Actions**
+
+  Only 2 spaces - this will NOT render correctly in MkDocs!
+```
+
+#### 2. Code Blocks Within Lists
+
+When including code blocks inside list items:
+
+- Add a blank line before and after the code block
+- Indent the entire code block **8 spaces** (4 for the list item + 4 for the code block)
+
+**Example:**
+```markdown
+1. **Install dependencies:**
+
+    First, navigate to the project directory.
+
+    ```bash
+    cd ~/Projects/criobe_data
+    pip install -r requirements.txt
+    ```
+
+    The installation should complete without errors.
+```
+
+#### 3. Trailing Spaces (Use Sparingly)
+
+Two trailing spaces at the end of a line create a hard line break. However:
+
+- **Avoid trailing spaces when possible** - they're invisible and many editors remove them
+- Only use when you specifically need a line break without starting a new paragraph
+- For most cases, use proper 4-space indentation instead
+
+**When trailing spaces might be useful:**
+```markdown
+- Line one with two spaces after it··
+  This continues on the next line (same paragraph, hard break)
+```
+
+**Better alternative (using proper indentation):**
+```markdown
+- Line one
+
+    This is a new paragraph within the same list item (4 spaces).
+```
+
+#### 4. Blank Lines Before Lists
+
+**CRITICAL: Always add a blank line before starting a list.**
+
+Lists must be preceded by a blank line to render correctly in MkDocs. This applies to:
+- Lists following paragraphs
+- Lists following bold headers (e.g., `**Header**:`)
+- Lists following any other block-level content
+
+**Example - Correct formatting:**
+```markdown
+**Benefits of Centralized Data**:
+
+- Download test data once, accessible by all modules
+- Share CVAT images and annotations across modules
+- No duplication of large datasets
 ```
 
 **Example - Incorrect formatting:**
 ```markdown
-1. **Step 1: Enable GitHub Pages with GitHub Actions**
+**Benefits of Centralized Data**:
+- Download test data once, accessible by all modules
+- Share CVAT images and annotations across modules
 
-   Go to your repository settings and configure GitHub Pages.
+This will render all items on one line without breaks!
 ```
 
-### When to Apply Trailing Spaces
+#### 5. Blank Lines Between List Items
 
-- After numbered list items with sub-content
-- After bulleted list items with sub-content
-- After list items that are followed by indented paragraphs, code blocks, or nested lists
-- Before blank lines within list items
+- Use blank lines between list items when they contain multiple paragraphs or blocks
+- Blank lines help improve readability and ensure proper rendering
+- Nested content after a blank line must still be indented 4 spaces
 
-### When NOT to Apply Trailing Spaces
+### Common List Formatting Mistakes
 
-- On the last line of a list item with no continuation
-- On standalone list items with no sub-content
-- Inside code blocks or code fences
+❌ **Wrong - No blank line before list:**
+```markdown
+**Header**:
+- Item 1
+- Item 2
+
+Result: All items render on one line!
+```
+
+❌ **Wrong - 2 or 3 space indentation:**
+```markdown
+1. Item
+  Only 2 spaces - breaks in MkDocs
+```
+
+❌ **Wrong - No indentation for continuation:**
+```markdown
+1. Item
+Next line without indentation - breaks the list
+```
+
+❌ **Wrong - Insufficient code block indentation:**
+```markdown
+1. Item
+    ```bash
+    code here
+    ```
+Only 4 spaces total - code block won't render in list
+```
+
+✅ **Correct - Blank line before list + 4 space indentation:**
+```markdown
+**Header**:
+
+- Item 1
+- Item 2
+
+1. Numbered item
+
+    Continuation paragraph with 4 spaces.
+
+    ```bash
+    # Code block with 4 additional spaces (8 total)
+    echo "hello"
+    ```
+```
 
 ## Documentation Standards
 
