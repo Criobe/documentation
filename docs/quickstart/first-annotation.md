@@ -64,27 +64,43 @@ You'll need two CVAT projects for this tutorial:
 
 1. **Open CVAT**: Navigate to http://localhost:8080
 2. **Login** with your credentials (default: `admin` / password from setup)
-3. **Create New Project**:
-    - Click **"Projects"** → **"+"** (Create new project)
-    - **Name**: `tutorial_corner_detection`
-    - **Labels**: Use the **Raw** editor to paste:
-        ```json
-        [
-          {
-            "name": "quadrat_corner",
-            "type": "skeleton",
-            "sublabels": [
-              {"name": "1", "type": "points"},
-              {"name": "2", "type": "points"},
-              {"name": "3", "type": "points"},
-              {"name": "4", "type": "points"}
-            ],
-            "svg": ""
-          }
-        ]
-        ```
-    - **Subset**: Leave default (training/validation/test)
-    - Click **Submit**
+   3. **Create New Project**:
+       - Click **"Projects"** → **"+"** (Create new project)
+       - **Name**: `tutorial_corner_detection`
+       - **Labels**: Use the **Raw** editor to paste:
+           ```json
+           [
+             {
+               "name": "quadrat_corner",
+               "type": "skeleton",
+               "sublabels": [
+                 {
+                   "name": "1",
+                   "type": "points",
+                   "attributes": []
+                 },
+                 {
+                   "name": "2",
+                   "type": "points",
+                   "attributes": []
+                 },
+                 {
+                   "name": "3",
+                   "type": "points",
+                   "attributes": []
+                 },
+                 {
+                   "name": "4",
+                   "type": "points",
+                   "attributes": []
+                 }
+               ],
+               "svg": "<circle r=&quot;0.75&quot; cx=&quot;17.558528900146484&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;1&quot; data-node-id=&quot;1&quot; data-label-name=&quot;1&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;65.0501708984375&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;2&quot; data-node-id=&quot;2&quot; data-label-name=&quot;2&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;61.27717208862305&quot; data-type=&quot;element node&quot; data-element-id=&quot;3&quot; data-node-id=&quot;3&quot; data-label-name=&quot;3&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;21.7391300201416&quot; cy=&quot;59.43770980834961&quot; data-type=&quot;element node&quot; data-element-id=&quot;4&quot; data-node-id=&quot;4&quot; data-label-name=&quot;4&quot;></circle>",
+               "attributes": []
+             }
+           ]
+           ```
+       - Click **Submit**
 
 !!! tip "Label Configuration"
     Corner detection uses a **Skeleton** type with 4 numbered sublabels. This ensures proper point ordering (clockwise from top-left).
@@ -132,7 +148,9 @@ Let's upload one test image to the corner detection project.
 
 Now configure the automation that will process images when tasks complete.
 
-### Webhook 1: Corner Detection → Coral Segmentation
+### Webhook 1: Task Completion (Corner → Coral)
+
+**Purpose**: When corner detection task completes, crop/warp image and create coral segmentation task
 
 1. **Open Project 1** (`tutorial_corner_detection`)
 2. **Click Actions → Setup Webhooks**
@@ -140,7 +158,7 @@ Now configure the automation that will process images when tasks complete.
 4. **Configure**:
     - **Target URL**:
         ```
-        http://bridge.gateway:8000/crop-quadrat-and-detect-corals-webhook?target_proj_id=2
+        http://bridge.gateway:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id=2
         ```
         (Replace `2` with your Project 2 ID)
     - **Content type**: Select `application/json` from dropdown
@@ -150,7 +168,7 @@ Now configure the automation that will process images when tasks complete.
     - **Events**: Select **"Select individual events"** radio button
         - ✅ Check `task` event
         - ✅ Check `job` event
-    - **Description**: `Auto-process to coral segmentation`
+    - **Description**: `Auto-process corners and create coral task`
 
 5. **Test Connection**:
     - Click **Ping** button
@@ -162,22 +180,32 @@ Now configure the automation that will process images when tasks complete.
 !!! warning "Important: Event Configuration"
     Make sure to select **"Select individual events"** and check both `task` and `job` events. The "Send everything" option may cause issues.
 
-### Optional: Add Model Detection Webhook
+### Webhook 2: Model Detection (Auto-segment Corals)
 
-If you want automatic model inference:
+**Purpose**: Automatically run coral segmentation when job is opened in Project 2
 
-1. **Add another webhook** to Project 2 (`tutorial_coral_segmentation`)
-2. **Configure**:
+1. **Open Project 2** (`tutorial_coral_segmentation`)
+2. **Click Actions → Setup Webhooks**
+3. **Click "+ Add webhook"**
+4. **Configure**:
     - **Target URL**:
         ```
         http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask_to_poly=true
         ```
     - **Content type**: `application/json`
+    - **Secret**: Leave empty
+    - **Enable SSL verification**: Unchecked
     - **Active**: ✅ Checked
-    - **Events**: ✅ Check `job` event only
-    - **Description**: `Auto-detect corals with YOLO`
+    - **Events**: Select **"Select individual events"**
+        - ☐ Uncheck `task` event
+        - ✅ Check `job` event only
+    - **Description**: `Auto-segment corals with YOLO`
 
-3. **Ping** to test, then **Submit**
+5. **Test**: Click **Ping** → Should show "✅ Success (200)"
+6. **Click Submit** to save
+
+!!! tip "Job Event Only"
+    Model detection webhooks should **only** trigger on `job` events (when job state changes to "in progress"), not on task completion.
 
 ## Step 4: Annotate Corners (or Skip)
 
@@ -375,18 +403,28 @@ docker logs bridge -f
 
 ### Webhook URLs
 
+**Task Completion Webhooks**:
 ```bash
-# Direct corner → coral (simple 2-stage)
-http://bridge.gateway:8000/crop-quadrat-and-detect-corals-webhook?target_proj_id=<ID>
+# Corner → Coral Segmentation (2-stage pipeline)
+http://bridge.gateway:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id=<CORAL_PROJECT_ID>
 
-# Corner → grid detection (3-stage part 1)
-http://bridge.gateway:8000/crop-quadrat-and-detect-grid-webhook?target_proj_id=<ID>
+# Corner → Grid Detection (3-stage part 1)
+http://bridge.gateway:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id=<GRID_PROJECT_ID>
 
-# Grid → coral with removal (3-stage part 2)
-http://bridge.gateway:8000/remove-grid-and-detect-corals-webhook?target_proj_id=<ID>
+# Grid → Coral Segmentation with removal (3-stage part 2)
+http://bridge.gateway:8000/remove-grid-and-create-new-task-webhook?target_proj_id=<CORAL_PROJECT_ID>
+```
 
-# Model detection (any project)
-http://bridge.gateway:8000/detect-model-webhook?model_name=<MODEL_NAME>
+**Model Detection Webhooks**:
+```bash
+# Corner detection
+http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-gridcorners
+
+# Grid pose detection
+http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-gridpose
+
+# Coral segmentation (CRIOBE)
+http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask_to_poly=true
 ```
 
 ### Available Models

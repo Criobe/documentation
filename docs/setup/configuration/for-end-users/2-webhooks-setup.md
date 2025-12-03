@@ -68,7 +68,10 @@ graph TB
 
 ### Example: 2-Stage Pipeline (Corner → Coral)
 
-Skip grid detection for faster processing:
+Skip grid detection for faster processing. This pipeline uses two webhooks:
+
+1. **Task completion webhook** in Corner Detection project → creates task in Coral project
+2. **Model detection webhook** in Coral Segmentation project → auto-segments corals
 
 ```mermaid
 flowchart LR
@@ -189,14 +192,14 @@ Before configuring, here are the webhook URLs you'll use:
 ### Task Completion Webhooks
 
 ```bash
-# Corner → Grid Detection
+# Corner → Grid Detection (3-stage pipeline)
 http://bridge.gateway:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id=<PROJECT_2_ID>
 
-# Grid → Coral Segmentation (with grid removal)
-http://bridge.gateway:8000/remove-grid-and-create-new-task-webhook?target_proj_id=<PROJECT_3_ID>
+# Corner → Coral Segmentation (2-stage pipeline)
+http://bridge.gateway:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id=<PROJECT_3_ID>
 
-# Corner → Coral (direct, skipping grid detection)
-http://bridge.gateway:8000/crop-quadrat-and-detect-corals-webhook?target_proj_id=<PROJECT_3_ID>
+# Grid → Coral Segmentation (with grid removal, 3-stage pipeline)
+http://bridge.gateway:8000/remove-grid-and-create-new-task-webhook?target_proj_id=<PROJECT_3_ID>
 ```
 
 ### Model Detection Webhooks
@@ -412,19 +415,6 @@ ID | URL                           | Event | Status | Timestamp
 6. Annotations appear in CVAT interface
 
 ## Advanced Webhook Configurations
-
-### Alternative Pipeline: Direct Corner → Coral
-
-Skip grid detection and removal for faster processing:
-
-**Project 1 Webhook (Replace task completion webhook)**:
-```
-http://bridge.gateway:8000/crop-quadrat-and-detect-corals-webhook?target_proj_id=3
-```
-
-This directly creates coral segmentation task after corner detection.
-
-**Trade-off**: Faster but grid lines remain in images.
 
 ### Multiple Model Options
 
