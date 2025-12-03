@@ -87,7 +87,13 @@ ls work_dirs/{experiment}/*.py  # Also need config file
 
 ### Step 2: Review Function Configuration
 
-Each deployment has a `function.yaml` defining:
+Each module contains deployment files in the `deploy/` folder:
+
+```bash
+cd PROJ_ROOT/criobe/{module}/deploy/
+```
+
+This folder contains the `function.yaml` configuration file that defines:
 
 ```yaml
 metadata:
@@ -117,9 +123,16 @@ spec:
       memory: 8Gi                   # Memory requirement
 ```
 
-### Step 3: Create Handler Function
+### Step 3: Review Handler Function
 
-The `main.py` handler receives CVAT webhook data and returns predictions:
+The `deploy/` folder also contains the `main.py` handler that receives CVAT webhook data and returns predictions:
+
+```bash
+cd PROJ_ROOT/criobe/{module}/deploy/
+cat main.py
+```
+
+Handler structure:
 
 ```python
 import json
@@ -166,7 +179,7 @@ def handler(context, event):
 
 ### Step 4: Package Function
 
-All modules now use **parameterized deployment scripts** that accept model weights and configuration files as arguments:
+All modules now use **parameterized deployment scripts** that package everything from the `deploy/` folder:
 
 ```bash
 # Run from module root directory
@@ -184,7 +197,21 @@ cd PROJ_ROOT/criobe/{module}/
 ./deploy_as_zip.sh MODEL_NAME MODEL_WEIGHTS TEMPLATE_PATH
 ```
 
-This creates a `nuclio.zip` package containing:
+**What the script does:**
+
+The `deploy_as_zip.sh` script packages the contents of the `deploy/` folder along with your model files:
+
+1. **Copies deployment files** from `PROJ_ROOT/criobe/{module}/deploy/`:
+   - `function.yaml` - Nuclio function configuration
+   - `main.py` - Handler code
+   - Additional source code modules (e.g., `src/`, `inferencer.py`)
+
+2. **Adds your model files**:
+   - Model weights (checkpoint files)
+   - Configuration files (for MMSeg)
+   - Template files (for grid detection)
+
+3. **Creates portable archive** `nuclio.zip` containing:
 
 ```
 nuclio/
@@ -197,6 +224,9 @@ nuclio/
 └── ...                           # Additional dependencies
 ```
 
+!!! success "Portable Deployment Package"
+    The resulting `nuclio.zip` archive is **fully portable** and contains everything needed to deploy the function. You can deploy it using two deployment options shown in **Step 5** below.
+
 **Key benefits of parameterized deployment:**
 
 - ✅ No manual copying of weights to deploy directories
@@ -204,6 +234,7 @@ nuclio/
 - ✅ Input validation prevents errors
 - ✅ Standardized weight names across deployments
 - ✅ Clear help text with examples
+- ✅ Portable archive can be deployed anywhere
 
 ### Step 5: Deploy to Nuclio
 
