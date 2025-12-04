@@ -83,98 +83,290 @@ In the project creation dialog, you need to configure the labels. CVAT provides 
   {
     "name": "Acanthastrea",
     "color": "#ff0000",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Acropora",
     "color": "#00ff00",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Astreopora",
     "color": "#0000ff",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Atrea",
     "color": "#ffff00",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Fungia",
     "color": "#ff00ff",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Goniastrea",
     "color": "#00ffff",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Leptastrea",
     "color": "#ff8000",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Merulinidae",
     "color": "#8000ff",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Millepora",
     "color": "#00ff80",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Montastrea",
     "color": "#ff0080",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Montipora",
     "color": "#80ff00",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Other",
     "color": "#808080",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Pavona/Leptoseris",
     "color": "#ff8080",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Pocillopora",
     "color": "#8080ff",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Porites",
     "color": "#80ff80",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   },
   {
     "name": "Psammocora",
     "color": "#ff80ff",
-    "attributes": [],
-    "type": "polygon"
+    "type": "polygon",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   }
 ]
 ```

@@ -114,7 +114,7 @@ This project is for detecting all 117 intersection points of the grid overlay.
 2. **Fill Project Details**:
     - **Name**: `grid_detection`
     - **Labels**: Use the **Raw** editor. For the full 117-point skeleton configuration, see:
-        `docs/assets/cvat_project_label_config/grid_annotation_example.json`
+        [grid_annotation_example.json](../../../assets/cvat_project_label_config/grid_annotation_example.json)
 
     Or use this simplified structure (paste into Raw editor):
     ```json
