@@ -71,6 +71,18 @@ Ensure you have:
     - **Grid**: Exactly 117 points in top-left to bottom-right order
     - **Precision**: Points should be within 2-3 pixels of actual intersections
 
+!!! info "Alternative: Password-Protected Datasets"
+    If you have obtained access credentials, you can skip the data preparation workflow by using pre-annotated CVAT project backups:
+
+    - **CRIOBE Archive** (`criobe.7z`): Contains criobe_corner_annotation and criobe_grid_annotation
+    - **Banggai Archive** (`banggai.7z`): Contains banggai_corner_annotation
+
+    These archives contain complete CVAT projects with corner and grid keypoint annotations that can be restored directly to your CVAT instance, then pulled to FiftyOne for training.
+
+    **To obtain access**: Email gilles.siu@criobe.pf with your name, institution, and research purpose (academic research only).
+
+    **Setup instructions**: See [Developer Data Preparation Guide](../../setup/installation/for-developers/3-data-preparation.md#step-2-access-ml-datasets-from-cvat-backups) for download and restoration steps.
+
 ## Step 1: Environment Setup
 
 ### 1.1 Navigate to Module

@@ -98,6 +98,18 @@ Before starting any training guide, ensure you have:
     - [Two-Stage Banggai Setup](../data-preparation/2-two-stage-banggai.md)
     - [Three-Stage CRIOBE Setup](../data-preparation/3-three-stage-criobe.md)
 
+!!! info "Alternative: Password-Protected Datasets"
+    If you have obtained access credentials, you can skip the data preparation workflow by using pre-annotated CVAT project backups:
+
+    - **CRIOBE Archive** (`criobe.7z`): Contains criobe_finegrained_annotated (345 images, 16 genera)
+    - **Banggai Archive** (`banggai.7z`): Contains banggai_extended_annotated (126 images, 10 genera)
+
+    These archives contain complete CVAT projects that can be restored directly to your CVAT instance, then pulled to FiftyOne for training.
+
+    **To obtain access**: Email gilles.siu@criobe.pf with your name, institution, and research purpose (academic research only).
+
+    **Setup instructions**: See [Developer Data Preparation Guide](../../setup/installation/for-developers/3-data-preparation.md#step-2-access-ml-datasets-from-cvat-backups) for download and restoration steps.
+
 ## Training Workflow Overview
 
 All training guides follow a similar structure:
