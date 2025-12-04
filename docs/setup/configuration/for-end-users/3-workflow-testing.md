@@ -86,12 +86,12 @@ Open the job to trigger automatic corner detection:
 
 1. **Open Task**: Click on `test_workflow_001`
 2. **Open Job**: Click **Open** button (or Job #1 link)
-3. **Wait for Auto-detection**:
-    - Job state changes to "in progress"
+3. **Change job state to "in progress"** to trigger the automatic detection
+4. **Wait for Auto-detection**:
     - This triggers the model detection webhook
     - Wait 5-10 seconds
-4. **Refresh Page**: Press Ctrl+R or F5
-5. **Verify**: You should see **4 corner points** automatically placed on the image
+5. **Refresh Page**: Press Ctrl+R or F5
+6. **Verify**: You should see **4 corner points** automatically placed on the image
 
 **If corners appear**:
 - ✅ Model detection webhook working
@@ -156,7 +156,7 @@ Check that task was created in Project 2:
     - Status: "New"
     - Frames: 1 (the warped image)
 3. **Open Task**: Click on the new task
-4. **Open Job**: Click **Open**
+4. **Open Job**: Click **Open** (job state is automatically set to "in progress" by the webhook)
 5. **Wait for Auto-detection**:
     - Wait 10-15 seconds
 6. **Refresh Page**: Ctrl+R

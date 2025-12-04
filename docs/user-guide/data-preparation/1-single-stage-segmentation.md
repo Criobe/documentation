@@ -570,7 +570,7 @@ Now when you open an annotation job, the model will automatically run:
 
 1. Navigate to a task with unannotated images
 2. Click **Job #1** to open it
-3. The job state changes to "in progress", triggering the webhook
+3. Change job state to **"in progress"** to trigger the automatic detection
 4. Wait 10-30 seconds (depending on image complexity)
 5. **Refresh the page** (`F5`)
 6. You should see coral polylines automatically added!

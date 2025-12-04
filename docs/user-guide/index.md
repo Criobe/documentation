@@ -80,7 +80,7 @@ Choose a learning path based on your role:
 
     1. Understand the [Data Preparation overview](data-preparation/index.md)
     2. Choose appropriate workflow for your images (Guides A/B/C)
-    3. Set up complete pipeline with [webhook automation](data-preparation/2-two-stage-banggai.md#stage-2-automated-cropping-and-segmentation)
+    3. Set up complete pipeline with [webhook automation](data-preparation/2-two-stage-banggai.md#stage-2-coral-segmentation-workflow)
     4. Use pre-trained models for inference
     5. Explore custom model training if needed ([Training Guides](training-and-deployment/index.md))
 

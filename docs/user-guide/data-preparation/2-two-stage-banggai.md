@@ -60,95 +60,149 @@ graph LR
 
 ## Prerequisites
 
-Before starting, ensure you have:
+!!! warning "Critical: Complete Setup First"
+    This guide requires ALL CVAT projects and webhooks to be configured BEFORE uploading any images. Webhooks automatically create tasks in downstream projects, so those projects must exist first.
 
-- [x] CVAT instance running with admin access
+    **You must complete the full setup configuration before beginning annotation work.**
+
+### Required Setup Steps
+
+You must complete these setup guides in order:
+
+1. **[CVAT Projects Configuration](../../setup/configuration/for-end-users/1-cvat-projects.md)**
+
+    Create and configure **2 projects** with proper labels:
+
+    - **Project 1: Corner Detection** - Follow the "Corner Detection" section to create `banggai_corner_detection` with 4-point skeleton labels
+    - **Project 2: Coral Segmentation** - Follow the "Coral Segmentation" section to create `banggai_coral_segmentation` with 16 coral genera polygon labels
+
+2. **[Webhooks Setup](../../setup/configuration/for-end-users/2-webhooks-setup.md)**
+
+    Configure **3 webhooks** after all projects exist:
+
+    - **Webhook 1** (on Corner Detection project): Model detection webhook for auto-detecting corners
+    - **Webhook 2** (on Corner Detection project): Task completion webhook for automatic image warping and task creation
+    - **Webhook 3** (on Coral Segmentation project): Model detection webhook for auto-segmenting corals
+
+3. **[Workflow Testing](../../setup/configuration/for-end-users/3-workflow-testing.md)**
+
+    Verify the complete automation pipeline works end-to-end.
+
+### Setup Checklist
+
+Before starting annotation workflow, verify you have:
+
+- [x] **CVAT instance** running with admin access
 - [x] **Nuclio serverless platform** deployed
 - [x] **Bridge service** running and connected to CVAT network
+- [x] **2 CVAT projects created and configured**:
+    - `banggai_corner_detection` (corner detection project)
+    - `banggai_coral_segmentation` (segmentation project)
+- [x] **3 webhooks configured**:
+    - Corner detection: Model detection webhook (job state → "in progress")
+    - Corner detection: Task completion webhook (task → "completed")
+    - Segmentation: Model detection webhook (job state → "in progress")
+- [x] **2 Nuclio models deployed**:
+    - `pth-yolo-gridcorners` (corner detection)
+    - `pth-yolo-coralsegbanggai` (coral segmentation)
 - [x] Raw quadrat images with visible corner markers
 - [x] Completed [Guide A](1-single-stage-segmentation.md) (recommended for CVAT familiarity)
 
-!!! warning "Bridge Service Required"
-    This guide requires the Bridge service for automated task creation between stages. Verify it's running:
+!!! tip "Quick Setup Verification"
+    Before proceeding, verify your setup:
 
     ```bash
+    # Check Bridge service
     docker ps | grep bridge
-    # Should show bridge container running
-
-    # Test bridge API
     curl http://localhost:8000/health
     # Should return {"status": "healthy"}
+
+    # Check Nuclio functions deployed
+    nuctl get functions --platform local | grep -E "(gridcorners|coralsegbanggai)"
+    # Both should show STATE: ready
+
+    # Check CVAT projects exist
+    # Navigate to http://localhost:8080/projects
+    # Verify both projects are listed
     ```
 
-## Stage 1: Corner Detection and Image Warping
+## Pipeline Configuration Reference
 
-### Step 1.1: Create CVAT Project for Corner Detection
+This section summarizes the configuration needed for this two-stage pipeline. **Detailed setup instructions are in the [setup guides](../../setup/configuration/for-end-users/1-cvat-projects.md)** - you should have already completed those before reaching this point.
 
-1. Log in to CVAT at `http://localhost:8080`
-2. Navigate to **Projects** → Click **+** to create new project
-3. Enter project details:
-    - **Name**: `banggai_corner_detection`
-    - **Description**: "Quadrat corner detection for perspective correction (Banggai dataset)"
+### Project Summary
 
-### Step 1.2: Configure Corner Detection Labels
+This pipeline requires 2 CVAT projects (configured in [CVAT Projects guide](../../setup/configuration/for-end-users/1-cvat-projects.md)):
 
-Click the **Raw** tab in label configuration and paste this JSON:
+| Stage | Project Name | Label Type | Setup Guide Section | Purpose |
+|-------|--------------|------------|---------------------|---------|
+| 1 | `banggai_corner_detection` | Skeleton (4 points) | "Project 1: Corner Detection" | Detect quadrat corners for perspective correction |
+| 2 | `banggai_coral_segmentation` | Polygon (16 genera) | "Project 3: Coral Segmentation" | Annotate coral species on warped images |
 
-```json
-[
-  {
-    "name": "quadrat_corner",
-    "type": "skeleton",
-    "sublabels": [
-      {
-        "name": "1",
-        "type": "points",
-        "attributes": []
-      },
-      {
-        "name": "2",
-        "type": "points",
-        "attributes": []
-      },
-      {
-        "name": "3",
-        "type": "points",
-        "attributes": []
-      },
-      {
-        "name": "4",
-        "type": "points",
-        "attributes": []
-      }
-    ],
-    "svg": "<circle r=&quot;0.75&quot; cx=&quot;17.558528900146484&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;1&quot; data-node-id=&quot;1&quot; data-label-name=&quot;1&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;65.0501708984375&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;2&quot; data-node-id=&quot;2&quot; data-label-name=&quot;2&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;61.27717208862305&quot; data-type=&quot;element node&quot; data-element-id=&quot;3&quot; data-node-id=&quot;3&quot; data-label-name=&quot;3&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;21.7391300201416&quot; cy=&quot;59.43770980834961&quot; data-type=&quot;element node&quot; data-element-id=&quot;4&quot; data-node-id=&quot;4&quot; data-label-name=&quot;4&quot;></circle>",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  }
-]
+### Webhook Summary
+
+This pipeline requires 3 webhooks (configured in [Webhooks Setup guide](../../setup/configuration/for-end-users/2-webhooks-setup.md)):
+
+| Project | Webhook Type | Target URL | Trigger Event | Setup Guide Section | Purpose |
+|---------|-------------|------------|---------------|---------------------|---------|
+| `banggai_corner_detection` | Model Detection | `detect-model-webhook?model_name=pth-yolo-gridcorners` | Job → "in progress" | "Corner Detection Webhook" | Auto-detect 4 corner points |
+| `banggai_corner_detection` | Task Completion | `crop-quadrat-and-create-new-task-webhook?target_proj_id={SEG_ID}` | Task → "completed" | "Task Completion Webhook (Corner → Segmentation)" | Warp images and create segmentation task |
+| `banggai_coral_segmentation` | Model Detection | `detect-model-webhook?model_name=pth-yolo-coralsegbanggai&conv_mask_to_poly=true` | Job → "in progress" | "Coral Segmentation Webhook" | Auto-segment coral polygons |
+
+!!! info "Webhook Configuration Details"
+    The `{SEG_ID}` in the task completion webhook must be replaced with your actual coral segmentation project ID from CVAT.
+
+    Follow the [Webhooks Setup guide](../../setup/configuration/for-end-users/2-webhooks-setup.md) for step-by-step instructions on configuring each webhook with the correct project IDs, event triggers, and URLs.
+
+### Model Deployment Summary
+
+Both models must be deployed to Nuclio before starting annotation:
+
+**Corner Detection Model** (Stage 1):
+
+```bash
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
+./deploy_as_zip.sh
+nuctl deploy --project-name cvat --path ./nuclio --platform local --verbose
 ```
 
-!!! info "Skeleton Configuration"
-    This creates a 4-point skeleton structure for quadrat corners:
+**Coral Segmentation Model** (Stage 2):
 
-    - **Label name**: `quadrat_corner` (skeleton type)
-    - **4 sublabels**: Points labeled "1", "2", "3", "4" (one for each corner)
-    - **Order matters**: Annotate in clockwise order starting from top-left
-    - **Edges**: Automatically connects corners in a quadrilateral based on the SVG definition
-    - **Confidence attribute**: Numeric (0-100%, default 100) to capture prediction confidence for filtering low-quality detections
+```bash
+cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegbanggai
+./deploy_as_zip.sh
+nuctl deploy --project-name cvat --path ./nuclio --platform local --verbose
+```
 
-### Step 1.3: Upload Raw Quadrat Images
+For detailed deployment instructions, see the [setup guides](../../setup/configuration/for-end-users/1-cvat-projects.md).
+
+### Label Configuration Reference
+
+**Corner Detection Labels** (Skeleton with 4 points):
+
+- Label name: `quadrat_corner` (skeleton type)
+- 4 sublabels: Points labeled "1", "2", "3", "4"
+- Corner order: Clockwise from top-left (TL → TR → BR → BL)
+- Confidence attribute: 0-100% (default 100)
+
+**Coral Segmentation Labels** (16 genera polygons):
+
+Acanthastrea, Acropora, Astreopora, Atrea, Fungia, Goniastrea, Leptastrea, Merulinidae, Millepora, Montastrea, Montipora, Other, Pavona/Leptoseris, Pocillopora, Porites, Psammocora
+
+All labels include a `confidence` attribute (0-100%).
+
+For complete label JSON configurations, see [CVAT Projects Configuration](../../setup/configuration/for-end-users/1-cvat-projects.md).
+
+!!! success "Setup Complete?"
+    If you've completed all setup steps from the prerequisites, you're ready to begin the annotation workflow!
+
+## Annotation Workflow
+
+Once all projects, webhooks, and models are configured, you can begin processing images through the pipeline.
+
+### Stage 1: Corner Detection Workflow
+
+#### Step 1.1: Upload Raw Quadrat Images
 
 1. In the `banggai_corner_detection` project, click **Create a new task**
 2. Configure task:
@@ -165,75 +219,20 @@ Click the **Raw** tab in label configuration and paste this JSON:
 
     This allows automatic extraction of location, year, and quadrat number.
 
-### Step 1.4: Deploy Corner Detection Model
-
-Deploy the pre-trained YOLOv11 corner detection model:
-
-```bash
-# Navigate to grid pose detection module
-cd PROJ_ROOT/criobe/grid_pose_detection
-
-# Activate environment
-pixi shell -e grid-pose
-
-# Navigate to deployment directory
-cd deploy/pth-yolo-gridcorners
-
-# Deploy to Nuclio
-./deploy_as_zip.sh
-
-nuctl deploy --project-name cvat \
-    --path ./nuclio \
-    --platform local \
-    --verbose
-```
-
-**Verify deployment:**
-
-```bash
-# Check function status
-nuctl get functions --platform local | grep gridcorners
-
-# Should show:
-# pth-yolo-gridcorners  ready  ...
-```
-
-Test the function:
-
-```bash
-# From deploy directory
-curl -X POST http://localhost:8001 \
-    -H "Content-Type: application/json" \
-    -d @test_payload.json
-```
-
-### Step 1.5: Configure Detection Webhook
-
-Set up automatic corner detection when jobs are opened:
-
-1. Navigate to `banggai_corner_detection` project in CVAT
-2. Click **Actions** → **Webhooks**
-3. Click **Create webhook**
-4. Configure:
-    - **Target URL**: `http://bridge:8000/detect-model-webhook?model_name=pth-yolo-gridcorners&conv_mask_to_poly=false`
-    - **Description**: "Auto-detect quadrat corners"
-    - **Events**: Check **"When a job state is changed to 'in progress'"**
-    - **Content type**: `application/json`
-    - **Enable SSL verification**: Uncheck (for local deployment)
-5. Click **Submit**
-
-!!! info "Webhook Parameters"
-    - `model_name=pth-yolo-gridcorners`: The deployed Nuclio function name
-    - `conv_mask_to_poly=false`: Don't convert masks to polygons (we're using points/skeleton for this stage)
-
-### Step 1.6: Run Semi-Automatic Corner Detection
+#### Step 1.2: Semi-Automatic Corner Detection
 
 1. Open a job in the `raw_batch_01` task
-2. The webhook triggers automatically, running the corner detection model
-3. Wait 5-10 seconds, then **refresh** the page (`F5`)
-4. Four corner points should appear on the image!
+2. Change job state to **"in progress"** - this triggers the detection webhook automatically
+3. The corner detection model runs (you'll see activity in Bridge logs)
+4. Wait 5-10 seconds, then **refresh** the page (`F5`)
+5. Four corner points should appear on the image!
 
-**Manual correction workflow:**
+!!! info "Automatic Detection"
+    The webhook configured in setup automatically runs the corner detection model when job state changes to "in progress". No manual triggering needed!
+
+#### Step 1.3: Manual Corner Correction
+
+Review and correct the automatically detected corners:
 
 - **Check corner positions**: Are all 4 corners correctly detected?
 - **Adjust if needed**: Drag corner points to exact positions
@@ -252,417 +251,91 @@ Set up automatic corner detection when jobs are opened:
 
     Clockwise from top-left! Wrong order will result in distorted warped images.
 
-### Step 1.7: Complete Corner Detection Tasks
+#### Step 1.4: Complete Corner Detection Task
 
 Once all corners are correctly annotated:
 
 1. Review all images in the task
-2. Verify 4 corners per image
+2. Verify 4 corners per image in correct clockwise order
 3. Click **Menu** → **Finish the job**
 4. Mark the task as **Completed** in the project view
 
-## Stage 2: Automated Cropping and Segmentation
+!!! success "Automatic Progression to Stage 2"
+    When you mark the task as "completed", the task completion webhook automatically:
 
-### Step 2.1: Create CVAT Project for Segmentation
+    - Downloads corner annotations
+    - Warps images using perspective transformation
+    - Creates new task in the segmentation project
+    - Uploads warped images
 
-1. Create a new project in CVAT
-2. Enter details:
-    - **Name**: `banggai_coral_segmentation`
-    - **Description**: "Coral genus segmentation on warped Banggai images"
-
-### Step 2.2: Configure Segmentation Labels
-
-Use the same 16 coral genera labels from Guide A:
-
-Click **Raw** tab and paste:
-
-```json
-[
-  {
-    "name": "Acanthastrea",
-    "color": "#ff0000",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Acropora",
-    "color": "#00ff00",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Astreopora",
-    "color": "#0000ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Atrea",
-    "color": "#ffff00",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Fungia",
-    "color": "#ff00ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Goniastrea",
-    "color": "#00ffff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Leptastrea",
-    "color": "#ff8000",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Merulinidae",
-    "color": "#8000ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Millepora",
-    "color": "#00ff80",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Montastrea",
-    "color": "#ff0080",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Montipora",
-    "color": "#80ff00",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Other",
-    "color": "#808080",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Pavona/Leptoseris",
-    "color": "#ff8080",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Pocillopora",
-    "color": "#8080ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Porites",
-    "color": "#80ff80",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Psammocora",
-    "color": "#ff80ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  }
-]
-```
-
-Click **Continue** to create the project.
-
-### Step 2.3: Configure Bridge Webhook for Automatic Warping
-
-This is the **key automation step**: when corner detection tasks are completed, automatically warp images and create segmentation tasks.
-
-1. Return to the `banggai_corner_detection` project
-2. Go to **Actions** → **Webhooks**
-3. Click **Create webhook** (this is a second webhook on the same project)
-4. Configure:
-    - **Target URL**: `http://bridge:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id={SEGMENTATION_PROJECT_ID}`
-    - **Description**: "Auto-warp and create segmentation tasks"
-    - **Events**: Check **"When a task status is changed to 'completed'"**
-    - **Content type**: `application/json`
-5. **Replace `{SEGMENTATION_PROJECT_ID}`** with the actual project ID
-
-**To find the segmentation project ID:**
-
-1. Navigate to the `banggai_coral_segmentation` project
-2. Look at the URL: `http://localhost:8080/projects/{PROJECT_ID}`
-3. Copy the number (e.g., `7`)
-4. Update webhook URL: `http://bridge:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id=7`
-
-Click **Submit**.
-
-### Step 2.4: Trigger Automatic Warping
-
-Now test the automation:
-
-1. Ensure your corner detection task (`raw_batch_01`) is marked **Completed**
-2. The webhook triggers automatically
-3. **Check Bridge logs** to monitor progress:
+    Monitor progress in Bridge logs:
 
     ```bash
     docker logs -f bridge
     ```
 
-    You should see:
-    ```
-    INFO: Received task completion webhook for task ID: 123
-    INFO: Processing corner annotations...
-    INFO: Warping 20 images...
-    INFO: Creating new task in project 7...
-    INFO: Created task "raw_batch_01_warped" with 20 images
-    ```
+### Stage 2: Coral Segmentation Workflow
 
-4. **Navigate to `banggai_coral_segmentation` project**
-5. You should see a new task automatically created with warped images!
+#### Step 2.1: Verify Automatic Task Creation
 
-!!! success "Automation in Action"
-    The Bridge service just:
+After completing the corner detection task in Stage 1, the task completion webhook automatically creates a new task in the segmentation project.
 
-    - Downloaded corner annotations from the completed task
-    - Applied perspective transformation to crop and warp each image to a standard view
-    - Uploaded the warped images to the segmentation project
-    - Created a new task with preserved metadata
+**Check for the new task:**
 
-    All automatically! 🎉
+1. Navigate to the `banggai_coral_segmentation` project in CVAT
+2. You should see a new task automatically created (e.g., `raw_batch_01_warped`)
+3. The task contains warped, standardized images from the corner detection stage
 
-### Step 2.5: Deploy Segmentation Model (Optional)
-
-For semi-automatic coral annotation, deploy the Banggai segmentation model:
+**Monitor automation progress:**
 
 ```bash
-cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegbanggai
+# Watch Bridge logs to see processing
+docker logs -f bridge
 
-./deploy_as_zip.sh
-
-nuctl deploy --project-name cvat \
-    --path ./nuclio \
-    --platform local \
-    --verbose
+# You should see:
+# INFO: Received task completion webhook for task ID: 123
+# INFO: Processing corner annotations...
+# INFO: Warping 20 images...
+# INFO: Creating new task in project...
+# INFO: Created task "raw_batch_01_warped" with 20 images
 ```
 
-### Step 2.6: Configure Segmentation Detection Webhook
+!!! success "Automatic Warping Complete"
+    The Bridge service automatically:
 
-Add a webhook to the `banggai_coral_segmentation` project:
+    - Downloaded corner annotations from the completed task
+    - Applied perspective transformation to crop and warp each image
+    - Uploaded warped images to the segmentation project
+    - Created a new task with preserved metadata
 
-1. Navigate to `banggai_coral_segmentation` project
-2. **Actions** → **Webhooks** → **Create webhook**
-3. Configure:
-    - **Target URL**: `http://bridge:8000/detect-model-webhook?model_name=pth-yolo-coralsegbanggai&conv_mask_to_poly=true`
-    - **Description**: "Auto-detect corals on job open"
-    - **Events**: Check **"When a job state is changed to 'in progress'"**
-    - **Content type**: `application/json`
-4. Click **Submit**
-
-### Step 2.7: Annotate Corals on Warped Images
+#### Step 2.2: Semi-Automatic Coral Segmentation
 
 1. Open a job in the auto-created segmentation task
-2. Model automatically runs and adds coral polygons (wait ~10-30 sec, then refresh)
-3. Review and correct predictions (see Guide A Step 4.5 for correction workflow)
-4. Save frequently (`Ctrl+S`)
-5. Mark job as complete when done
+2. Job state is automatically set to **"in progress"** (triggers detection webhook)
+3. The segmentation model runs automatically (wait ~10-30 seconds)
+4. **Refresh** the page (`F5`) - coral polygons should appear!
+
+!!! info "Automatic Detection"
+    Tasks created by webhooks automatically have their job state set to "in progress", which immediately triggers the segmentation detection webhook. No manual state change needed!
+
+#### Step 2.3: Manual Correction and Annotation
+
+Review and correct the automatically generated coral annotations:
+
+**Correction workflow** (see [Guide A](1-single-stage-segmentation.md) for detailed instructions):
+
+- Review each automatically detected polygon
+- Correct boundaries and species labels as needed
+- Add missing coral colonies
+- Remove false positives
+- Adjust confidence values if uncertain
+- Save frequently (`Ctrl+S`)
+
+**When finished:**
+
+1. Review all images in the task
+2. Click **Menu** → **Finish the job**
+3. Mark task as **Completed** when ready for export
 
 ## End-to-End Pipeline Workflow
 

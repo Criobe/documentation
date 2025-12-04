@@ -47,9 +47,19 @@ graph LR
 
 **Stage 4**: Annotate coral genera on clean images
 
+!!! info "4 Stages, 3 CVAT Projects"
+    This is a **four-stage pipeline** that requires only **three CVAT projects**:
+
+    - **Stage 1** uses `criobe_corner_annotation` project
+    - **Stage 2** uses `criobe_grid_annotation` project
+    - **Stage 3** is fully automatic (no CVAT project needed)
+    - **Stage 4** uses `criobe_finegrained_annotated` project
+
+    Stage 3 (grid removal) runs automatically via webhook when Stage 2 completes, requiring no manual annotation work.
+
 ### What You'll Learn
 
-- Create four interconnected CVAT projects with different label configurations
+- Create three CVAT projects for the four-stage pipeline (Stage 3 is automatic)
 - Deploy four Nuclio functions for each pipeline stage
 - Configure a complete webhook automation chain
 - Monitor and debug multi-stage pipelines
@@ -58,7 +68,7 @@ graph LR
 
 ### Expected Outcome
 
-- Four CVAT projects working together as an automated pipeline
+- Three CVAT projects working together as a four-stage automated pipeline
 - Raw images automatically processed through all stages
 - High-quality grid-removed images ready for annotation
 - Complete annotated coral dataset for training
@@ -75,108 +85,190 @@ graph LR
 
 ## Prerequisites
 
-Before starting, ensure you have:
+!!! warning "Critical: Complete Setup First"
+    This guide requires ALL CVAT projects and ALL webhooks to be configured BEFORE uploading any images. The pipeline uses 5 webhooks that automatically create tasks in downstream projects, so ALL projects must exist before configuring ANY webhooks.
 
-- [x] CVAT instance running with admin access
+    **You must complete the full setup configuration before beginning annotation work.**
+
+### Required Setup Steps
+
+You must complete these setup guides in order:
+
+1. **[CVAT Projects Configuration](../../setup/configuration/for-end-users/1-cvat-projects.md)**
+
+    Create and configure **3 projects** with proper labels:
+
+    - **Project 1: Corner Detection** - Follow the "Corner Detection" section to create `criobe_corner_annotation` with 4-point skeleton labels
+    - **Project 2: Grid Detection** - Follow the "Grid Detection" section to create `criobe_grid_annotation` with 117 grid point labels
+    - **Project 3: Coral Segmentation** - Follow the "Coral Segmentation" section to create `criobe_finegrained_annotated` with 16 coral genera polygon labels
+
+2. **[Webhooks Setup](../../setup/configuration/for-end-users/2-webhooks-setup.md)**
+
+    Configure **5 webhooks** across projects after all projects exist:
+
+    - **Webhook 1** (on Corner Detection project): Model detection webhook for auto-detecting corners
+    - **Webhook 2** (on Corner Detection project): Task completion webhook for automatic image warping and grid task creation
+    - **Webhook 3** (on Grid Detection project): Model detection webhook for auto-detecting 117 grid points
+    - **Webhook 4** (on Grid Detection project): Task completion webhook for automatic grid removal and segmentation task creation
+    - **Webhook 5** (on Coral Segmentation project): Model detection webhook for auto-segmenting corals
+
+3. **[Workflow Testing](../../setup/configuration/for-end-users/3-workflow-testing.md)**
+
+    Verify the complete automation pipeline works end-to-end through all four stages.
+
+### Setup Checklist
+
+Before starting annotation workflow, verify you have:
+
+- [x] **CVAT instance** running with admin access
 - [x] **Nuclio serverless platform** deployed and functional
 - [x] **Bridge service** running and connected to CVAT network
+- [x] **3 CVAT projects created and configured**:
+    - `criobe_corner_annotation` (Stage 1: corner detection)
+    - `criobe_grid_annotation` (Stage 2: grid detection)
+    - `criobe_finegrained_annotated` (Stage 4: coral segmentation)
+- [x] **5 webhooks configured across projects**:
+    - Corner project: Model detection + task completion webhooks
+    - Grid project: Model detection + task completion webhooks
+    - Segmentation project: Model detection webhook
+- [x] **4 Nuclio models deployed**:
+    - `pth-yolo-gridcorners` (corner detection)
+    - `pth-yolo-gridpose` (grid point detection)
+    - `pth-lama` (grid removal/inpainting)
+    - `pth-yolo-coralsegv4` (coral segmentation)
 - [x] Raw quadrat images with visible grid overlays
 - [x] Sufficient disk space (processed images ~3x original dataset size)
 - [x] Completed [Guide B](2-two-stage-banggai.md) (highly recommended for webhook understanding)
 
-!!! warning "Bridge Service is Essential"
-    This guide relies heavily on the Bridge service for automation. Verify it's properly configured:
+!!! tip "Quick Setup Verification"
+    Before proceeding, verify your setup:
 
     ```bash
-    # Check bridge container
+    # Check Bridge service
     docker ps | grep bridge
-
-    # Verify bridge can reach CVAT
     docker exec -it bridge curl http://cvat_server:8080
-
-    # Test bridge API
     curl http://localhost:8000/health
     # Should return {"status": "healthy"}
 
-    # Check bridge logs
+    # Check all Nuclio functions deployed
+    nuctl get functions --platform local | grep -E "(gridcorners|gridpose|lama|coralsegv4)"
+    # All 4 functions should show STATE: ready
+
+    # Check CVAT projects exist
+    # Navigate to http://localhost:8080/projects
+    # Verify all 3 projects are listed with correct IDs
+
+    # Monitor Bridge logs in separate terminal
     docker logs -f bridge
     ```
 
-## Stage 1: Corner Detection and Image Warping
+## Pipeline Configuration Reference
 
-### Step 1.1: Create CVAT Project for Corners
+This section summarizes the configuration needed for this four-stage pipeline. **Detailed setup instructions are in the [setup guides](../../setup/configuration/for-end-users/1-cvat-projects.md)** - you should have already completed those before reaching this point.
 
-1. Log in to CVAT at `http://localhost:8080`
-2. Navigate to **Projects** → Click **+**
-3. Enter project details:
-    - **Name**: `criobe_corner_annotation`
-    - **Description**: "Quadrat corner detection for CRIOBE dataset (Stage 1 of 4)"
+### Project Summary
 
-### Step 1.2: Configure Corner Labels
+This pipeline requires 3 CVAT projects (configured in [CVAT Projects guide](../../setup/configuration/for-end-users/1-cvat-projects.md)):
 
-Click the **Raw** tab in label configuration and paste:
+| Stage | Project Name | Label Type | Setup Guide Section | Purpose |
+|-------|--------------|------------|---------------------|---------|
+| 1 | `criobe_corner_annotation` | Skeleton (4 points) | "Project 1: Corner Detection" | Detect quadrat corners for perspective correction |
+| 2 | `criobe_grid_annotation` | Points (117 total) | "Project 2: Grid Detection" | Detect grid intersection points (9×13 grid) |
+| 3 (automatic) | N/A - Grid removal processing | N/A | N/A | Automatic grid removal via LaMa inpainting (no project needed) |
+| 4 | `criobe_finegrained_annotated` | Polygon (16 genera) | "Project 3: Coral Segmentation" | Annotate coral species on clean images |
 
-```json
-[
-  {
-    "name": "quadrat_corner",
-    "type": "skeleton",
-    "sublabels": [
-      {
-        "name": "1",
-        "type": "points",
-        "attributes": []
-      },
-      {
-        "name": "2",
-        "type": "points",
-        "attributes": []
-      },
-      {
-        "name": "3",
-        "type": "points",
-        "attributes": []
-      },
-      {
-        "name": "4",
-        "type": "points",
-        "attributes": []
-      }
-    ],
-    "svg": "<circle r=&quot;0.75&quot; cx=&quot;17.558528900146484&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;1&quot; data-node-id=&quot;1&quot; data-label-name=&quot;1&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;65.0501708984375&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;2&quot; data-node-id=&quot;2&quot; data-label-name=&quot;2&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;61.27717208862305&quot; data-type=&quot;element node&quot; data-element-id=&quot;3&quot; data-node-id=&quot;3&quot; data-label-name=&quot;3&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;21.7391300201416&quot; cy=&quot;59.43770980834961&quot; data-type=&quot;element node&quot; data-element-id=&quot;4&quot; data-node-id=&quot;4&quot; data-label-name=&quot;4&quot;></circle>",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  }
-]
+!!! note "Stage 3 is Automatic"
+    Stage 3 (grid removal) does not require a separate CVAT project. The grid removal webhook processes images and directly creates tasks in the coral segmentation project (`criobe_finegrained_annotated`).
+
+### Webhook Summary
+
+This pipeline requires 5 webhooks across 3 projects (configured in [Webhooks Setup guide](../../setup/configuration/for-end-users/2-webhooks-setup.md)):
+
+| Project | Webhook Type | Target URL | Trigger Event | Setup Guide Section | Purpose |
+|---------|-------------|------------|---------------|---------------------|---------|
+| `criobe_corner_annotation` | Model Detection | `detect-model-webhook?model_name=pth-yolo-gridcorners` | Job → "in progress" | "Corner Detection Webhook" | Auto-detect 4 corner points |
+| `criobe_corner_annotation` | Task Completion | `crop-quadrat-and-create-new-task-webhook?target_proj_id={GRID_ID}` | Task → "completed" | "Task Completion Webhook (Corner → Grid)" | Warp images and create grid detection task |
+| `criobe_grid_annotation` | Model Detection | `detect-model-webhook?model_name=pth-yolo-gridpose` | Job → "in progress" | "Grid Detection Webhook" | Auto-detect 117 grid intersection points |
+| `criobe_grid_annotation` | Task Completion | `remove-grid-and-create-new-task-webhook?target_proj_id={SEG_ID}` | Task → "completed" | "Task Completion Webhook (Grid → Segmentation)" | Remove grid lines and create segmentation task |
+| `criobe_finegrained_annotated` | Model Detection | `detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask_to_poly=true` | Job → "in progress" | "Coral Segmentation Webhook" | Auto-segment coral polygons |
+
+!!! info "Webhook Configuration Details"
+    The `{GRID_ID}` and `{SEG_ID}` placeholders in the task completion webhooks must be replaced with your actual project IDs from CVAT.
+
+    Follow the [Webhooks Setup guide](../../setup/configuration/for-end-users/2-webhooks-setup.md) for step-by-step instructions on configuring each webhook with the correct project IDs, event triggers, and URLs.
+
+### Model Deployment Summary
+
+All four models must be deployed to Nuclio before starting annotation:
+
+**Corner Detection Model** (Stage 1):
+
+```bash
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
+./deploy_as_zip.sh
+nuctl deploy --project-name cvat --path ./nuclio --platform local --verbose
 ```
 
-Click **Continue** to create the project.
+**Grid Pose Detection Model** (Stage 2):
 
-!!! info "4-Point Skeleton Structure"
-    This creates a 4-point skeleton structure for quadrat corners:
+```bash
+cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridpose
+./deploy_as_zip.sh
+nuctl deploy --project-name cvat --path ./nuclio --platform local --verbose
+```
 
-    - **Label name**: `quadrat_corner` (skeleton type)
-    - **4 sublabels**: Points labeled "1", "2", "3", "4" (one for each corner)
-    - **Annotation order**: Create points in clockwise order starting from top-left:
-        1. Top-left corner
-        2. Top-right corner
-        3. Bottom-right corner
-        4. Bottom-left corner
-    - **Edges**: Automatically connects corners in a quadrilateral based on the SVG definition
-    - **Confidence attribute**: Numeric (0-100%, default 100) to capture prediction confidence for filtering low-quality detections
+**LaMa Inpainting Model** (Stage 3):
 
-### Step 1.3: Upload Raw Quadrat Images
+```bash
+cd PROJ_ROOT/criobe/grid_inpainting/deploy
+./deploy_as_zip.sh
+nuctl deploy --project-name cvat --path ./pth-lama-nuclio --platform local --verbose
+```
+
+**Coral Segmentation Model** (Stage 4):
+
+```bash
+cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegv4
+./deploy_as_zip.sh
+nuctl deploy --project-name cvat --path ./nuclio --platform local --verbose
+```
+
+For detailed deployment instructions, see the [setup guides](../../setup/configuration/for-end-users/1-cvat-projects.md).
+
+### Label Configuration Reference
+
+**Corner Detection Labels** (Skeleton with 4 points):
+
+- Label name: `quadrat_corner` (skeleton type)
+- 4 sublabels: Points labeled "1", "2", "3", "4"
+- Corner order: Clockwise from top-left (TL → TR → BR → BL)
+- Confidence attribute: 0-100% (default 100)
+
+**Grid Detection Labels** (117 individual points):
+
+- Label name: `grid_point` (points type)
+- 117 points total (9×13 grid pattern)
+- Auto-detected by model, requires manual refinement
+- Critical for accurate grid removal
+
+**Coral Segmentation Labels** (16 genera polygons):
+
+Acanthastrea, Acropora, Astreopora, Atrea, Fungia, Goniastrea, Leptastrea, Merulinidae, Millepora, Montastrea, Montipora, Other, Pavona/Leptoseris, Pocillopora, Porites, Psammocora
+
+All labels include a `confidence` attribute (0-100%).
+
+For complete label JSON configurations, see [CVAT Projects Configuration](../../setup/configuration/for-end-users/1-cvat-projects.md).
+
+!!! success "Setup Complete?"
+    If you've completed all setup steps from the prerequisites, you're ready to begin the annotation workflow!
+
+## Annotation Workflow
+
+Once all projects, webhooks, and models are configured, you can begin processing images through the complete four-stage pipeline.
+
+### Stage 1: Corner Detection Workflow
+
+#### Step 1.1: Upload Raw Quadrat Images
 
 1. In `criobe_corner_annotation`, click **Create a new task**
 2. Configure task:
@@ -194,64 +286,20 @@ Click **Continue** to create the project.
 
     This enables automatic metadata extraction for area, year, and quadrat number.
 
-### Step 1.4: Deploy GridCorners Model
-
-```bash
-# Navigate to grid pose detection module
-cd PROJ_ROOT/criobe/grid_pose_detection
-
-# Activate environment
-pixi shell -e grid-pose
-
-# Navigate to deployment directory
-cd deploy/pth-yolo-gridcorners
-
-# Run deployment script
-./deploy_as_zip.sh
-
-# Deploy to Nuclio
-nuctl deploy --project-name cvat \
-    --path ./nuclio \
-    --platform local \
-    --verbose
-```
-
-**Verify deployment:**
-
-```bash
-# Check function status
-nuctl get functions --platform local | grep gridcorners
-
-# Expected output:
-# pth-yolo-gridcorners  ready  http://:8001  ...
-
-# Test function
-cd PROJ_ROOT/criobe/grid_pose_detection/deploy/pth-yolo-gridcorners
-curl -X POST http://localhost:8001 \
-    -H "Content-Type: application/json" \
-    -d @test_payload.json
-```
-
-### Step 1.5: Configure Detection Webhook
-
-1. In CVAT, navigate to `criobe_corner_annotation` project
-2. Click **Actions** → **Webhooks** → **Create webhook**
-3. Configure:
-    - **Target URL**: `http://bridge:8000/detect-model-webhook?model_name=pth-yolo-gridcorners&conv_mask_to_poly=false`
-    - **Description**: "Auto-detect quadrat corners (Stage 1)"
-    - **Events**: Check **"When a job state is changed to 'in progress'"**
-    - **Content type**: `application/json`
-    - **Enable SSL verification**: Uncheck
-4. Click **Submit**
-
-### Step 1.6: Semi-Automatic Corner Detection
+#### Step 1.2: Semi-Automatic Corner Detection
 
 1. Open a job in your corner detection task
-2. Webhook triggers automatically, running corner detection
-3. Wait 5-10 seconds, then refresh (`F5`)
-4. Four corner points should appear!
+2. Change job state to **"in progress"** - this triggers the detection webhook automatically
+3. The corner detection model runs (monitor Bridge logs)
+4. Wait 5-10 seconds, then **refresh** (`F5`)
+5. Four corner points should appear!
 
-**Manual correction:**
+!!! info "Automatic Detection"
+    The webhook configured in setup automatically runs the corner detection model when job state changes to "in progress". No manual triggering needed!
+
+#### Step 1.3: Manual Corner Correction
+
+Review and correct the automatically detected corners:
 
 - Verify all 4 corners are detected
 - Drag points to exact corner positions
@@ -260,60 +308,57 @@ curl -X POST http://localhost:8001 \
 - Save with `Ctrl+S`
 
 !!! warning "Critical: Corner Order"
-    Incorrect corner order will produce distorted warped images! Always verify clockwise ordering starting from top-left.
+    Incorrect corner order will produce distorted warped images! Always verify clockwise ordering starting from top-left:
 
-### Step 1.7: Complete Corner Detection
+    1. Top-left corner
+    2. Top-right corner
+    3. Bottom-right corner
+    4. Bottom-left corner
+
+#### Step 1.4: Complete Corner Detection
 
 Once all images have correct corner annotations:
 
 1. Review entire task
-2. Click **Menu** → **Finish the job**
-3. Mark task as **Completed** in project view
+2. Verify 4 corners per image in correct clockwise order
+3. Click **Menu** → **Finish the job**
+4. Mark task as **Completed** in project view
 
-## Stage 2: Grid Pose Detection
+!!! success "Automatic Progression to Stage 2"
+    When you mark the task as "completed", the task completion webhook automatically:
 
-### Step 2.1: Create CVAT Project for Grid Detection
+    - Downloads corner annotations
+    - Warps images using perspective transformation
+    - Creates new task in the grid detection project
+    - Uploads warped images
 
-1. Create new project in CVAT
-2. Enter details:
-    - **Name**: `criobe_grid_annotation`
-    - **Description**: "117-point grid detection for CRIOBE dataset (Stage 2 of 4)"
+    Monitor progress in Bridge logs:
 
-### Step 2.2: Configure Grid Point Labels
+    ```bash
+    docker logs -f bridge
+    ```
 
-This is the most complex label configuration. Click **Raw** tab and paste:
+### Stage 2: Grid Detection Workflow
 
-```json
-[
-  {
-    "name": "grid_point",
-    "color": "#00ff00",
-    "attributes": [],
-    "type": "points"
-  }
-]
-```
+#### Step 2.1: Verify Automatic Task Creation
 
-!!! info "117-Point Grid Skeleton"
-    The CRIOBE quadrat uses a standard 9×13 grid (117 intersection points). When the model runs, it will:
+After completing the corner detection task in Stage 1, the task completion webhook automatically creates a new task in the grid detection project.
 
-    - Detect all 117 grid intersections
-    - Create a skeleton connecting adjacent points
-    - Numbered from top-left to bottom-right
+**Check for the new task:**
 
-    The grid template is stored in `grid_pose_detection/assets/kp_template_gridpose.npy`.
+1. Navigate to the `criobe_grid_annotation` project in CVAT
+2. You should see a new task automatically created (e.g., `moorea_2023_batch_01_warped`)
+3. The task contains warped, standardized images from the corner detection stage
 
-### Step 2.3: Configure Automatic Task Creation from Stage 1
+!!! success "Automatic Warping Complete"
+    The Bridge service automatically:
 
-Now configure the **bridge webhook** to automatically warp images and create grid detection tasks when corner detection is complete.
+    - Downloaded corner annotations
+    - Applied perspective transformation
+    - Uploaded warped images to grid detection project
+    - Created new task ready for grid annotation
 
-1. Return to `criobe_corner_annotation` project
-2. Click **Actions** → **Webhooks** → **Create webhook** (second webhook)
-3. Configure:
-    - **Target URL**: `http://bridge:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id={GRID_PROJECT_ID}`
-    - **Description**: "Auto-warp and create grid detection tasks (Stage 1 → 2)"
-    - **Events**: Check **"When a task status is changed to 'completed'"**
-    - **Content type**: `application/json`
+#### Step 2.2: Semi-Automatic Grid Detection
 
 **To find `{GRID_PROJECT_ID}`:**
 
@@ -395,10 +440,13 @@ nuctl get functions --platform local | grep gridpose
 
 ### Step 2.7: Semi-Automatic Grid Detection
 
-1. Open a job in the auto-created grid detection task
+1. Open a job in the auto-created grid detection task (job state is automatically set to **"in progress"** by the webhook)
 2. Model runs automatically (detecting 117 points)
 3. Wait 10-15 seconds, then refresh (`F5`)
 4. All 117 grid intersection points should appear!
+
+!!! info "Automatic Job State"
+    Tasks created by the cropping webhook automatically have their job state set to "in progress", which triggers the grid detection webhook immediately. No manual state change is needed.
 
 **Manual refinement:**
 
@@ -421,32 +469,23 @@ nuctl get functions --platform local | grep gridpose
 2. Click **Menu** → **Finish the job**
 3. Mark task as **Completed**
 
-## Stage 3: Automated Grid Removal
+### Stage 3: Automatic Grid Removal
 
-### Step 3.1: Create CVAT Project for Clean Images
+This stage is **fully automatic** - no manual annotation work required!
 
-1. Create new project
-2. Enter details:
-    - **Name**: `criobe_clean_images`
-    - **Description**: "Grid-removed images for CRIOBE dataset (Stage 3 of 4)"
+!!! info "Automatic Processing"
+    When you complete a grid detection task in Stage 2, the webhook automatically:
 
-!!! info "No Labels Needed"
-    This project doesn't require any label configuration because it's an **intermediate processing stage**. The LaMa inpainting model will automatically remove grids using keypoints from Stage 2.
+    - Downloads grid point annotations (117 points)
+    - Generates masks around grid lines using the point positions
+    - Calls LaMa inpainting model to remove grid
+    - Creates task in segmentation project with clean images
 
-### Step 3.2: Deploy LaMa Inpainting Model
+    **Processing time**: ~5-8 seconds per image on GPU
 
-```bash
-cd PROJ_ROOT/criobe/grid_inpainting/deploy
+#### Step 3.1: Monitor Automatic Grid Removal
 
-./deploy_as_zip.sh
-
-nuctl deploy --project-name cvat \
-    --path ./pth-lama-nuclio \
-    --platform local \
-    --verbose
-```
-
-**Verify:**
+After completing Stage 2, monitor the automatic grid removal:
 
 ```bash
 nuctl get functions --platform local | grep lama
@@ -530,509 +569,92 @@ INFO: Created task: moorea_2023_batch_01_clean
     - Created clean images ready for segmentation
     - Uploaded to final segmentation project
 
-## Stage 4: Coral Segmentation
+### Stage 4: Coral Segmentation Workflow
 
-### Step 4.1: Create CVAT Project for Segmentation
+After Stage 3 completes grid removal, you're ready for final coral annotation on clean images.
 
-1. Create new project
-2. Enter details:
-    - **Name**: `criobe_finegrained_annotated`
-    - **Description**: "Coral segmentation on clean images - CRIOBE finegrained taxonomy (16 genera)"
+#### Step 4.1: Verify Automatic Task Creation
 
-### Step 4.2: Configure Coral Genus Labels
+After the grid removal process completes in Stage 3, the webhook automatically creates a new task in the segmentation project.
 
-Click **Raw** tab and paste the complete 16-genera configuration:
+**Check for the new task:**
 
-```json
-[
-  {
-    "name": "Acanthastrea",
-    "color": "#ff0000",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Acropora",
-    "color": "#00ff00",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Astreopora",
-    "color": "#0000ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Atrea",
-    "color": "#ffff00",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Fungia",
-    "color": "#ff00ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Goniastrea",
-    "color": "#00ffff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Leptastrea",
-    "color": "#ff8000",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Merulinidae",
-    "color": "#8000ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Millepora",
-    "color": "#00ff80",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Montastrea",
-    "color": "#ff0080",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Montipora",
-    "color": "#80ff00",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Other",
-    "color": "#808080",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Pavona/Leptoseris",
-    "color": "#ff8080",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Pocillopora",
-    "color": "#8080ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Porites",
-    "color": "#80ff80",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  },
-  {
-    "name": "Psammocora",
-    "color": "#ff80ff",
-    "type": "polygon",
-    "attributes": [
-      {
-        "name": "confidence",
-        "input_type": "number",
-        "mutable": true,
-        "values": [
-          "0",
-          "100",
-          "1"
-        ],
-        "default_value": "100"
-      }
-    ]
-  }
-]
-```
+1. Navigate to the `criobe_finegrained_annotated` project in CVAT
+2. You should see a new task automatically created with clean, grid-removed images
+3. The task is ready for coral segmentation
 
-Click **Continue**.
+!!! success "Automatic Task Creation"
+    The Bridge service automatically:
 
-!!! info "CRIOBE Finegrained Taxonomy"
-    This 16-genera classification is used for scientific monitoring at CRIOBE research stations. For different taxonomies, see [Label Templates Reference](../reference/cvat-label-templates.md).
+    - Processed grid-removed images from Stage 3
+    - Uploaded clean images to segmentation project
+    - Created task ready for annotation
+    - Set job state to "in progress" (triggers segmentation webhook)
 
-### Step 4.3: Verify Automatic Task Creation
+#### Step 4.2: Semi-Automatic Coral Segmentation
 
-If you configured the webhook correctly in Step 3.3, tasks should already be created here with grid-removed images!
+!!! note "Label Configuration Reference"
+    The complete 16-genera polygon label configuration (300+ lines of JSON) is in the setup guide. See [CVAT Projects Configuration](../../setup/configuration/for-end-users/1-cvat-projects.md) for the full JSON.
 
-If not created automatically:
+1. Open a job in the auto-created segmentation task
+2. Job state is automatically set to **"in progress"** (triggers segmentation webhook)
+3. The coral segmentation model runs automatically (wait ~15-30 seconds)
+4. **Refresh** the page (`F5`) - coral polygons should appear on the clean images!
 
-1. Go back to Step 3.3 and verify webhook configuration
-2. Manually trigger by marking grid detection task as "in progress" then "completed" again
+!!! info "Automatic Detection"
+    Tasks created by the grid removal webhook automatically have job state set to "in progress", which triggers the segmentation detection webhook immediately.
 
-### Step 4.4: Deploy Coral Segmentation Model
+#### Step 4.3: Manual Correction and Annotation
 
-```bash
-cd PROJ_ROOT/criobe/coral_seg_yolo/deploy/pth-yolo-coralsegv4
+Review and correct the automatically generated coral annotations:
 
-./deploy_as_zip.sh
+**Correction workflow** (see [Guide A](1-single-stage-segmentation.md) or [Guide B](2-two-stage-banggai.md) for detailed instructions):
 
-nuctl deploy --project-name cvat \
-    --path ./nuclio \
-    --platform local \
-    --verbose
-```
+- Review each automatically detected polygon
+- Correct boundaries and species labels as needed
+- Add missing coral colonies
+- Remove false positives
+- Adjust confidence values if uncertain
+- Save frequently (`Ctrl+S`)
 
-**Verify:**
+**When finished:**
 
-```bash
-nuctl get functions --platform local | grep coralseg
-# pth-yolo-coralsegv4  ready  http://:8004  ...
-```
-
-### Step 4.5: Configure Segmentation Detection Webhook
-
-1. Navigate to `criobe_finegrained_annotated` project
-2. **Actions** → **Webhooks** → **Create webhook**
-3. Configure:
-    - **Target URL**: `http://bridge:8000/detect-model-webhook?model_name=pth-yolo-coralsegv4&conv_mask_to_poly=true`
-    - **Description**: "Auto-detect coral instances (Stage 4)"
-    - **Events**: Check **"When a job state is changed to 'in progress'"**
-    - **Content type**: `application/json`
-4. Click **Submit**
-
-### Step 4.6: Semi-Automatic Coral Segmentation
-
-1. Open a job in segmentation task
-2. Model runs automatically, creating polygon annotations in CVAT
-3. Wait 15-30 seconds (depends on coral density), then refresh
-4. Coral polygons should appear!
-
-**Manual correction workflow:**
-
-- **Check for missed corals**: Scan entire image, add missing colonies
-- **Correct boundaries**: Adjust polyline vertices to match coral edges precisely
-- **Fix genus labels**: Change misclassified corals to correct genus
-- **Delete false positives**: Remove annotations on rocks, sand, or artifacts
-- **Split merged colonies**: Delete merged shapes, draw separate polylines
-- **Quality check**: Ensure all corals >2cm diameter are annotated
-
-For detailed correction techniques, see [Guide A, Step 4.5](1-single-stage-segmentation.md#45-manual-correction-workflow).
-
-### Step 4.7: Complete Segmentation
-
-1. Review and correct all images
+1. Review all images in the task
 2. Click **Menu** → **Finish the job**
-3. Mark task as **Completed**
+3. Mark task as **Completed** when ready for export
 
-## Complete Pipeline Automation
+## End-to-End Pipeline Summary
 
-### End-to-End Workflow Summary
+You've now completed the full four-stage CRIOBE pipeline! Here's what happened:
 
-Here's how the complete four-stage pipeline works once configured:
+**Stage 1: Corner Detection**
+- Uploaded raw images with grid overlays
+- Auto-detected 4 quadrat corners
+- Manual correction and task completion
 
-```mermaid
-graph TD
-    A[Upload Raw Images<br/>to Corner Project] --> B[Open Job]
-    B --> C[Auto-Detect Corners<br/>Webhook 1]
-    C --> D[Manual Corner<br/>Correction]
-    D --> E[Mark Task Complete]
-    E --> F[Webhook 2:<br/>Warp Images]
-    F --> G[Auto-Create<br/>Grid Detection Task]
-    G --> H[Open Grid Job]
-    H --> I[Auto-Detect 117 Points<br/>Webhook 3]
-    I --> J[Manual Grid<br/>Refinement]
-    J --> K[Mark Task Complete]
-    K --> L[Webhook 4:<br/>Remove Grid with LaMa]
-    L --> M[Auto-Create<br/>Segmentation Task]
-    M --> N[Open Segmentation Job]
-    N --> O[Auto-Detect Corals<br/>Webhook 5]
-    O --> P[Manual Segmentation<br/>Correction]
-    P --> Q[Mark Complete]
-    Q --> R[Export Dataset]
+**Stage 2: Grid Detection  **
+- Automatic task creation with warped images
+- Auto-detected 117 grid intersection points
+- Manual refinement for accuracy
 
-    style A fill:#e1f5ff
-    style F fill:#fff9c4
-    style L fill:#fff9c4
-    style R fill:#c8e6c9
-```
+**Stage 3: Grid Removal (Automatic)**
+- LaMa inpainting removed grid lines
+- Generated clean coral images
+- No manual work required (~5-8 sec/image)
 
-### Webhook Configuration Summary
+**Stage 4: Coral Segmentation**
+- Automatic task creation with clean images
+- Auto-segmented coral polygons (16 genera)
+- Manual correction and completion
 
-You should have configured **5 webhooks total** across 3 projects:
+!!! success "Complete Automation Achieved"
+    From raw upload to final dataset, the only manual steps were:
 
-| Project | Webhook | Trigger | Action |
-|---------|---------|---------|--------|
-| `criobe_corner_annotation` | 1 | Job → In Progress | Auto-detect corners (GridCorners model) |
-| `criobe_corner_annotation` | 2 | Task → Completed | Warp images + create grid detection tasks |
-| `criobe_grid_annotation` | 3 | Job → In Progress | Auto-detect 117 grid points (GridPose model) |
-| `criobe_grid_annotation` | 4 | Task → Completed | Remove grid with LaMa + create segmentation tasks |
-| `criobe_finegrained_annotated` | 5 | Job → In Progress | Auto-detect corals (YOLO segmentation model) |
+    1. Correct corner positions (Stage 1)
+    2. Refine grid points (Stage 2)
+    3. Correct coral segmentations (Stage 4)
 
-### Monitoring and Debugging
-
-**Check webhook executions:**
-
-1. In CVAT, navigate to any project with webhooks
-2. **Actions** → **Webhooks** → Click on a webhook
-3. View **Recent Deliveries** tab to see execution history
-
-**Monitor bridge service:**
-
-```bash
-# Real-time logs
-docker logs -f bridge
-
-# Recent errors
-docker logs bridge | grep ERROR
-
-# Check webhook processing
-docker logs bridge | grep "Webhook received"
-```
-
-**Verify Nuclio functions:**
-
-```bash
-# Check all function statuses
-nuctl get functions --platform local
-
-# View specific function logs
-nuctl get logs pth-yolo-gridcorners --platform local
-
-# Check function metrics
-curl http://localhost:8070/api/functions
-```
-
-**Test webhooks manually:**
-
-```bash
-# Test corner detection
-curl -X POST "http://localhost:8000/detect-model-webhook?model_name=pth-yolo-gridcorners&conv_mask_to_poly=false" \
-    -H "Content-Type: application/json" \
-    -d '{"job_id": 123}'
-
-# Test image warping
-curl -X POST "http://localhost:8000/crop-quadrat-and-create-new-task-webhook?target_proj_id=8" \
-    -H "Content-Type: application/json" \
-    -d '{"task_id": 45}'
-
-# Test grid removal
-curl -X POST "http://localhost:8000/remove-grid-and-create-new-task-webhook?target_proj_id=10" \
-    -H "Content-Type: application/json" \
-    -d '{"task_id": 46}'
-```
-
-### Quality Control Checkpoints
-
-Implement QA at each stage:
-
-**Stage 1 Quality Checks:**
-- [ ] All 4 corners detected per image
-- [ ] Corner order is clockwise (TL → TR → BR → BL)
-- [ ] Corner positions are accurate (within 5 pixels of actual corners)
-- [ ] No missing or duplicate corners
-
-**Stage 2 Quality Checks:**
-- [ ] Warped images are properly cropped to quadrat boundaries
-- [ ] No perspective distortion (grid should appear rectangular)
-- [ ] Image resolution preserved
-- [ ] All 117 grid points detected
-- [ ] Grid points form regular 9×13 pattern
-- [ ] Point positions accurate (within 3 pixels of intersections)
-
-**Stage 3 Quality Checks:**
-- [ ] Grid lines completely removed
-- [ ] No visible artifacts or blur
-- [ ] Coral textures preserved
-- [ ] Image brightness consistent
-- [ ] No edge effects or black regions
-
-**Stage 4 Quality Checks:**
-- [ ] All visible coral colonies annotated (>2cm diameter)
-- [ ] Polylines follow colony boundaries accurately
-- [ ] Genus labels correct (or "Other" if uncertain)
-- [ ] No false positives on background
-- [ ] Overlapping corals separated into individual instances
+    All image transformations and task creation were fully automated!
 
 ## Data Export and Preparation
 
@@ -1042,12 +664,12 @@ Implement QA at each stage:
 cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
-# Pull corner annotations (optional, for records)
+# Pull corner detection annotations (optional, for records)
 python create_fiftyone_dataset.py \
     --cvat-project-name "criobe_corner_annotation" \
     --dataset-name "criobe_corners_fo"
 
-# Pull grid annotations (optional, for training grid detection)
+# Pull grid detection annotations (optional, for analysis)
 python create_fiftyone_dataset.py \
     --cvat-project-name "criobe_grid_annotation" \
     --dataset-name "criobe_grid_fo"
@@ -1271,7 +893,7 @@ For large-scale dataset creation:
 
 Congratulations! You've mastered the complete CRIOBE pipeline. You now have:
 
-- ✅ Four interconnected CVAT projects
+- ✅ Three CVAT projects orchestrating a four-stage pipeline
 - ✅ Complete webhook automation chain
 - ✅ Semi-automatic processing at every stage
 - ✅ High-quality grid-removed coral images
@@ -1300,19 +922,10 @@ Congratulations! You've mastered the complete CRIOBE pipeline. You now have:
 ## Reference Materials
 
 - [CVAT Label Templates](../reference/cvat-label-templates.md) - All configurations
+- [Module Documentation](../reference/module-documentation.md) - Technical docs for all pipeline modules
 - [Webhook Configuration Reference](../reference/cvat-label-templates.md#webhook-configurations)
 - [Bridge Service API Documentation](http://localhost:8000/docs) - When bridge is running
 - [Nuclio Function Documentation](http://localhost:8070) - Dashboard when deployed
-
-### Module Documentation
-
-For detailed technical information on each stage:
-
-- **Stage 1 & 2**: [grid_pose_detection/README.md](https://github.com/taiamiti/criobe/grid_pose_detection/README.md)
-- **Stage 3**: [grid_inpainting/README.md](https://github.com/taiamiti/criobe/grid_inpainting/README.md)
-- **Stage 4 (YOLO)**: [coral_seg_yolo/README.md](https://github.com/taiamiti/criobe/coral_seg_yolo/README.md)
-- **Stage 4 (MMSeg)**: [DINOv2_mmseg/README.md](https://github.com/taiamiti/criobe/DINOv2_mmseg/README.md)
-- **Bridge Service**: [bridge/README.md](https://github.com/taiamiti/criobe/bridge/README.md)
 
 ---
 

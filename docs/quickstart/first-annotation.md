@@ -232,7 +232,7 @@ If you deployed the corner detection Nuclio function:
     ```
     http://bridge.gateway:8000/detect-model-webhook?model_name=pth-yolo-gridcorners
     ```
-2. **Open the task** → The job state changes to "in progress"
+2. **Open the task** and change job state to **"in progress"** to trigger the automatic detection
 3. **Wait ~5 seconds** for auto-detection
 4. **Refresh page** to see detected corners
 5. **Verify corners** are correct
@@ -278,7 +278,7 @@ docker logs bridge -f
 
 1. **Navigate to Project 2** (`tutorial_coral_segmentation`)
 2. **Open the newly created task**
-3. **Open the job** (this triggers model inference)
+3. **Open the job** (job state is automatically set to **"in progress"** by the webhook)
 4. **Wait 10-15 seconds**
 5. **Refresh** the annotation page
 6. **See auto-detected coral polygons!**

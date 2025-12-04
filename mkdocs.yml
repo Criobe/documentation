@@ -263,6 +263,7 @@ nav:
       - Model Deployment: user-guide/training-and-deployment/model-deployment.md
     - Reference:
       - CVAT Label Templates: user-guide/reference/cvat-label-templates.md
+      - Module Documentation: user-guide/reference/module-documentation.md
 
   # Developer Guide - coming later
   - Developer Guide:
