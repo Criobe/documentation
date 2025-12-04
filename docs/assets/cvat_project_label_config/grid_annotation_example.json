@@ -1,7 +1,6 @@
 [
   {
     "name": "grid",
-    "id": 312,
     "color": "#7571e6",
     "type": "skeleton",
     "sublabels": [
@@ -9,823 +8,718 @@
         "name": "1",
         "attributes": [],
         "type": "points",
-        "color": "#d12345",
-        "id": 313
+        "color": "#d12345"
       },
       {
         "name": "2",
         "attributes": [],
         "type": "points",
-        "color": "#350dea",
-        "id": 314
+        "color": "#350dea"
       },
       {
         "name": "3",
         "attributes": [],
         "type": "points",
-        "color": "#479ffe",
-        "id": 315
+        "color": "#479ffe"
       },
       {
         "name": "4",
         "attributes": [],
         "type": "points",
-        "color": "#4a649f",
-        "id": 316
+        "color": "#4a649f"
       },
       {
         "name": "5",
         "attributes": [],
         "type": "points",
-        "color": "#478144",
-        "id": 317
+        "color": "#478144"
       },
       {
         "name": "6",
         "attributes": [],
         "type": "points",
-        "color": "#57236b",
-        "id": 318
+        "color": "#57236b"
       },
       {
         "name": "7",
         "attributes": [],
         "type": "points",
-        "color": "#1cdda5",
-        "id": 319
+        "color": "#1cdda5"
       },
       {
         "name": "8",
         "attributes": [],
         "type": "points",
-        "color": "#e2bc6e",
-        "id": 320
+        "color": "#e2bc6e"
       },
       {
         "name": "9",
         "attributes": [],
         "type": "points",
-        "color": "#f067db",
-        "id": 321
+        "color": "#f067db"
       },
       {
         "name": "10",
         "attributes": [],
         "type": "points",
-        "color": "#63bbfa",
-        "id": 322
+        "color": "#63bbfa"
       },
       {
         "name": "11",
         "attributes": [],
         "type": "points",
-        "color": "#22b16f",
-        "id": 323
+        "color": "#22b16f"
       },
       {
         "name": "12",
         "attributes": [],
         "type": "points",
-        "color": "#daddec",
-        "id": 324
+        "color": "#daddec"
       },
       {
         "name": "13",
         "attributes": [],
         "type": "points",
-        "color": "#2ac791",
-        "id": 325
+        "color": "#2ac791"
       },
       {
         "name": "14",
         "attributes": [],
         "type": "points",
-        "color": "#de22a0",
-        "id": 326
+        "color": "#de22a0"
       },
       {
         "name": "15",
         "attributes": [],
         "type": "points",
-        "color": "#a7a570",
-        "id": 327
+        "color": "#a7a570"
       },
       {
         "name": "16",
         "attributes": [],
         "type": "points",
-        "color": "#74db1b",
-        "id": 328
+        "color": "#74db1b"
       },
       {
         "name": "17",
         "attributes": [],
         "type": "points",
-        "color": "#aaa246",
-        "id": 329
+        "color": "#aaa246"
       },
       {
         "name": "18",
         "attributes": [],
         "type": "points",
-        "color": "#bfa552",
-        "id": 330
+        "color": "#bfa552"
       },
       {
         "name": "19",
         "attributes": [],
         "type": "points",
-        "color": "#9b8d37",
-        "id": 331
+        "color": "#9b8d37"
       },
       {
         "name": "20",
         "attributes": [],
         "type": "points",
-        "color": "#c8023c",
-        "id": 332
+        "color": "#c8023c"
       },
       {
         "name": "21",
         "attributes": [],
         "type": "points",
-        "color": "#c0762a",
-        "id": 333
+        "color": "#c0762a"
       },
       {
         "name": "22",
         "attributes": [],
         "type": "points",
-        "color": "#76bb18",
-        "id": 334
+        "color": "#76bb18"
       },
       {
         "name": "23",
         "attributes": [],
         "type": "points",
-        "color": "#afc7d8",
-        "id": 335
+        "color": "#afc7d8"
       },
       {
         "name": "24",
         "attributes": [],
         "type": "points",
-        "color": "#3b1ebf",
-        "id": 336
+        "color": "#3b1ebf"
       },
       {
         "name": "25",
         "attributes": [],
         "type": "points",
-        "color": "#3d4e6a",
-        "id": 337
+        "color": "#3d4e6a"
       },
       {
         "name": "26",
         "attributes": [],
         "type": "points",
-        "color": "#b295e8",
-        "id": 338
+        "color": "#b295e8"
       },
       {
         "name": "27",
         "attributes": [],
         "type": "points",
-        "color": "#a8eeed",
-        "id": 339
+        "color": "#a8eeed"
       },
       {
         "name": "28",
         "attributes": [],
         "type": "points",
-        "color": "#1cb413",
-        "id": 340
+        "color": "#1cb413"
       },
       {
         "name": "29",
         "attributes": [],
         "type": "points",
-        "color": "#b19fbd",
-        "id": 341
+        "color": "#b19fbd"
       },
       {
         "name": "30",
         "attributes": [],
         "type": "points",
-        "color": "#5cc934",
-        "id": 342
+        "color": "#5cc934"
       },
       {
         "name": "31",
         "attributes": [],
         "type": "points",
-        "color": "#179232",
-        "id": 343
+        "color": "#179232"
       },
       {
         "name": "32",
         "attributes": [],
         "type": "points",
-        "color": "#5d93c8",
-        "id": 344
+        "color": "#5d93c8"
       },
       {
         "name": "33",
         "attributes": [],
         "type": "points",
-        "color": "#0b9b66",
-        "id": 345
+        "color": "#0b9b66"
       },
       {
         "name": "34",
         "attributes": [],
         "type": "points",
-        "color": "#1004d4",
-        "id": 346
+        "color": "#1004d4"
       },
       {
         "name": "35",
         "attributes": [],
         "type": "points",
-        "color": "#76ffa6",
-        "id": 347
+        "color": "#76ffa6"
       },
       {
         "name": "36",
         "attributes": [],
         "type": "points",
-        "color": "#e52057",
-        "id": 348
+        "color": "#e52057"
       },
       {
         "name": "37",
         "attributes": [],
         "type": "points",
-        "color": "#0ca4a0",
-        "id": 349
+        "color": "#0ca4a0"
       },
       {
         "name": "38",
         "attributes": [],
         "type": "points",
-        "color": "#34fb06",
-        "id": 350
+        "color": "#34fb06"
       },
       {
         "name": "39",
         "attributes": [],
         "type": "points",
-        "color": "#ff6165",
-        "id": 351
+        "color": "#ff6165"
       },
       {
         "name": "40",
         "attributes": [],
         "type": "points",
-        "color": "#049dea",
-        "id": 352
+        "color": "#049dea"
       },
       {
         "name": "41",
         "attributes": [],
         "type": "points",
-        "color": "#7dd43b",
-        "id": 353
+        "color": "#7dd43b"
       },
       {
         "name": "42",
         "attributes": [],
         "type": "points",
-        "color": "#a62183",
-        "id": 354
+        "color": "#a62183"
       },
       {
         "name": "43",
         "attributes": [],
         "type": "points",
-        "color": "#fbcfc4",
-        "id": 355
+        "color": "#fbcfc4"
       },
       {
         "name": "44",
         "attributes": [],
         "type": "points",
-        "color": "#7b1509",
-        "id": 356
+        "color": "#7b1509"
       },
       {
         "name": "45",
         "attributes": [],
         "type": "points",
-        "color": "#ed30ca",
-        "id": 357
+        "color": "#ed30ca"
       },
       {
         "name": "46",
         "attributes": [],
         "type": "points",
-        "color": "#a73a69",
-        "id": 358
+        "color": "#a73a69"
       },
       {
         "name": "47",
         "attributes": [],
         "type": "points",
-        "color": "#9553cb",
-        "id": 359
+        "color": "#9553cb"
       },
       {
         "name": "48",
         "attributes": [],
         "type": "points",
-        "color": "#623d5e",
-        "id": 360
+        "color": "#623d5e"
       },
       {
         "name": "49",
         "attributes": [],
         "type": "points",
-        "color": "#973ab6",
-        "id": 361
+        "color": "#973ab6"
       },
       {
         "name": "50",
         "attributes": [],
         "type": "points",
-        "color": "#4170c0",
-        "id": 362
+        "color": "#4170c0"
       },
       {
         "name": "51",
         "attributes": [],
         "type": "points",
-        "color": "#7616e6",
-        "id": 363
+        "color": "#7616e6"
       },
       {
         "name": "52",
         "attributes": [],
         "type": "points",
-        "color": "#94f1d5",
-        "id": 364
+        "color": "#94f1d5"
       },
       {
         "name": "53",
         "attributes": [],
         "type": "points",
-        "color": "#c27715",
-        "id": 365
+        "color": "#c27715"
       },
       {
         "name": "54",
         "attributes": [],
         "type": "points",
-        "color": "#d3b644",
-        "id": 366
+        "color": "#d3b644"
       },
       {
         "name": "55",
         "attributes": [],
         "type": "points",
-        "color": "#f0cfbe",
-        "id": 367
+        "color": "#f0cfbe"
       },
       {
         "name": "56",
         "attributes": [],
         "type": "points",
-        "color": "#bd3880",
-        "id": 368
+        "color": "#bd3880"
       },
       {
         "name": "57",
         "attributes": [],
         "type": "points",
-        "color": "#0e199c",
-        "id": 369
+        "color": "#0e199c"
       },
       {
         "name": "58",
         "attributes": [],
         "type": "points",
-        "color": "#2fe635",
-        "id": 370
+        "color": "#2fe635"
       },
       {
         "name": "59",
         "attributes": [],
         "type": "points",
-        "color": "#2c529c",
-        "id": 371
+        "color": "#2c529c"
       },
       {
         "name": "60",
         "attributes": [],
         "type": "points",
-        "color": "#c953bc",
-        "id": 372
+        "color": "#c953bc"
       },
       {
         "name": "61",
         "attributes": [],
         "type": "points",
-        "color": "#417b52",
-        "id": 373
+        "color": "#417b52"
       },
       {
         "name": "62",
         "attributes": [],
         "type": "points",
-        "color": "#69e040",
-        "id": 374
+        "color": "#69e040"
       },
       {
         "name": "63",
         "attributes": [],
         "type": "points",
-        "color": "#c3978b",
-        "id": 375
+        "color": "#c3978b"
       },
       {
         "name": "64",
         "attributes": [],
         "type": "points",
-        "color": "#79bcb8",
-        "id": 376
+        "color": "#79bcb8"
       },
       {
         "name": "65",
         "attributes": [],
         "type": "points",
-        "color": "#ed3d69",
-        "id": 377
+        "color": "#ed3d69"
       },
       {
         "name": "66",
         "attributes": [],
         "type": "points",
-        "color": "#bfad0e",
-        "id": 378
+        "color": "#bfad0e"
       },
       {
         "name": "67",
         "attributes": [],
         "type": "points",
-        "color": "#f52a0f",
-        "id": 379
+        "color": "#f52a0f"
       },
       {
         "name": "68",
         "attributes": [],
         "type": "points",
-        "color": "#af1154",
-        "id": 380
+        "color": "#af1154"
       },
       {
         "name": "69",
         "attributes": [],
         "type": "points",
-        "color": "#84a25b",
-        "id": 381
+        "color": "#84a25b"
       },
       {
         "name": "70",
         "attributes": [],
         "type": "points",
-        "color": "#fbd900",
-        "id": 382
+        "color": "#fbd900"
       },
       {
         "name": "71",
         "attributes": [],
         "type": "points",
-        "color": "#c1b52d",
-        "id": 383
+        "color": "#c1b52d"
       },
       {
         "name": "72",
         "attributes": [],
         "type": "points",
-        "color": "#d0b506",
-        "id": 384
+        "color": "#d0b506"
       },
       {
         "name": "73",
         "attributes": [],
         "type": "points",
-        "color": "#f6ef0d",
-        "id": 385
+        "color": "#f6ef0d"
       },
       {
         "name": "74",
         "attributes": [],
         "type": "points",
-        "color": "#4ad924",
-        "id": 386
+        "color": "#4ad924"
       },
       {
         "name": "75",
         "attributes": [],
         "type": "points",
-        "color": "#5e413b",
-        "id": 387
+        "color": "#5e413b"
       },
       {
         "name": "76",
         "attributes": [],
         "type": "points",
-        "color": "#c5a7d3",
-        "id": 388
+        "color": "#c5a7d3"
       },
       {
         "name": "77",
         "attributes": [],
         "type": "points",
-        "color": "#3a140c",
-        "id": 389
+        "color": "#3a140c"
       },
       {
         "name": "78",
         "attributes": [],
         "type": "points",
-        "color": "#10d0dd",
-        "id": 390
+        "color": "#10d0dd"
       },
       {
         "name": "79",
         "attributes": [],
         "type": "points",
-        "color": "#a7d09d",
-        "id": 391
+        "color": "#a7d09d"
       },
       {
         "name": "80",
         "attributes": [],
         "type": "points",
-        "color": "#68f176",
-        "id": 392
+        "color": "#68f176"
       },
       {
         "name": "81",
         "attributes": [],
         "type": "points",
-        "color": "#d5162a",
-        "id": 393
+        "color": "#d5162a"
       },
       {
         "name": "82",
         "attributes": [],
         "type": "points",
-        "color": "#c85181",
-        "id": 394
+        "color": "#c85181"
       },
       {
         "name": "83",
         "attributes": [],
         "type": "points",
-        "color": "#15a7d9",
-        "id": 395
+        "color": "#15a7d9"
       },
       {
         "name": "84",
         "attributes": [],
         "type": "points",
-        "color": "#c0be1d",
-        "id": 396
+        "color": "#c0be1d"
       },
       {
         "name": "85",
         "attributes": [],
         "type": "points",
-        "color": "#c0e1e4",
-        "id": 397
+        "color": "#c0e1e4"
       },
       {
         "name": "86",
         "attributes": [],
         "type": "points",
-        "color": "#b54b5a",
-        "id": 398
+        "color": "#b54b5a"
       },
       {
         "name": "87",
         "attributes": [],
         "type": "points",
-        "color": "#d889cf",
-        "id": 399
+        "color": "#d889cf"
       },
       {
         "name": "88",
         "attributes": [],
         "type": "points",
-        "color": "#d530ce",
-        "id": 400
+        "color": "#d530ce"
       },
       {
         "name": "89",
         "attributes": [],
         "type": "points",
-        "color": "#6b81eb",
-        "id": 401
+        "color": "#6b81eb"
       },
       {
         "name": "90",
         "attributes": [],
         "type": "points",
-        "color": "#36e941",
-        "id": 402
+        "color": "#36e941"
       },
       {
         "name": "91",
         "attributes": [],
         "type": "points",
-        "color": "#9c67a2",
-        "id": 403
+        "color": "#9c67a2"
       },
       {
         "name": "92",
         "attributes": [],
         "type": "points",
-        "color": "#8de318",
-        "id": 404
+        "color": "#8de318"
       },
       {
         "name": "93",
         "attributes": [],
         "type": "points",
-        "color": "#deb524",
-        "id": 405
+        "color": "#deb524"
       },
       {
         "name": "94",
         "attributes": [],
         "type": "points",
-        "color": "#ee8fdd",
-        "id": 406
+        "color": "#ee8fdd"
       },
       {
         "name": "95",
         "attributes": [],
         "type": "points",
-        "color": "#dcb1c3",
-        "id": 407
+        "color": "#dcb1c3"
       },
       {
         "name": "96",
         "attributes": [],
         "type": "points",
-        "color": "#779831",
-        "id": 408
+        "color": "#779831"
       },
       {
         "name": "97",
         "attributes": [],
         "type": "points",
-        "color": "#9fc90c",
-        "id": 409
+        "color": "#9fc90c"
       },
       {
         "name": "98",
         "attributes": [],
         "type": "points",
-        "color": "#5a63e2",
-        "id": 410
+        "color": "#5a63e2"
       },
       {
         "name": "99",
         "attributes": [],
         "type": "points",
-        "color": "#46dc4c",
-        "id": 411
+        "color": "#46dc4c"
       },
       {
         "name": "100",
         "attributes": [],
         "type": "points",
-        "color": "#a74bcb",
-        "id": 412
+        "color": "#a74bcb"
       },
       {
         "name": "101",
         "attributes": [],
         "type": "points",
-        "color": "#9c7a9e",
-        "id": 413
+        "color": "#9c7a9e"
       },
       {
         "name": "102",
         "attributes": [],
         "type": "points",
-        "color": "#f77019",
-        "id": 414
+        "color": "#f77019"
       },
       {
         "name": "103",
         "attributes": [],
         "type": "points",
-        "color": "#7c6321",
-        "id": 415
+        "color": "#7c6321"
       },
       {
         "name": "104",
         "attributes": [],
         "type": "points",
-        "color": "#e00f16",
-        "id": 416
+        "color": "#e00f16"
       },
       {
         "name": "105",
         "attributes": [],
         "type": "points",
-        "color": "#402cc0",
-        "id": 417
+        "color": "#402cc0"
       },
       {
         "name": "106",
         "attributes": [],
         "type": "points",
-        "color": "#a5958a",
-        "id": 418
+        "color": "#a5958a"
       },
       {
         "name": "107",
         "attributes": [],
         "type": "points",
-        "color": "#d95a4a",
-        "id": 419
+        "color": "#d95a4a"
       },
       {
         "name": "108",
         "attributes": [],
         "type": "points",
-        "color": "#e8be81",
-        "id": 420
+        "color": "#e8be81"
       },
       {
         "name": "109",
         "attributes": [],
         "type": "points",
-        "color": "#ead0cb",
-        "id": 421
+        "color": "#ead0cb"
       },
       {
         "name": "110",
         "attributes": [],
         "type": "points",
-        "color": "#dee283",
-        "id": 422
+        "color": "#dee283"
       },
       {
         "name": "111",
         "attributes": [],
         "type": "points",
-        "color": "#26928e",
-        "id": 423
+        "color": "#26928e"
       },
       {
         "name": "112",
         "attributes": [],
         "type": "points",
-        "color": "#f97af2",
-        "id": 424
+        "color": "#f97af2"
       },
       {
         "name": "113",
         "attributes": [],
         "type": "points",
-        "color": "#956e93",
-        "id": 425
+        "color": "#956e93"
       },
       {
         "name": "114",
         "attributes": [],
         "type": "points",
-        "color": "#b2bccc",
-        "id": 426
+        "color": "#b2bccc"
       },
       {
         "name": "115",
         "attributes": [],
         "type": "points",
-        "color": "#aa68d4",
-        "id": 427
+        "color": "#aa68d4"
       },
       {
         "name": "116",
         "attributes": [],
         "type": "points",
-        "color": "#58cd2c",
-        "id": 428
+        "color": "#58cd2c"
       },
       {
         "name": "117",
         "attributes": [],
         "type": "points",
-        "color": "#bc2d55",
-        "id": 429
+        "color": "#bc2d55"
       }
     ],
     "svg": "<circle r=&quot;0.75&quot; cx=&quot;13.37792682647705&quot; cy=&quot;4.849498271942139&quot; data-type=&quot;element node&quot; data-element-id=&quot;1&quot; data-node-id=&quot;1&quot; data-label-id=&quot;313&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;22.57525062561035&quot; cy=&quot;5.351170539855957&quot; data-type=&quot;element node&quot; data-element-id=&quot;2&quot; data-node-id=&quot;2&quot; data-label-id=&quot;314&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;31.270902633666992&quot; cy=&quot;5.518394470214844&quot; data-type=&quot;element node&quot; data-element-id=&quot;3&quot; data-node-id=&quot;3&quot; data-label-id=&quot;315&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;40.301002502441406&quot; cy=&quot;5.016722202301025&quot; data-type=&quot;element node&quot; data-element-id=&quot;4&quot; data-node-id=&quot;4&quot; data-label-id=&quot;316&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;49.33110427856445&quot; cy=&quot;5.18394660949707&quot; data-type=&quot;element node&quot; data-element-id=&quot;5&quot; data-node-id=&quot;5&quot; data-label-id=&quot;317&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;58.862876892089844&quot; cy=&quot;5.18394660949707&quot; data-type=&quot;element node&quot; data-element-id=&quot;6&quot; data-node-id=&quot;6&quot; data-label-id=&quot;318&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;5.016722202301025&quot; data-type=&quot;element node&quot; data-element-id=&quot;7&quot; data-node-id=&quot;7&quot; data-label-id=&quot;319&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.09030151367188&quot; cy=&quot;4.682274341583252&quot; data-type=&quot;element node&quot; data-element-id=&quot;8&quot; data-node-id=&quot;8&quot; data-label-id=&quot;320&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.6220703125&quot; cy=&quot;4.515049934387207&quot; data-type=&quot;element node&quot; data-element-id=&quot;9&quot; data-node-id=&quot;9&quot; data-label-id=&quot;321&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;5.016722202301025&quot; cy=&quot;14.046822547912598&quot; data-type=&quot;element node&quot; data-element-id=&quot;10&quot; data-node-id=&quot;10&quot; data-label-id=&quot;322&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;13.712374687194824&quot; cy=&quot;14.046822547912598&quot; data-type=&quot;element node&quot; data-element-id=&quot;11&quot; data-node-id=&quot;11&quot; data-label-id=&quot;323&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;22.40802764892578&quot; cy=&quot;14.882943153381348&quot; data-type=&quot;element node&quot; data-element-id=&quot;12&quot; data-node-id=&quot;12&quot; data-label-id=&quot;324&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.27424621582031&quot; cy=&quot;14.214046478271484&quot; data-type=&quot;element node&quot; data-element-id=&quot;13&quot; data-node-id=&quot;13&quot; data-label-id=&quot;325&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;40.46822738647461&quot; cy=&quot;14.046822547912598&quot; data-type=&quot;element node&quot; data-element-id=&quot;14&quot; data-node-id=&quot;14&quot; data-label-id=&quot;326&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;49.665550231933594&quot; cy=&quot;14.046822547912598&quot; data-type=&quot;element node&quot; data-element-id=&quot;15&quot; data-node-id=&quot;15&quot; data-label-id=&quot;327&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.03010177612305&quot; cy=&quot;13.879598617553711&quot; data-type=&quot;element node&quot; data-element-id=&quot;16&quot; data-node-id=&quot;16&quot; data-label-id=&quot;328&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;67.89297485351562&quot; cy=&quot;13.712374687194824&quot; data-type=&quot;element node&quot; data-element-id=&quot;17&quot; data-node-id=&quot;17&quot; data-label-id=&quot;329&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.59197235107422&quot; cy=&quot;13.712374687194824&quot; data-type=&quot;element node&quot; data-element-id=&quot;18&quot; data-node-id=&quot;18&quot; data-label-id=&quot;330&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.45484924316406&quot; cy=&quot;14.046822547912598&quot; data-type=&quot;element node&quot; data-element-id=&quot;19&quot; data-node-id=&quot;19&quot; data-label-id=&quot;331&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.81939697265625&quot; cy=&quot;13.545150756835938&quot; data-type=&quot;element node&quot; data-element-id=&quot;20&quot; data-node-id=&quot;20&quot; data-label-id=&quot;332&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;5.016722202301025&quot; cy=&quot;23.076923370361328&quot; data-type=&quot;element node&quot; data-element-id=&quot;21&quot; data-node-id=&quot;21&quot; data-label-id=&quot;333&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;13.712374687194824&quot; cy=&quot;22.909698486328125&quot; data-type=&quot;element node&quot; data-element-id=&quot;22&quot; data-node-id=&quot;22&quot; data-label-id=&quot;334&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;22.742475509643555&quot; cy=&quot;23.4113712310791&quot; data-type=&quot;element node&quot; data-element-id=&quot;23&quot; data-node-id=&quot;23&quot; data-label-id=&quot;335&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;31.77257537841797&quot; cy=&quot;23.4113712310791&quot; data-type=&quot;element node&quot; data-element-id=&quot;24&quot; data-node-id=&quot;24&quot; data-label-id=&quot;336&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;40.802677154541016&quot; cy=&quot;23.2441463470459&quot; data-type=&quot;element node&quot; data-element-id=&quot;25&quot; data-node-id=&quot;25&quot; data-label-id=&quot;337&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;49.498329162597656&quot; cy=&quot;23.578596115112305&quot; data-type=&quot;element node&quot; data-element-id=&quot;26&quot; data-node-id=&quot;26&quot; data-label-id=&quot;338&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;58.69565200805664&quot; cy=&quot;23.4113712310791&quot; data-type=&quot;element node&quot; data-element-id=&quot;27&quot; data-node-id=&quot;27&quot; data-label-id=&quot;339&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.22742462158203&quot; cy=&quot;23.745819091796875&quot; data-type=&quot;element node&quot; data-element-id=&quot;28&quot; data-node-id=&quot;28&quot; data-label-id=&quot;340&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;76.92308044433594&quot; cy=&quot;23.745819091796875&quot; data-type=&quot;element node&quot; data-element-id=&quot;29&quot; data-node-id=&quot;29&quot; data-label-id=&quot;341&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.45484924316406&quot; cy=&quot;23.4113712310791&quot; data-type=&quot;element node&quot; data-element-id=&quot;30&quot; data-node-id=&quot;30&quot; data-label-id=&quot;342&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;94.9832763671875&quot; cy=&quot;23.2441463470459&quot; data-type=&quot;element node&quot; data-element-id=&quot;31&quot; data-node-id=&quot;31&quot; data-label-id=&quot;343&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;5.016722202301025&quot; cy=&quot;31.939800262451172&quot; data-type=&quot;element node&quot; data-element-id=&quot;32&quot; data-node-id=&quot;32&quot; data-label-id=&quot;344&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;14.046822547912598&quot; cy=&quot;32.441471099853516&quot; data-type=&quot;element node&quot; data-element-id=&quot;33&quot; data-node-id=&quot;33&quot; data-label-id=&quot;345&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;23.076923370361328&quot; cy=&quot;32.77592086791992&quot; data-type=&quot;element node&quot; data-element-id=&quot;34&quot; data-node-id=&quot;34&quot; data-label-id=&quot;346&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.107025146484375&quot; cy=&quot;32.60869598388672&quot; data-type=&quot;element node&quot; data-element-id=&quot;35&quot; data-node-id=&quot;35&quot; data-label-id=&quot;347&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.47157287597656&quot; cy=&quot;32.60869598388672&quot; data-type=&quot;element node&quot; data-element-id=&quot;36&quot; data-node-id=&quot;36&quot; data-label-id=&quot;348&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50&quot; cy=&quot;32.94314193725586&quot; data-type=&quot;element node&quot; data-element-id=&quot;37&quot; data-node-id=&quot;37&quot; data-label-id=&quot;349&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.197322845458984&quot; cy=&quot;32.77592086791992&quot; data-type=&quot;element node&quot; data-element-id=&quot;38&quot; data-node-id=&quot;38&quot; data-label-id=&quot;350&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;32.77592086791992&quot; data-type=&quot;element node&quot; data-element-id=&quot;39&quot; data-node-id=&quot;39&quot; data-label-id=&quot;351&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.42475128173828&quot; cy=&quot;32.441471099853516&quot; data-type=&quot;element node&quot; data-element-id=&quot;40&quot; data-node-id=&quot;40&quot; data-label-id=&quot;352&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.12039947509766&quot; cy=&quot;32.60869598388672&quot; data-type=&quot;element node&quot; data-element-id=&quot;41&quot; data-node-id=&quot;41&quot; data-label-id=&quot;353&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.65217590332031&quot; cy=&quot;32.441471099853516&quot; data-type=&quot;element node&quot; data-element-id=&quot;42&quot; data-node-id=&quot;42&quot; data-label-id=&quot;354&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;4.849498271942139&quot; cy=&quot;41.137123107910156&quot; data-type=&quot;element node&quot; data-element-id=&quot;43&quot; data-node-id=&quot;43&quot; data-label-id=&quot;355&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;14.046822547912598&quot; cy=&quot;41.137123107910156&quot; data-type=&quot;element node&quot; data-element-id=&quot;44&quot; data-node-id=&quot;44&quot; data-label-id=&quot;356&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;22.742475509643555&quot; cy=&quot;41.137123107910156&quot; data-type=&quot;element node&quot; data-element-id=&quot;45&quot; data-node-id=&quot;45&quot; data-label-id=&quot;357&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;31.939800262451172&quot; cy=&quot;41.638797760009766&quot; data-type=&quot;element node&quot; data-element-id=&quot;46&quot; data-node-id=&quot;46&quot; data-label-id=&quot;358&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.137123107910156&quot; cy=&quot;41.47157287597656&quot; data-type=&quot;element node&quot; data-element-id=&quot;47&quot; data-node-id=&quot;47&quot; data-label-id=&quot;359&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50&quot; cy=&quot;41.638797760009766&quot; data-type=&quot;element node&quot; data-element-id=&quot;48&quot; data-node-id=&quot;48&quot; data-label-id=&quot;360&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.36454772949219&quot; cy=&quot;41.638797760009766&quot; data-type=&quot;element node&quot; data-element-id=&quot;49&quot; data-node-id=&quot;49&quot; data-label-id=&quot;361&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;41.973243713378906&quot; data-type=&quot;element node&quot; data-element-id=&quot;50&quot; data-node-id=&quot;50&quot; data-label-id=&quot;362&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;76.92308044433594&quot; cy=&quot;41.137123107910156&quot; data-type=&quot;element node&quot; data-element-id=&quot;51&quot; data-node-id=&quot;51&quot; data-label-id=&quot;363&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.28762817382812&quot; cy=&quot;41.638797760009766&quot; data-type=&quot;element node&quot; data-element-id=&quot;52&quot; data-node-id=&quot;52&quot; data-label-id=&quot;364&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.81939697265625&quot; cy=&quot;41.8060188293457&quot; data-type=&quot;element node&quot; data-element-id=&quot;53&quot; data-node-id=&quot;53&quot; data-label-id=&quot;365&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;5.351170539855957&quot; cy=&quot;50.1672248840332&quot; data-type=&quot;element node&quot; data-element-id=&quot;54&quot; data-node-id=&quot;54&quot; data-label-id=&quot;366&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;14.046822547912598&quot; cy=&quot;49.8327751159668&quot; data-type=&quot;element node&quot; data-element-id=&quot;55&quot; data-node-id=&quot;55&quot; data-label-id=&quot;367&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;23.2441463470459&quot; cy=&quot;49.665550231933594&quot; data-type=&quot;element node&quot; data-element-id=&quot;56&quot; data-node-id=&quot;56&quot; data-label-id=&quot;368&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.441471099853516&quot; cy=&quot;49.8327751159668&quot; data-type=&quot;element node&quot; data-element-id=&quot;57&quot; data-node-id=&quot;57&quot; data-label-id=&quot;369&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.30434799194336&quot; cy=&quot;50.1672248840332&quot; data-type=&quot;element node&quot; data-element-id=&quot;58&quot; data-node-id=&quot;58&quot; data-label-id=&quot;370&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50.334449768066406&quot; cy=&quot;50&quot; data-type=&quot;element node&quot; data-element-id=&quot;59&quot; data-node-id=&quot;59&quot; data-label-id=&quot;371&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.197322845458984&quot; cy=&quot;50.334449768066406&quot; data-type=&quot;element node&quot; data-element-id=&quot;60&quot; data-node-id=&quot;60&quot; data-label-id=&quot;372&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;50&quot; data-type=&quot;element node&quot; data-element-id=&quot;61&quot; data-node-id=&quot;61&quot; data-label-id=&quot;373&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.42475128173828&quot; cy=&quot;50.334449768066406&quot; data-type=&quot;element node&quot; data-element-id=&quot;62&quot; data-node-id=&quot;62&quot; data-label-id=&quot;374&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;85.78594970703125&quot; cy=&quot;50.501670837402344&quot; data-type=&quot;element node&quot; data-element-id=&quot;63&quot; data-node-id=&quot;63&quot; data-label-id=&quot;375&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.15050506591797&quot; cy=&quot;50.66889572143555&quot; data-type=&quot;element node&quot; data-element-id=&quot;64&quot; data-node-id=&quot;64&quot; data-label-id=&quot;376&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;5.518394470214844&quot; cy=&quot;59.36454772949219&quot; data-type=&quot;element node&quot; data-element-id=&quot;65&quot; data-node-id=&quot;65&quot; data-label-id=&quot;377&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;14.214046478271484&quot; cy=&quot;59.197322845458984&quot; data-type=&quot;element node&quot; data-element-id=&quot;66&quot; data-node-id=&quot;66&quot; data-label-id=&quot;378&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;23.2441463470459&quot; cy=&quot;58.69565200805664&quot; data-type=&quot;element node&quot; data-element-id=&quot;67&quot; data-node-id=&quot;67&quot; data-label-id=&quot;379&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.441471099853516&quot; cy=&quot;58.69565200805664&quot; data-type=&quot;element node&quot; data-element-id=&quot;68&quot; data-node-id=&quot;68&quot; data-label-id=&quot;380&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.47157287597656&quot; cy=&quot;59.36454772949219&quot; data-type=&quot;element node&quot; data-element-id=&quot;69&quot; data-node-id=&quot;69&quot; data-label-id=&quot;381&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50.334449768066406&quot; cy=&quot;59.36454772949219&quot; data-type=&quot;element node&quot; data-element-id=&quot;70&quot; data-node-id=&quot;70&quot; data-label-id=&quot;382&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.53177261352539&quot; cy=&quot;59.53177261352539&quot; data-type=&quot;element node&quot; data-element-id=&quot;71&quot; data-node-id=&quot;71&quot; data-label-id=&quot;383&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.22742462158203&quot; cy=&quot;59.197322845458984&quot; data-type=&quot;element node&quot; data-element-id=&quot;72&quot; data-node-id=&quot;72&quot; data-label-id=&quot;384&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.25752258300781&quot; cy=&quot;59.53177261352539&quot; data-type=&quot;element node&quot; data-element-id=&quot;73&quot; data-node-id=&quot;73&quot; data-label-id=&quot;385&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.45484924316406&quot; cy=&quot;59.03010177612305&quot; data-type=&quot;element node&quot; data-element-id=&quot;74&quot; data-node-id=&quot;74&quot; data-label-id=&quot;386&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.3177261352539&quot; cy=&quot;59.53177261352539&quot; data-type=&quot;element node&quot; data-element-id=&quot;75&quot; data-node-id=&quot;75&quot; data-label-id=&quot;387&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;5.016722202301025&quot; cy=&quot;67.89297485351562&quot; data-type=&quot;element node&quot; data-element-id=&quot;76&quot; data-node-id=&quot;76&quot; data-label-id=&quot;388&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;14.214046478271484&quot; cy=&quot;68.0602035522461&quot; data-type=&quot;element node&quot; data-element-id=&quot;77&quot; data-node-id=&quot;77&quot; data-label-id=&quot;389&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;23.2441463470459&quot; cy=&quot;67.89297485351562&quot; data-type=&quot;element node&quot; data-element-id=&quot;78&quot; data-node-id=&quot;78&quot; data-label-id=&quot;390&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.441471099853516&quot; cy=&quot;67.55852508544922&quot; data-type=&quot;element node&quot; data-element-id=&quot;79&quot; data-node-id=&quot;79&quot; data-label-id=&quot;391&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.47157287597656&quot; cy=&quot;67.89297485351562&quot; data-type=&quot;element node&quot; data-element-id=&quot;80&quot; data-node-id=&quot;80&quot; data-label-id=&quot;392&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50&quot; cy=&quot;68.39464569091797&quot; data-type=&quot;element node&quot; data-element-id=&quot;81&quot; data-node-id=&quot;81&quot; data-label-id=&quot;393&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.53177261352539&quot; cy=&quot;68.0602035522461&quot; data-type=&quot;element node&quot; data-element-id=&quot;82&quot; data-node-id=&quot;82&quot; data-label-id=&quot;394&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.72909545898438&quot; cy=&quot;68.22742462158203&quot; data-type=&quot;element node&quot; data-element-id=&quot;83&quot; data-node-id=&quot;83&quot; data-label-id=&quot;395&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.75920104980469&quot; cy=&quot;68.22742462158203&quot; data-type=&quot;element node&quot; data-element-id=&quot;84&quot; data-node-id=&quot;84&quot; data-label-id=&quot;396&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.78929901123047&quot; cy=&quot;68.56187438964844&quot; data-type=&quot;element node&quot; data-element-id=&quot;85&quot; data-node-id=&quot;85&quot; data-label-id=&quot;397&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.3177261352539&quot; cy=&quot;68.39464569091797&quot; data-type=&quot;element node&quot; data-element-id=&quot;86&quot; data-node-id=&quot;86&quot; data-label-id=&quot;398&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;5.18394660949707&quot; cy=&quot;77.59197235107422&quot; data-type=&quot;element node&quot; data-element-id=&quot;87&quot; data-node-id=&quot;87&quot; data-label-id=&quot;399&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;14.046822547912598&quot; cy=&quot;77.42475128173828&quot; data-type=&quot;element node&quot; data-element-id=&quot;88&quot; data-node-id=&quot;88&quot; data-label-id=&quot;400&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;23.076923370361328&quot; cy=&quot;77.59197235107422&quot; data-type=&quot;element node&quot; data-element-id=&quot;89&quot; data-node-id=&quot;89&quot; data-label-id=&quot;401&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.60869598388672&quot; cy=&quot;77.75920104980469&quot; data-type=&quot;element node&quot; data-element-id=&quot;90&quot; data-node-id=&quot;90&quot; data-label-id=&quot;402&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.973243713378906&quot; cy=&quot;77.59197235107422&quot; data-type=&quot;element node&quot; data-element-id=&quot;91&quot; data-node-id=&quot;91&quot; data-label-id=&quot;403&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50.83612060546875&quot; cy=&quot;77.75920104980469&quot; data-type=&quot;element node&quot; data-element-id=&quot;92&quot; data-node-id=&quot;92&quot; data-label-id=&quot;404&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.53177261352539&quot; cy=&quot;77.09030151367188&quot; data-type=&quot;element node&quot; data-element-id=&quot;93&quot; data-node-id=&quot;93&quot; data-label-id=&quot;405&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.56187438964844&quot; cy=&quot;77.75920104980469&quot; data-type=&quot;element node&quot; data-element-id=&quot;94&quot; data-node-id=&quot;94&quot; data-label-id=&quot;406&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;78.09364318847656&quot; cy=&quot;77.59197235107422&quot; data-type=&quot;element node&quot; data-element-id=&quot;95&quot; data-node-id=&quot;95&quot; data-label-id=&quot;407&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.45484924316406&quot; cy=&quot;77.42475128173828&quot; data-type=&quot;element node&quot; data-element-id=&quot;96&quot; data-node-id=&quot;96&quot; data-label-id=&quot;408&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.48494720458984&quot; cy=&quot;77.75920104980469&quot; data-type=&quot;element node&quot; data-element-id=&quot;97&quot; data-node-id=&quot;97&quot; data-label-id=&quot;409&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;4.849498271942139&quot; cy=&quot;87.12374877929688&quot; data-type=&quot;element node&quot; data-element-id=&quot;98&quot; data-node-id=&quot;98&quot; data-label-id=&quot;410&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;13.879598617553711&quot; cy=&quot;86.45484924316406&quot; data-type=&quot;element node&quot; data-element-id=&quot;99&quot; data-node-id=&quot;99&quot; data-label-id=&quot;411&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;23.578596115112305&quot; cy=&quot;86.45484924316406&quot; data-type=&quot;element node&quot; data-element-id=&quot;100&quot; data-node-id=&quot;100&quot; data-label-id=&quot;412&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.77592086791992&quot; cy=&quot;86.45484924316406&quot; data-type=&quot;element node&quot; data-element-id=&quot;101&quot; data-node-id=&quot;101&quot; data-label-id=&quot;413&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.973243713378906&quot; cy=&quot;86.45484924316406&quot; data-type=&quot;element node&quot; data-element-id=&quot;102&quot; data-node-id=&quot;102&quot; data-label-id=&quot;414&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50.66889572143555&quot; cy=&quot;86.12039947509766&quot; data-type=&quot;element node&quot; data-element-id=&quot;103&quot; data-node-id=&quot;103&quot; data-label-id=&quot;415&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.8662223815918&quot; cy=&quot;86.12039947509766&quot; data-type=&quot;element node&quot; data-element-id=&quot;104&quot; data-node-id=&quot;104&quot; data-label-id=&quot;416&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;86.28762817382812&quot; data-type=&quot;element node&quot; data-element-id=&quot;105&quot; data-node-id=&quot;105&quot; data-label-id=&quot;417&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.59197235107422&quot; cy=&quot;86.28762817382812&quot; data-type=&quot;element node&quot; data-element-id=&quot;106&quot; data-node-id=&quot;106&quot; data-label-id=&quot;418&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;86.9565200805664&quot; cy=&quot;86.45484924316406&quot; data-type=&quot;element node&quot; data-element-id=&quot;107&quot; data-node-id=&quot;107&quot; data-label-id=&quot;419&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;95.65217590332031&quot; cy=&quot;86.45484924316406&quot; data-type=&quot;element node&quot; data-element-id=&quot;108&quot; data-node-id=&quot;108&quot; data-label-id=&quot;420&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;14.046822547912598&quot; cy=&quot;95.81939697265625&quot; data-type=&quot;element node&quot; data-element-id=&quot;109&quot; data-node-id=&quot;109&quot; data-label-id=&quot;421&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;23.4113712310791&quot; cy=&quot;95.65217590332031&quot; data-type=&quot;element node&quot; data-element-id=&quot;110&quot; data-node-id=&quot;110&quot; data-label-id=&quot;422&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;32.60869598388672&quot; cy=&quot;95.65217590332031&quot; data-type=&quot;element node&quot; data-element-id=&quot;111&quot; data-node-id=&quot;111&quot; data-label-id=&quot;423&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;41.8060188293457&quot; cy=&quot;95.48494720458984&quot; data-type=&quot;element node&quot; data-element-id=&quot;112&quot; data-node-id=&quot;112&quot; data-label-id=&quot;424&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;50.501670837402344&quot; cy=&quot;95.65217590332031&quot; data-type=&quot;element node&quot; data-element-id=&quot;113&quot; data-node-id=&quot;113&quot; data-label-id=&quot;425&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;59.698997497558594&quot; cy=&quot;95.15050506591797&quot; data-type=&quot;element node&quot; data-element-id=&quot;114&quot; data-node-id=&quot;114&quot; data-label-id=&quot;426&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;69.06354522705078&quot; cy=&quot;94.9832763671875&quot; data-type=&quot;element node&quot; data-element-id=&quot;115&quot; data-node-id=&quot;115&quot; data-label-id=&quot;427&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;77.75920104980469&quot; cy=&quot;95.48494720458984&quot; data-type=&quot;element node&quot; data-element-id=&quot;116&quot; data-node-id=&quot;116&quot; data-label-id=&quot;428&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;87.12374877929688&quot; cy=&quot;95.3177261352539&quot; data-type=&quot;element node&quot; data-element-id=&quot;117&quot; data-node-id=&quot;117&quot; data-label-id=&quot;429&quot;></circle>",
-    "attributes": []
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   }
 ]

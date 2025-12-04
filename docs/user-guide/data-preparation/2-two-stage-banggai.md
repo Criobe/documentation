@@ -97,20 +97,56 @@ Click the **Raw** tab in label configuration and paste this JSON:
 ```json
 [
   {
-    "name": "corner",
-    "color": "#ff0000",
-    "attributes": [],
-    "type": "points"
+    "name": "quadrat_corner",
+    "type": "skeleton",
+    "sublabels": [
+      {
+        "name": "1",
+        "type": "points",
+        "attributes": []
+      },
+      {
+        "name": "2",
+        "type": "points",
+        "attributes": []
+      },
+      {
+        "name": "3",
+        "type": "points",
+        "attributes": []
+      },
+      {
+        "name": "4",
+        "type": "points",
+        "attributes": []
+      }
+    ],
+    "svg": "<circle r=&quot;0.75&quot; cx=&quot;17.558528900146484&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;1&quot; data-node-id=&quot;1&quot; data-label-name=&quot;1&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;65.0501708984375&quot; cy=&quot;19.638378143310547&quot; data-type=&quot;element node&quot; data-element-id=&quot;2&quot; data-node-id=&quot;2&quot; data-label-name=&quot;2&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;68.0602035522461&quot; cy=&quot;61.27717208862305&quot; data-type=&quot;element node&quot; data-element-id=&quot;3&quot; data-node-id=&quot;3&quot; data-label-name=&quot;3&quot;></circle>\n<circle r=&quot;0.75&quot; cx=&quot;21.7391300201416&quot; cy=&quot;59.43770980834961&quot; data-type=&quot;element node&quot; data-element-id=&quot;4&quot; data-node-id=&quot;4&quot; data-label-name=&quot;4&quot;></circle>",
+    "attributes": [
+      {
+        "name": "confidence",
+        "input_type": "number",
+        "mutable": true,
+        "values": [
+          "0",
+          "100",
+          "1"
+        ],
+        "default_value": "100"
+      }
+    ]
   }
 ]
 ```
 
 !!! info "Skeleton Configuration"
-    CVAT will automatically create a skeleton when you add 4 points in the correct order during annotation. The skeleton structure is:
+    This creates a 4-point skeleton structure for quadrat corners:
 
-    - **4 joints** (corner points)
-    - **Order matters**: Top-left → Top-right → Bottom-right → Bottom-left (clockwise)
-    - **Edges**: Automatically connects corners in a quadrilateral
+    - **Label name**: `quadrat_corner` (skeleton type)
+    - **4 sublabels**: Points labeled "1", "2", "3", "4" (one for each corner)
+    - **Order matters**: Annotate in clockwise order starting from top-left
+    - **Edges**: Automatically connects corners in a quadrilateral based on the SVG definition
+    - **Confidence attribute**: Numeric (0-100%, default 100) to capture prediction confidence for filtering low-quality detections
 
 ### Step 1.3: Upload Raw Quadrat Images
 
