@@ -98,8 +98,26 @@ This folder contains the `function.yaml` configuration file that defines:
 ```yaml
 metadata:
   name: pth-{model-name}           # Unique function name
-  labels:
-    nuclio.io/project-name: cvat   # Deploy to CVAT project
+  namespace: cvat
+  annotations:
+    name: Model description (e.g., "Grid corners detection")
+    type: detector                 # or "tracker", "interactor"
+    spec: |
+      [
+        {
+          "name": "label_name",
+          "type": "polygon",          # or "skeleton", "points"
+          "attributes": [
+            {
+              "name": "confidence",
+              "input_type": "number",
+              "mutable": true,
+              "values": ["0", "100", "1"],
+              "default_value": "100"
+            }
+          ]
+        }
+      ]
 
 spec:
   handler: main:handler              # Python handler function
@@ -122,6 +140,32 @@ spec:
     requests:
       memory: 8Gi                   # Memory requirement
 ```
+
+!!! info "Confidence Attribute and Score Conversion"
+    The `confidence` attribute in the label spec captures model prediction confidence:
+
+    **Score Conversion Process:**
+
+    1. **Model output**: Prediction scores are typically between 0 and 1 (e.g., 0.87 for 87% confidence)
+    2. **Percentage conversion**: Convert to 0-100 range by multiplying by 100: `score * 100`
+    3. **String formatting**: Return as string in the handler JSON response (e.g., `"87"`)
+
+    **CVAT 2.29.0 Compatibility:**
+
+    - CVAT 2.29.0 does **not handle float values** for numeric attributes
+    - The confidence attribute expects **integer values** (0-100) converted to **strings** in the handler response
+    - Example conversion in handler:
+      ```python
+      confidence_score = prediction.conf.item()  # 0.0-1.0 from model
+      confidence_percent = str(int(confidence_score * 100))  # "0"-"100" for CVAT
+      ```
+
+    This allows users to:
+
+    - Filter low-confidence predictions in CVAT
+    - Sort annotations by confidence score
+    - Perform quality control on automated annotations
+    - Prioritize review of uncertain predictions
 
 ### Step 3: Review Handler Function
 
