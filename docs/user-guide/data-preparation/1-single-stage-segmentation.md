@@ -656,9 +656,7 @@ cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 # Pull project annotations into FiftyOne
-python create_fiftyone_dataset.py \
-    --cvat-project-name "my_coral_segmentation" \
-    --dataset-name "my_coral_segmentation_fo"
+python create_fiftyone_dataset.py "my_coral_segmentation"
 ```
 
 **What this does:**
@@ -675,7 +673,7 @@ INFO: Connecting to CVAT at http://localhost:8080
 INFO: Found project 'my_coral_segmentation' (ID: 5)
 INFO: Downloading 120 images...
 INFO: Processing annotations...
-INFO: Created FiftyOne dataset 'my_coral_segmentation_fo' with 120 samples
+INFO: Created FiftyOne dataset 'my_coral_segmentation' with 120 samples
 INFO: Dataset stored in PROJ_ROOT/criobe/data_engineering/data/media/my_coral_segmentation
 ```
 
@@ -685,7 +683,7 @@ Launch the FiftyOne app to verify your dataset:
 
 ```bash
 # From within the pixi shell
-fiftyone app launch my_coral_segmentation_fo
+fiftyone app launch my_coral_segmentation
 ```
 
 This opens a browser at `http://localhost:5151` showing:
@@ -714,7 +712,7 @@ pixi shell -e coral-seg-yolo-dev
 
 # Convert dataset
 python src/prepare_data.py \
-    --dataset-name my_coral_segmentation_fo \
+    --dataset-name my_coral_segmentation \
     --output-dir data/prepared_for_training/my_dataset
 ```
 
@@ -747,7 +745,7 @@ pixi shell -e dinov2-mmseg
 
 # Convert dataset
 python prepare_data.py \
-    --dataset-name my_coral_segmentation_fo \
+    --dataset-name my_coral_segmentation \
     --output-dir data/prepared_for_training/my_dataset
 ```
 

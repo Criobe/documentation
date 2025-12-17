@@ -381,21 +381,17 @@ cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 # Pull corner detection annotations (optional, for records)
-python create_fiftyone_dataset.py \
-    --cvat-project-name "banggai_corner_detection" \
-    --dataset-name "banggai_corners_fo"
+python create_fiftyone_dataset.py "banggai_corner_detection"
 
 # Pull segmentation annotations (main dataset)
-python create_fiftyone_dataset.py \
-    --cvat-project-name "banggai_coral_segmentation" \
-    --dataset-name "banggai_segmentation_fo"
+python create_fiftyone_dataset.py "banggai_coral_segmentation"
 ```
 
 ### Verify and Prepare for Training
 
 ```bash
 # Launch FiftyOne app
-fiftyone app launch banggai_segmentation_fo
+fiftyone app launch banggai_coral_segmentation
 ```
 
 Verify:
@@ -413,7 +409,7 @@ cd PROJ_ROOT/criobe/coral_seg_yolo
 pixi shell -e coral-seg-yolo-dev
 
 python src/prepare_data.py \
-    --dataset-name banggai_segmentation_fo \
+    --dataset-name banggai_coral_segmentation \
     --output-dir data/prepared_for_training/banggai_dataset
 ```
 
@@ -424,7 +420,7 @@ cd PROJ_ROOT/criobe/DINOv2_mmseg
 pixi shell -e dinov2-mmseg
 
 python prepare_data.py \
-    --dataset-name banggai_segmentation_fo \
+    --dataset-name banggai_coral_segmentation \
     --output-dir data/prepared_for_training/banggai_dataset
 ```
 

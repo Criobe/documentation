@@ -135,7 +135,7 @@ python create_fiftyone_dataset.py "banggai_corner_detection"
 **Verify corner dataset:**
 
 ```bash
-fiftyone app launch criobe_corners_fo
+fiftyone app launch criobe_corner_annotation
 ```
 
 Check:
@@ -156,7 +156,7 @@ python create_fiftyone_dataset.py "criobe_grid_annotation"
 **Verify grid dataset:**
 
 ```bash
-fiftyone app launch criobe_grid_fo
+fiftyone app launch criobe_grid_annotation
 ```
 
 Check:
@@ -190,7 +190,7 @@ python src/prepare_data.py gridcorners
 **Expected output:**
 
 ```
-INFO: Loading FiftyOne dataset: criobe_corners_fo
+INFO: Loading FiftyOne dataset: criobe_corner_annotation
 INFO: Found 200 samples (train: 140, val: 40, test: 20)
 INFO: Converting 4-point skeletons to YOLO format...
 INFO: Processing train split: 140 samples
@@ -225,7 +225,7 @@ python src/prepare_data.py gridpose
 **Output:**
 
 ```
-INFO: Loading FiftyOne dataset: criobe_grid_fo
+INFO: Loading FiftyOne dataset: criobe_grid_annotation
 INFO: Found 180 samples (train: 126, val: 36, test: 18)
 INFO: Converting 117-point skeletons to YOLO format...
 INFO: Created keypoint template: assets/kp_template_gridpose.npy

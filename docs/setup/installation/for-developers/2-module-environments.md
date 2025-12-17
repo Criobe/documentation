@@ -685,8 +685,8 @@ pixi run -e grid-pose-dev jupyter lab          # Jupyter
 
 # data_engineering
 cd data_engineering
-pixi run python create_fiftyone_dataset.py     # Pull from CVAT
-pixi run fiftyone app launch                   # Launch FiftyOne
+pixi run python create_fiftyone_dataset.py <project_name>  # Pull from CVAT
+pixi run fiftyone app launch                                # Launch FiftyOne
 ```
 
 ### Verification Checklist

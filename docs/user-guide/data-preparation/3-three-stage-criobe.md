@@ -665,37 +665,31 @@ cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 # Pull corner detection annotations (optional, for records)
-python create_fiftyone_dataset.py \
-    --cvat-project-name "criobe_corner_annotation" \
-    --dataset-name "criobe_corners_fo"
+python create_fiftyone_dataset.py "criobe_corner_annotation"
 
 # Pull grid detection annotations (optional, for analysis)
-python create_fiftyone_dataset.py \
-    --cvat-project-name "criobe_grid_annotation" \
-    --dataset-name "criobe_grid_fo"
+python create_fiftyone_dataset.py "criobe_grid_annotation"
 
 # Pull final segmentation dataset (main dataset)
-python create_fiftyone_dataset.py \
-    --cvat-project-name "criobe_finegrained_annotated" \
-    --dataset-name "criobe_finegrained_fo"
+python create_fiftyone_dataset.py "criobe_finegrained_annotated"
 ```
 
 ### Organize Multi-Stage Dataset
 
 The FiftyOne datasets now contain:
 
-- **criobe_corners_fo**: Raw images + 4-point corner annotations
-- **criobe_grid_fo**: Warped images + 117-point grid annotations
-- **criobe_finegrained_fo**: Clean images + coral annotations (FiftyOne polylines from CVAT polygons)
+- **criobe_corner_annotation**: Raw images + 4-point corner annotations
+- **criobe_grid_annotation**: Warped images + 117-point grid annotations
+- **criobe_finegrained_annotated**: Clean images + coral annotations (FiftyOne polylines from CVAT polygons)
 
 **Verify in FiftyOne app:**
 
 ```bash
 # View segmentation dataset
-fiftyone app launch criobe_finegrained_fo
+fiftyone app launch criobe_finegrained_annotated
 
 # Compare across stages
-fiftyone app launch criobe_corners_fo criobe_grid_fo criobe_finegrained_fo
+fiftyone app launch criobe_corner_annotation criobe_grid_annotation criobe_finegrained_annotated
 ```
 
 ### Prepare for Training
@@ -707,7 +701,7 @@ cd PROJ_ROOT/criobe/coral_seg_yolo
 pixi shell -e coral-seg-yolo-dev
 
 python src/prepare_data.py \
-    --dataset-name criobe_finegrained_fo \
+    --dataset-name criobe_finegrained_annotated \
     --output-dir data/prepared_for_training/criobe_finegrained
 ```
 
@@ -718,7 +712,7 @@ cd PROJ_ROOT/criobe/DINOv2_mmseg
 pixi shell -e dinov2-mmseg
 
 python prepare_data.py \
-    --dataset-name criobe_finegrained_fo \
+    --dataset-name criobe_finegrained_annotated \
     --output-dir data/prepared_for_training/criobe_finegrained
 ```
 
@@ -731,13 +725,13 @@ pixi shell -e grid-pose-dev
 # Prepare corner detection data
 python src/prepare_data.py \
     --task gridcorners \
-    --dataset criobe_corners_fo \
+    --dataset criobe_corner_annotation \
     --output-dir data/prepared_for_training/gridcorners
 
 # Prepare grid pose data
 python src/prepare_data.py \
     --task gridpose \
-    --dataset criobe_grid_fo \
+    --dataset criobe_grid_annotation \
     --output-dir data/prepared_for_training/gridpose
 ```
 
@@ -852,12 +846,9 @@ python src/prepare_data.py \
        print([p.name for p in projects])
        ```
 
-    4. Retry with verbose logging:
+    4. Retry the dataset pull:
        ```bash
-       python create_fiftyone_dataset.py \
-           --cvat-project-name "criobe_finegrained_annotated" \
-           --dataset-name "criobe_finegrained_fo" \
-           --verbose
+       python create_fiftyone_dataset.py "criobe_finegrained_annotated"
        ```
 
 ## Batch Processing at Scale

@@ -45,7 +45,7 @@ This guide walks you through training YOLOv11 segmentation models on your annota
 Ensure you have:
 
 - [x] Completed one of the [Data Preparation Guides](../data-preparation/index.md)
-- [x] FiftyOne dataset with polyline annotations (e.g., `criobe_finegrained_fo` or `banggai_segmentation_fo`)
+- [x] FiftyOne dataset with polyline annotations (e.g., `criobe_finegrained_annotated` or `banggai_coral_segmentation`)
 - [x] CUDA-capable GPU with 8GB+ VRAM
 - [x] Pixi installed and configured
 - [x] At least 100GB free disk space
@@ -120,20 +120,16 @@ cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
 # Pull your segmentation project
-python create_fiftyone_dataset.py \
-    --cvat-project-name "criobe_finegrained_annotated" \
-    --dataset-name "criobe_finegrained_fo"
+python create_fiftyone_dataset.py "criobe_finegrained_annotated"
 
 # Or for Banggai dataset
-python create_fiftyone_dataset.py \
-    --cvat-project-name "banggai_coral_segmentation" \
-    --dataset-name "banggai_segmentation_fo"
+python create_fiftyone_dataset.py "banggai_coral_segmentation"
 ```
 
 **Verify dataset in FiftyOne:**
 
 ```bash
-fiftyone app launch criobe_finegrained_fo
+fiftyone app launch criobe_finegrained_annotated
 ```
 
 Check:
@@ -151,7 +147,7 @@ Check:
 cd PROJ_ROOT/criobe/coral_seg_yolo
 pixi shell -e coral-seg-yolo-dev
 
-python src/prepare_data.py criobe_finegrained_fo
+python src/prepare_data.py criobe_finegrained_annotated
 ```
 
 **What this script does:**
@@ -165,26 +161,26 @@ python src/prepare_data.py criobe_finegrained_fo
 **Expected output:**
 
 ```
-INFO: Loading FiftyOne dataset: criobe_finegrained_fo
+INFO: Loading FiftyOne dataset: criobe_finegrained_annotated
 INFO: Found 450 samples (train: 315, val: 90, test: 45)
 INFO: Converting polylines to YOLO segmentation format...
 INFO: Processing train split: 315 samples
 INFO: Processing val split: 90 samples
 INFO: Processing test split: 45 samples
 INFO: Created dataset.yaml with 16 classes
-INFO: Dataset prepared at: data/coral_annotation_yolo_seg/criobe_finegrained_fo
+INFO: Dataset prepared at: data/coral_annotation_yolo_seg/criobe_finegrained_annotated
 ```
 
 ### 3.2 Verify Output Structure
 
 ```bash
-tree data/coral_annotation_yolo_seg/criobe_finegrained_fo -L 2
+tree data/coral_annotation_yolo_seg/criobe_finegrained_annotated -L 2
 ```
 
 Expected structure:
 
 ```
-data/coral_annotation_yolo_seg/criobe_finegrained_fo/
+data/coral_annotation_yolo_seg/criobe_finegrained_annotated/
 ├── dataset.yaml          # YOLO dataset configuration
 ├── train/
 │   ├── images/           # Training images
@@ -200,13 +196,13 @@ data/coral_annotation_yolo_seg/criobe_finegrained_fo/
 ### 3.3 Inspect dataset.yaml
 
 ```bash
-cat data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml
+cat data/coral_annotation_yolo_seg/criobe_finegrained_annotated/dataset.yaml
 ```
 
 Should contain:
 
 ```yaml
-path: PROJ_ROOT/criobe/coral_seg_yolo/data/coral_annotation_yolo_seg/criobe_finegrained_fo
+path: PROJ_ROOT/criobe/coral_seg_yolo/data/coral_annotation_yolo_seg/criobe_finegrained_annotated
 train: train/images
 val: val/images
 test: test/images
@@ -238,7 +234,7 @@ names:
 
 ```bash
 # Check a sample label file
-head -3 data/coral_annotation_yolo_seg/criobe_finegrained_fo/train/labels/sample_001.txt
+head -3 data/coral_annotation_yolo_seg/criobe_finegrained_annotated/train/labels/sample_001.txt
 ```
 
 YOLO segmentation format:
@@ -282,7 +278,7 @@ nano experiments/my_training.yaml
 model: yolo11m-seg.pt  # Change to desired size
 
 # Dataset
-data: data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml
+data: data/coral_annotation_yolo_seg/criobe_finegrained_annotated/dataset.yaml
 
 # Training hyperparameters
 epochs: 100            # Number of training epochs
@@ -360,7 +356,7 @@ pixi run -e coral-seg-yolo yolo task=segment mode=train \
 ```bash
 pixi run -e coral-seg-yolo yolo segment train \
     model=yolo11m-seg.pt \
-    data=data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml \
+    data=data/coral_annotation_yolo_seg/criobe_finegrained_annotated/dataset.yaml \
     epochs=100 \
     imgsz=1920 \
     batch=16 \
@@ -442,7 +438,7 @@ Evaluate the best model on the test set:
 ```bash
 pixi run -e coral-seg-yolo yolo segment val \
     model=runs/segment/criobe_finegrained_yolo11m/weights/best.pt \
-    data=data/coral_annotation_yolo_seg/criobe_finegrained_fo/dataset.yaml \
+    data=data/coral_annotation_yolo_seg/criobe_finegrained_annotated/dataset.yaml \
     split=test \
     imgsz=1920 \
     save_json=true
@@ -465,7 +461,7 @@ For detailed error analysis, use FiftyOne integration:
 
 ```bash
 pixi run -e coral-seg-yolo-dev python src/fiftyone_evals.py \
-    --dataset-name criobe_finegrained_fo \
+    --dataset-name criobe_finegrained_annotated \
     --model-path runs/segment/criobe_finegrained_yolo11m/weights/best.pt \
     --pred-field-name "predictions_yolo11m"
 ```
@@ -481,7 +477,7 @@ pixi run -e coral-seg-yolo-dev python src/fiftyone_evals.py \
 **Launch FiftyOne app:**
 
 ```bash
-fiftyone app launch criobe_finegrained_fo
+fiftyone app launch criobe_finegrained_annotated
 ```
 
 **Interactive analysis:**
@@ -802,7 +798,7 @@ Train models on different taxonomic hierarchies by creating transformed datasets
 # Step 1: Create FiftyOne dataset with extended taxonomy (in data_engineering/)
 cd PROJ_ROOT/criobe/data_engineering
 python create_cvat_annotation_tasks.py \
-    --source-dataset criobe_finegrained_fo \
+    --source-dataset criobe_finegrained_annotated \
     --target-dataset criobe_extended_fo \
     --taxonomy extended
 
@@ -817,7 +813,7 @@ python src/prepare_data.py criobe_extended_fo
 # Step 1: Create FiftyOne dataset with main families taxonomy
 cd PROJ_ROOT/criobe/data_engineering
 python create_cvat_annotation_tasks.py \
-    --source-dataset criobe_finegrained_fo \
+    --source-dataset criobe_finegrained_annotated \
     --target-dataset criobe_main_families_fo \
     --taxonomy main_families
 

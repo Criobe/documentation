@@ -290,13 +290,9 @@ cp .env.example .env
 # Edit .env with CVAT_URL, CVAT_USERNAME, CVAT_PASSWORD
 
 # Pull dataset from CVAT
-pixi run python create_fiftyone_dataset.py \
-    --project-name "criobe_finegrained_annotated" \
-    --output-dir data/pulled_from_cvat/criobe_finegrained
+pixi run python create_fiftyone_dataset.py "criobe_finegrained_annotated"
 
-# This creates a persistent FiftyOne dataset
-# Images stored in: data/media/criobe_finegrained_annotated/
-# Annotations: data/pulled_from_cvat/criobe_finegrained/
+# This creates a persistent FiftyOne dataset named "criobe_finegrained_annotated"
 ```
 
 ## Step 4: Explore Datasets with FiftyOne

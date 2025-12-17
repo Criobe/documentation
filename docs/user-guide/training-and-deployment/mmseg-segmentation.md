@@ -115,9 +115,7 @@ If you haven't already created the FiftyOne dataset:
 cd PROJ_ROOT/criobe/data_engineering
 pixi shell
 
-python create_fiftyone_dataset.py \
-    --cvat-project-name "criobe_finegrained_annotated" \
-    --dataset-name "criobe_finegrained_fo"
+python create_fiftyone_dataset.py "criobe_finegrained_annotated"
 ```
 
 ### 2.2 Convert to MMSegmentation Format
@@ -126,7 +124,7 @@ python create_fiftyone_dataset.py \
 cd PROJ_ROOT/criobe/DINOv2_mmseg
 pixi shell -e dinov2-mmseg
 
-python prepare_data.py criobe_finegrained_fo
+python prepare_data.py criobe_finegrained_annotated
 ```
 
 **What this script does:**
@@ -143,7 +141,7 @@ python prepare_data.py criobe_finegrained_fo
 **Expected output:**
 
 ```
-INFO: Loading FiftyOne dataset: criobe_finegrained_fo
+INFO: Loading FiftyOne dataset: criobe_finegrained_annotated
 INFO: Found 450 samples (train: 315, val: 90, test: 45)
 INFO: Converting polylines to semantic masks...
 INFO: Processing train split: 315 samples
