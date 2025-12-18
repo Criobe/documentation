@@ -120,7 +120,7 @@ mkdir -p ~/quadratseg-platform
 cd ~/quadratseg-platform
 
 # Clone CRIOBE's CVAT repository (criobe branch)
-git clone -b criobe https://github.com/criobe/cvat.git
+git clone --recurse-submodules -b criobe https://github.com/criobe/cvat.git
 cd cvat
 
 # Verify you're on the criobe branch

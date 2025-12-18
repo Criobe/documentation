@@ -223,7 +223,7 @@ Bridge is part of the CVAT repository. Only needed if you want to modify bridge 
 ```bash
 # Clone CVAT repository with bridge (use criobe branch)
 cd ~/Projects
-git clone -b criobe https://github.com/criobe/cvat.git
+git clone --recurse-submodules -b criobe https://github.com/criobe/cvat.git
 cd cvat/bridge
 
 # Install environment

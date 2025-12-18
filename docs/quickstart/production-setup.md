@@ -76,7 +76,7 @@ docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu20.04 nvidia-smi
 
 ```bash
 # Clone the CRIOBE fork of CVAT (use criobe branch)
-git clone -b criobe https://github.com/criobe/cvat.git
+git clone --recurse-submodules -b criobe https://github.com/criobe/cvat.git
 cd cvat
 
 # Verify you're on the criobe branch
