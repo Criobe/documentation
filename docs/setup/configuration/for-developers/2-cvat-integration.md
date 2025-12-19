@@ -896,14 +896,14 @@ pixi run -e coral-seg-yolo yolo cfg=experiments/train_cfg_yolo_extended.yaml mod
 
 # Compare in FiftyOne
 pixi run -e coral-seg-yolo-dev python src/fiftyone_evals.py \
-    --dataset_name criobe_finegrained_annotated \
-    --model_path runs/train_finegrained/weights/best.pt \
-    --predicted_field_name preds_finegrained
+    --dataset-name criobe_finegrained_annotated \
+    --model-path runs/train_finegrained/weights/best.pt \
+    --predicted-field-name preds_finegrained
 
 pixi run -e coral-seg-yolo-dev python src/fiftyone_evals.py \
-    --dataset_name criobe_extended_annotated \
-    --model_path runs/train_extended/weights/best.pt \
-    --predicted_field_name preds_extended
+    --dataset-name criobe_extended_annotated \
+    --model-path runs/train_extended/weights/best.pt \
+    --predicted-field-name preds_extended
 ```
 
 ### Workflow 4: Quality Control

@@ -461,9 +461,9 @@ For detailed error analysis, use FiftyOne integration:
 
 ```bash
 pixi run -e coral-seg-yolo-dev python src/fiftyone_evals.py \
-    --dataset-name criobe_finegrained_annotated \
-    --model-path runs/segment/criobe_finegrained_yolo11m/weights/best.pt \
-    --pred-field-name "predictions_yolo11m"
+    --dataset_name criobe_finegrained_annotated \
+    --model_path runs/segment/criobe_finegrained_yolo11m/weights/best.pt \
+    --predicted_field_name "predictions_yolo11m"
 ```
 
 **What this does:**
@@ -555,10 +555,7 @@ pixi run -e coral-seg-yolo-dev python src/inference_demo.py \
     results/inference_output/ \
     runs/segment/criobe_finegrained_yolo11m/weights/best.pt \
     --method overlapping \
-    --patch-size 1920 \
-    --overlap 0.2 \
-    --conf-threshold 0.25 \
-    --iou-threshold 0.5
+    --conf 0.25
 ```
 
 **Inference methods:**
@@ -797,10 +794,9 @@ Train models on different taxonomic hierarchies by creating transformed datasets
 ```bash
 # Step 1: Create FiftyOne dataset with extended taxonomy (in data_engineering/)
 cd PROJ_ROOT/criobe/data_engineering
-python create_cvat_annotation_tasks.py \
-    --source-dataset criobe_finegrained_annotated \
-    --target-dataset criobe_extended_fo \
-    --taxonomy extended
+python create_cvat_annotation_tasks.py create_and_upload_extended \
+    criobe_finegrained_annotated \
+    criobe_extended_fo
 
 # Step 2: Export to YOLO format (in coral_seg_yolo/)
 cd PROJ_ROOT/criobe/coral_seg_yolo
@@ -812,10 +808,9 @@ python src/prepare_data.py criobe_extended_fo
 ```bash
 # Step 1: Create FiftyOne dataset with main families taxonomy
 cd PROJ_ROOT/criobe/data_engineering
-python create_cvat_annotation_tasks.py \
-    --source-dataset criobe_finegrained_annotated \
-    --target-dataset criobe_main_families_fo \
-    --taxonomy main_families
+python create_cvat_annotation_tasks.py create_and_upload_main_familys \
+    criobe_finegrained_annotated \
+    criobe_main_families_fo
 
 # Step 2: Export to YOLO format
 cd PROJ_ROOT/criobe/coral_seg_yolo

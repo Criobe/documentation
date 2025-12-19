@@ -445,10 +445,10 @@ For integration with warping and grid removal:
 
 ```bash
 pixi run -e grid-pose python src/gridpose_inference.py predict_as_yolo_txt \
-    --test-dir data/test_samples/1-raw_jpg/ \
-    --model-path runs/pose/gridcorners_yolo11n/weights/best.pt \
-    --template-path assets/kp_template_corners.npy \
-    --output-dir results/corners_yolo_format
+    --test_dir data/test_samples/1-raw_jpg/ \
+    --model_path runs/pose/gridcorners_yolo11n/weights/best.pt \
+    --template_path assets/kp_template_corners.npy \
+    --output_dir results/corners_yolo_format
 ```
 
 Creates `.txt` files compatible with YOLO format for downstream processing.
