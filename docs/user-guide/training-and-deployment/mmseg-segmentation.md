@@ -163,14 +163,15 @@ Expected structure:
 
 ```
 data/prepared_for_training/criobe_finegrained/
-├── images/
-│   ├── train/              # Training images (JPG)
-│   ├── val/                # Validation images
-│   └── test/               # Test images
-├── annotations/
-│   ├── train/              # Semantic masks (PNG, single-channel)
-│   ├── val/
-│   └── test/
+├── train/
+│   ├── data/               # Training images (JPG)
+│   └── labels/             # Semantic masks (PNG, single-channel)
+├── val/
+│   ├── data/               # Validation images (JPG)
+│   └── labels/             # Semantic masks (PNG, single-channel)
+├── test/
+│   ├── data/               # Test images (JPG)
+│   └── labels/             # Semantic masks (PNG, single-channel)
 ├── classes.txt             # Class names (one per line)
 ├── palette.txt             # RGB color palette for visualization
 └── dataset_info.py         # MMSeg dataset configuration
@@ -183,7 +184,7 @@ data/prepared_for_training/criobe_finegrained/
 python -c "
 import cv2
 import numpy as np
-mask = cv2.imread('data/prepared_for_training/criobe_finegrained/annotations/train/sample_001.png', 0)
+mask = cv2.imread('data/prepared_for_training/criobe_finegrained/train/labels/Mangareva_2017_01.png', 0)
 print(f'Mask shape: {mask.shape}')
 print(f'Unique classes: {np.unique(mask)}')
 print(f'Class distribution: {np.bincount(mask.flatten())}')
@@ -199,190 +200,41 @@ Class distribution: [2845632  156743   23456  ...] # Pixel counts per class
 
 ## Step 3: Configure Training
 
-### 3.1 Understanding MMSeg Configs
+MMSegmentation uses hierarchical Python configuration files. Pre-configured training configs are in `DINOv2_mmseg/configs/`.
 
-MMSegmentation uses hierarchical configuration files:
+**Config structure:**
 
-```
-configs/
-├── _base_/
-│   ├── models/           # Model architectures
-│   ├── datasets/         # Dataset configs
-│   ├── schedules/        # Training schedules
-│   └── default_runtime.py
-└── dinov2_vitb14_coralsegv4_ms_config_segformer.py  # Main config
-```
+- **Base config** (`dinov2_vitb14_*_ms_config_base.py`): Model, dataset, training schedule, data augmentation
+- **Head config** (`dinov2_vitb14_*_ms_config_segformer.py`): Decoder head (extends base config)
 
-### 3.2 Edit Main Training Config
+**View example configs:**
 
-```bash
-nano configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py
-```
+- [dinov2_vitb14_banggai_ms_config_base.py](https://github.com/criobe-pf/DINOv2_mmseg/blob/main/configs/dinov2_vitb14_banggai_ms_config_base.py)
+- [dinov2_vitb14_banggai_ms_config_segformer.py](https://github.com/criobe-pf/DINOv2_mmseg/blob/main/configs/dinov2_vitb14_banggai_ms_config_segformer.py)
 
-Key sections to configure:
+**Key parameters to adjust:**
 
-```python
-_base_ = [
-    'mmseg::_base_/models/segformer_mit-b0.py',
-    'mmseg::_base_/datasets/ade20k.py',
-    'mmseg::_base_/default_runtime.py',
-    'mmseg::_base_/schedules/schedule_160k.py'
-]
+**In base config:**
 
-# Model configuration
-model = dict(
-    type='EncoderDecoder',
-    backbone=dict(
-        type='mmseg.VisionTransformer',
-        img_size=(1920, 1920),
-        patch_size=14,
-        embed_dims=768,
-        num_layers=12,
-        num_heads=12,
-        mlp_ratio=4,
-        out_indices=[2, 5, 8, 11],  # Multi-level features
-        qkv_bias=True,
-        drop_rate=0.0,
-        attn_drop_rate=0.0,
-        drop_path_rate=0.1,
-        with_cls_token=True,
-        frozen_stages=-1,  # -1 = train all, 0+ = freeze first N stages
-        interpolate_mode='bicubic',
-        init_cfg=dict(
-            type='Pretrained',
-            checkpoint='facebook/dinov2-base',  # DINOv2 pretrained weights
-            prefix='backbone.'
-        )
-    ),
-    decode_head=dict(
-        type='SegformerHead',
-        in_channels=[768, 768, 768, 768],  # Match backbone out_indices
-        in_index=[0, 1, 2, 3],
-        channels=256,
-        dropout_ratio=0.1,
-        num_classes=16,  # Adjust for your taxonomy
-        norm_cfg=dict(type='SyncBN', requires_grad=True),
-        align_corners=False,
-        loss_decode=dict(
-            type='CrossEntropyLoss',
-            use_sigmoid=False,
-            loss_weight=1.0
-        )
-    ),
-    train_cfg=dict(),
-    test_cfg=dict(mode='whole')  # 'whole' or 'slide' for large images
-)
+- `data_root`: Path to prepared dataset (e.g., `./data/coral_annotation_dinov2_mmseg/criobe_finegrained_annotated`)
+- `crop_size`: Training crop size (default: 518×518, larger = more memory but better accuracy)
+- `batch_size`: Samples per GPU (default: 5, reduce if OOM)
+- `num_workers`: Data loading workers (default: 8 train, 4 val)
+- `max_epochs`: Training epochs (default: 150)
+- `val_interval`: Validation frequency (default: every 20 epochs)
+- `lr`: Learning rate (default: 0.001)
+- `freeze_vit`: Freeze DINOv2 backbone (default: `True`, set `False` to fine-tune)
 
-# Dataset configuration
-dataset_type = 'CustomDataset'
-data_root = 'data/prepared_for_training/criobe_finegrained'
+**In head config:**
 
-img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53],  # ImageNet normalization
-    std=[58.395, 57.12, 57.375],
-    to_rgb=True
-)
-
-train_pipeline = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations'),
-    dict(type='Resize', img_scale=(1920, 1920), keep_ratio=True),
-    dict(type='RandomFlip', prob=0.5, direction='horizontal'),
-    dict(type='RandomFlip', prob=0.5, direction='vertical'),
-    dict(type='PhotoMetricDistortion'),  # Color augmentation
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size=(1920, 1920), pad_val=0, seg_pad_val=255),
-    dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_semantic_seg'])
-]
-
-# Multi-scale training for better accuracy
-train_pipeline_multiscale = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations'),
-    dict(
-        type='RandomResize',
-        ratio_range=(0.5, 2.0),  # Random scale
-        keep_ratio=True
-    ),
-    dict(type='RandomCrop', crop_size=(1280, 1280)),  # Random crop
-    dict(type='RandomFlip', prob=0.5, direction='horizontal'),
-    dict(type='RandomFlip', prob=0.5, direction='vertical'),
-    dict(type='PhotoMetricDistortion'),
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size=(1280, 1280), pad_val=0, seg_pad_val=255),
-    dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_semantic_seg'])
-]
-
-# Training schedule
-optimizer = dict(
-    type='AdamW',
-    lr=0.0001,  # Initial learning rate
-    betas=(0.9, 0.999),
-    weight_decay=0.01
-)
-
-optimizer_config = dict(
-    type='GradientCumulativeOptimizerHook',
-    cumulative_iters=2  # Gradient accumulation for large images
-)
-
-lr_config = dict(
-    policy='poly',
-    power=0.9,
-    min_lr=1e-6,
-    by_epoch=False
-)
-
-runner = dict(type='EpochBasedRunner', max_epochs=160)
-checkpoint_config = dict(by_epoch=True, interval=10)  # Save every 10 epochs
-evaluation = dict(interval=10, metric='mIoU', pre_eval=True, save_best='mIoU')
-
-# Data loaders
-data = dict(
-    samples_per_gpu=4,  # Batch size per GPU (adjust for VRAM)
-    workers_per_gpu=4,  # Data loading workers
-    train=dict(
-        type=dataset_type,
-        data_root=data_root,
-        img_dir='images/train',
-        ann_dir='annotations/train',
-        pipeline=train_pipeline_multiscale  # Use multi-scale
-    ),
-    val=dict(
-        type=dataset_type,
-        data_root=data_root,
-        img_dir='images/val',
-        ann_dir='annotations/val',
-        pipeline=val_pipeline
-    ),
-    test=dict(
-        type=dataset_type,
-        data_root=data_root,
-        img_dir='images/test',
-        ann_dir='annotations/test',
-        pipeline=test_pipeline
-    )
-)
-```
+- `num_classes`: Number of coral genera (16 for criobe_finegrained, 11 for banggai_extended)
 
 !!! tip "Batch Size Tuning for VRAM"
-    - **16GB VRAM**: `samples_per_gpu=2`, `crop_size=(1280, 1280)`
-    - **24GB VRAM**: `samples_per_gpu=4`, `crop_size=(1920, 1920)`
-    - **40GB+ VRAM**: `samples_per_gpu=8`, full multi-scale
+    Adjust `batch_size` in the base config based on your GPU memory:
 
-### 3.3 Optional: Freeze Backbone Layers
-
-For faster training or limited data:
-
-```python
-backbone=dict(
-    ...
-    frozen_stages=6,  # Freeze first 6 layers, train last 6
-    ...
-)
-```
+    - **16GB VRAM**: `batch_size=2`, `crop_size=(518, 518)`
+    - **24GB VRAM**: `batch_size=4-5`, `crop_size=(518, 518)` or larger
+    - **40GB+ VRAM**: `batch_size=8`, `crop_size=(1024, 1024)`
 
 ## Step 4: Train DINOv2 + SegFormer
 
