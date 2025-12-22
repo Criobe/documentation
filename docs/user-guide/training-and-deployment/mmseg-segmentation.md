@@ -330,32 +330,6 @@ pixi run -e dinov2-mmseg python test.py \
 +----------------+-------+-------+
 ```
 
-### 5.2 Test Set Evaluation
-
-```bash
-pixi run -e dinov2-mmseg python test.py \
-    configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
-    work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
-    --show-dir work_dirs/criobe_finegrained_dinov2_segformer/test_results
-```
-
-!!! tip "Testing on Test Split"
-    By default, test.py evaluates on the validation split. To evaluate on the test split, modify the `data.test` section in your config file to point to your test dataset.
-
-### 5.3 Confusion Matrix Analysis
-
-Generate confusion matrix using MMSegmentation's analysis tools:
-
-```bash
-pixi run -e dinov2-mmseg mim run mmseg confusion_matrix \
-    configs/dinov2_vitb14_coralsegv4_ms_config_segformer.py \
-    work_dirs/criobe_finegrained_dinov2_segformer/best_mIoU_epoch_140.pth \
-    --show \
-    --save-dir work_dirs/criobe_finegrained_dinov2_segformer/confusion
-```
-
-Generates confusion matrix showing which classes are most often confused.
-
 ## Step 6: Two-Stage Inference (Semantic → Instance)
 
 DINOv2 produces semantic masks (pixel-level classification). For instance segmentation, use the two-stage pipeline with CoralSCoP refinement.
