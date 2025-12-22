@@ -289,15 +289,6 @@ Open `http://localhost:6006` to view:
 - Per-class IoU metrics
 - Learning rate schedule
 
-### 4.4 Training Duration
-
-Typical training times (160 epochs, 450 images, RTX 4090):
-
-- **DINOv2-base + SegFormer**: ~24-30 hours
-- **Each epoch**: ~8-10 minutes
-
-**Checkpointing:** Best model (highest mIoU) automatically saved to `work_dirs/*/best_mIoU_*.pth`
-
 ## Step 5: Evaluate Semantic Segmentation
 
 ### 5.1 Validation Set Evaluation

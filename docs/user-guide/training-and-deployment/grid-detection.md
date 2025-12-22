@@ -347,14 +347,6 @@ Epoch    GPU_mem   box_loss   pose_loss   kobj_loss   cls_loss  Instances       
 - **kobj_loss**: Keypoint objectness loss
 - **Pose(mAP50)**: Mean Average Precision for keypoints (aim for >0.85)
 
-### 4.4 Training Duration
-
-**Expected training times:**
-- **GridCorners**: ~2-3 hours on RTX 4090 (70 epochs)
-- **GridPose**: ~4-6 hours on RTX 4090 (70 epochs)
-
-**Note:** Training completes automatically and includes evaluation on validation set.
-
 ## Step 5: Evaluate Models
 
 !!! note "Automatic Evaluation"

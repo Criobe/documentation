@@ -404,15 +404,6 @@ Open browser at `http://localhost:6006` to view:
 - Learning rate schedule
 - Sample predictions
 
-### 5.4 Training Duration
-
-Typical training times (yolo11m-seg, 450 images, RTX 4090):
-
-- **100 epochs**: ~8 hours
-- **Each epoch**: ~4-5 minutes
-
-**Early stopping:** Training may stop early if validation mAP doesn't improve for `patience` epochs (default 30).
-
 ## Step 6: Evaluate Model
 
 ### 6.1 Automatic Validation
