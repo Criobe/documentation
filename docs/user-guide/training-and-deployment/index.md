@@ -90,6 +90,7 @@ Before starting any training guide, ensure you have:
 - [x] **Pixi environment manager** installed
 - [x] **Sufficient disk space** (50GB+ for datasets and model checkpoints)
 - [x] **FiftyOne datasets** created from CVAT projects
+- [x] **Environment variables configured** per [Environment Variables Guide](../../setup/configuration/for-developers/1-environment-variables.md)
 
 !!! tip "Complete Data Preparation First"
     These guides assume you have already completed one of the data preparation workflows:

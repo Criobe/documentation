@@ -58,6 +58,9 @@ Ensure you have:
 
 ## Step 1: Environment Setup
 
+!!! info "Environment Variables Required"
+    Before proceeding, ensure your `.env` file is configured with data paths and processing settings. See the [Environment Variables Guide](../../setup/configuration/for-developers/1-environment-variables.md) for the complete `grid_inpainting` configuration.
+
 ### 1.1 Navigate to Module
 
 ```bash

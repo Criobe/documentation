@@ -43,6 +43,7 @@ Before deploying, ensure you have:
 - [x] CVAT instance running
 - [x] Bridge service running (for webhook integration)
 - [x] `nuctl` CLI tool installed
+- [x] Environment variables configured (see [Environment Variables Guide](../../setup/configuration/for-developers/1-environment-variables.md))
 
 **Verify Nuclio is running:**
 

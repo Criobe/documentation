@@ -110,10 +110,11 @@ FIFTYONE_CVAT_PASSWORD=your_secure_password
 # CVAT_API_TOKEN=your_api_token_here
 
 # =============================================================================
-# FiftyOne Settings
+# FiftyOne Settings (Centralized MongoDB)
 # =============================================================================
-# FiftyOne database directory
-FIFTYONE_DATABASE_DIR=~/.fiftyone
+# MongoDB connection (recommended - shared across all Python environments)
+FIFTYONE_DATABASE_URI=mongodb://localhost:27017
+FIFTYONE_DATABASE_NAME=fiftyone
 
 # FiftyOne dataset directory (persistent storage)
 FIFTYONE_DATASET_DIR=./data/fiftyone_datasets
@@ -221,6 +222,12 @@ nano .env
 FIFTYONE_CVAT_URL=http://localhost:8080
 FIFTYONE_CVAT_USERNAME=admin
 FIFTYONE_CVAT_PASSWORD=your_secure_password
+
+# =============================================================================
+# FiftyOne Settings (Centralized MongoDB)
+# =============================================================================
+FIFTYONE_DATABASE_URI=mongodb://localhost:27017
+FIFTYONE_DATABASE_NAME=fiftyone
 
 # =============================================================================
 # Data Paths
@@ -343,6 +350,12 @@ FIFTYONE_CVAT_USERNAME=admin
 FIFTYONE_CVAT_PASSWORD=your_secure_password
 
 # =============================================================================
+# FiftyOne Settings (Centralized MongoDB)
+# =============================================================================
+FIFTYONE_DATABASE_URI=mongodb://localhost:27017
+FIFTYONE_DATABASE_NAME=fiftyone
+
+# =============================================================================
 # Data Paths
 # =============================================================================
 DATA_ROOT=./data
@@ -414,6 +427,12 @@ nano .env
 FIFTYONE_CVAT_URL=http://localhost:8080
 FIFTYONE_CVAT_USERNAME=admin
 FIFTYONE_CVAT_PASSWORD=your_secure_password
+
+# =============================================================================
+# FiftyOne Settings (Centralized MongoDB)
+# =============================================================================
+FIFTYONE_DATABASE_URI=mongodb://localhost:27017
+FIFTYONE_DATABASE_NAME=fiftyone
 
 # =============================================================================
 # Data Paths
@@ -521,6 +540,71 @@ BATCH_SIZE=1  # Inpainting is memory-intensive
 NUM_WORKERS=2
 ```
 
+## Centralized FiftyOne Database with MongoDB
+
+When FiftyOne is installed across multiple Python environments (e.g., different Pixi modules), each environment may create its own local database. This can lead to:
+
+- Dataset fragmentation across environments
+- MongoDB version conflicts between environments
+- Difficulty sharing datasets between modules
+
+**Solution**: Deploy a centralized MongoDB database using Docker that all environments connect to.
+
+### Deploy MongoDB with Docker
+
+```bash
+# Create and run a MongoDB container
+# - No authentication required (FiftyOne connects without password)
+# - Restarts automatically on system boot (Linux) or Docker Desktop start (Windows/macOS)
+docker run -d \
+  --name fiftyone-mongodb \
+  --restart unless-stopped \
+  -p 27017:27017 \
+  -v fiftyone-mongo-data:/data/db \
+  mongo:latest
+
+# Verify it's running
+docker ps | grep fiftyone-mongodb
+```
+
+!!! info "Automatic Restart"
+    The `--restart unless-stopped` flag ensures MongoDB starts automatically:
+
+    - **Linux**: Container restarts when the system boots
+    - **Windows/macOS**: Container restarts when Docker Desktop starts
+
+### Configure Environment Variables
+
+Add these variables to each module's `.env` file:
+
+```bash
+# MongoDB connection for FiftyOne
+FIFTYONE_DATABASE_URI=mongodb://localhost:27017
+FIFTYONE_DATABASE_NAME=fiftyone
+```
+
+### Benefits
+
+- **Single database**: All datasets accessible from any Python environment
+- **Version consistency**: Avoids MongoDB version conflicts between Pixi environments
+- **Easy sharing**: Datasets created in one module are immediately available in others
+- **Persistent storage**: Data persists in Docker volume across container restarts
+
+### Verify Connection
+
+```bash
+pixi run python -c "
+import fiftyone as fo
+
+# This will use the MongoDB specified in FIFTYONE_DATABASE_URI
+datasets = fo.list_datasets()
+print(f'✓ Connected to centralized MongoDB')
+print(f'✓ Found {len(datasets)} datasets')
+for ds in datasets[:5]:
+    print(f'  - {ds}')
+"
+```
+
 ## Environment Variables Reference
 
 ### Complete Variable List
@@ -532,6 +616,9 @@ NUM_WORKERS=2
 | `FIFTYONE_CVAT_USERNAME` | CVAT username | `admin` | All modules with CVAT |
 | `FIFTYONE_CVAT_PASSWORD` | CVAT password | Required | All modules with CVAT |
 | `CVAT_API_TOKEN` | Alternative auth | Optional | All modules with CVAT |
+| **FiftyOne Settings** | | | |
+| `FIFTYONE_DATABASE_URI` | MongoDB connection URI | `mongodb://localhost:27017` | All modules |
+| `FIFTYONE_DATABASE_NAME` | MongoDB database name | `fiftyone` | All modules |
 | **Data Paths** | | | |
 | `DATA_ROOT` | Root data directory | `./data` | All modules |
 | `MEDIA_DIR` | Images from CVAT | `data/media` | All modules |

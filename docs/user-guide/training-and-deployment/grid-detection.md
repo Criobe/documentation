@@ -85,6 +85,9 @@ Ensure you have:
 
 ## Step 1: Environment Setup
 
+!!! info "Environment Variables Required"
+    Before proceeding, ensure your `.env` file is configured with CVAT connection settings, FiftyOne MongoDB, and data paths. See the [Environment Variables Guide](../../setup/configuration/for-developers/1-environment-variables.md) for the complete `grid_pose_detection` configuration.
+
 ### 1.1 Navigate to Module
 
 ```bash

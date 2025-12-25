@@ -136,7 +136,7 @@ python prepare_data.py criobe_finegrained_annotated
 5. Creates class mapping and color palette
 
 !!! note "Configuration"
-    Output directory, taxonomy, and image size are configured via environment variables in the `.env` file, not CLI arguments. The script uses Fire for CLI parsing with a single positional argument (dataset name).
+    Output directory, taxonomy, and image size are configured via environment variables in the `.env` file, not CLI arguments. See the [Environment Variables Guide](../../setup/configuration/for-developers/1-environment-variables.md) for the complete `DINOv2_mmseg` configuration. The script uses Fire for CLI parsing with a single positional argument (dataset name).
 
 **Expected output:**
 
